@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Expenses</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="text_mobile_number">Mobile Number</string>
+    <string name="text_email">Email</string>
+    <string name="text_name">Name</string>
+    <string name="text_save">Save</string>
+    <string name="title_activity_profile">My Profile</string>
+    <string name="rs_symbol">₹</string>
+    <string name="menu_search">Search</string>
+    <string name="no_groups">No Groups.\nCreate Group by clicking \'+\' above.</string>
+    <string name="menu_new_group">New Group</string>
+</resources>

@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "88149946343",
+    "firebase_url": "https://ar-expenses.firebaseio.com",
+    "project_id": "ar-expenses",
+    "storage_bucket": "ar-expenses.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:88149946343:android:6abe001c42fc8ac0",
+        "android_client_info": {
+          "package_name": "com.afterroot.expenses"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "88149946343-vf0e5hcaq32saobvks021nj2th2egcv2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.expenses",
+            "certificate_hash": "c4c1401827ceb8ea36fd16eb945032fe135ba7d1"
+          }
+        },
+        {
+          "client_id": "88149946343-gj7jo8thrc6kctnp6bbffituo1dq0cse.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afterroot.expenses",
+            "certificate_hash": "34179262c4455e27b8dcd2eb5e8c634b2434eaa2"
+          }
+        },
+        {
+          "client_id": "88149946343-22nguv8rcga769gaqk0bvmah7amtpnli.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfK3jsXPkOoR6UxTrggop2pAHmr5bLOVU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "88149946343-22nguv8rcga769gaqk0bvmah7amtpnli.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
