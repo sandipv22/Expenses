@@ -3,8 +3,8 @@ package com.afterroot.expenses.utils
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.support.v4.content.ContextCompat
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.afterroot.expenses.BuildConfig
 import com.afterroot.expenses.model.User
 import com.firebase.ui.auth.AuthUI
@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
 import java.util.*
 
 
@@ -19,10 +20,10 @@ import java.util.*
  * Created by Sandip on 04-12-2017.
  */
 object Utils {
-    private var providers = Arrays.asList(
-            AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-            AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build(),
-            AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build())
+    private var providers = arrayListOf(
+            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.PhoneBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build())
     /*     AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
          AuthUI.IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build())*/
 
@@ -66,6 +67,27 @@ object Utils {
             builder.toString()
         }
     }
+
+    fun formatNames(map: HashMap<String, String>): String {
+        val builder = StringBuilder()
+        var i = 0
+        map.forEach {
+            i++
+            when (i) {
+                map.size -> builder.append(it.value)
+                map.size - 1 -> builder.append(it.value + " and ")
+                else -> builder.append(it.value + ", ")
+            }
+        }
+        return builder.toString()
+    }
+
+    fun formatPhone(context: Context, phone: String): String {
+        val phoneUtil = PhoneNumberUtil.createInstance(context)
+        val number = phoneUtil.parse(phone, "IN")
+        val test = number.nationalNumber.toString()
+        return test.replace("[\\D]", "")
+    }
 }
 
 class PermissionChecker(private val mContext: Context) {
@@ -91,6 +113,7 @@ object DBConstants {
     val USERS = "users"
     val EXPENSES = "expenses"
     val GROUPS = "groups"
+    val CATEGORIES = "categories"
 
     val FIELD_NAME = "name"
     val FIELD_EMAIL = "email"
@@ -114,7 +137,7 @@ object FirebaseUtils {
 
     val firebaseUser: FirebaseUser? = null
         get() {
-            Log.d("FirebaseUtils", "FirebaseUtils.getFirebaseUser: getting user")
+            Log.d("FirebaseUtils", "FirebaseUtils.getFirebaseUser: getting firebaseUser")
             return field ?: auth!!.currentUser
         }
 
@@ -141,28 +164,28 @@ object FirebaseUtils {
         userRef.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
                 Log.d("FirebaseUser", "DocumentSnapshot data: " + documentSnapshot.data)
-                callbacks.onSuccess(documentSnapshot.toObject(User::class.java))
+                callbacks.onSuccess(documentSnapshot.toObject(User::class.java)!!)
             } else {
                 callbacks.onFailed("User Not Exists")
             }
         }.addOnFailureListener { exception ->
-                    Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
-                    callbacks.onFailed(exception.message!!)
-                }
+            Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
+            callbacks.onFailed(exception.message!!)
+        }
     }
 
     inline fun <reified T> getByID(ref: DocumentReference, callbacks: FirebaseUtils.Callbacks<T>) {
         ref.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
                 Log.d("FirebaseUser", "DocumentSnapshot data: " + documentSnapshot.data)
-                callbacks.onSuccess(documentSnapshot.toObject(T::class.java))
+                callbacks.onSuccess(documentSnapshot.toObject(T::class.java)!!)
             } else {
                 callbacks.onFailed("User Not Exists")
             }
         }.addOnFailureListener { exception ->
-                    Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
-                    callbacks.onFailed(exception.message!!)
-                }
+            Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
+            callbacks.onFailed(exception.message!!)
+        }
     }
 
 }

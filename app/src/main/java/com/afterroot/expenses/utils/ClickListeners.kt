@@ -1,6 +1,5 @@
 package com.afterroot.expenses.utils
 
-import android.net.Uri
 import com.afterroot.expenses.model.ExpenseItem
 
 interface ExpenseClickCallbacks {
@@ -9,14 +8,10 @@ interface ExpenseClickCallbacks {
 }
 
 interface ListClickCallbacks<in T> {
-    fun onListItemClick(item: T?)
-    fun onListItemLongClick(item: T?)
+    fun onListItemClick(item: T?, docId: String)
+    fun onListItemLongClick(item: T?, docId: String)
 }
 
 interface OnSaveButtonClick {
     fun onSaveButtonClicked()
-}
-
-interface OnFragmentInteractionListener {
-    fun onFragmentInteraction(uri: Uri)
 }
