@@ -1,8 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.ExpenseDetailFragment">
 
-</FrameLayout>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/detail_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textSize="48sp"
+        app:fontFamily="sans-serif-thin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="₹500AaBbCc" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/detail_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableStart="@drawable/ic_list"
+        android:drawablePadding="@dimen/text_drawable_padding"
+        android:gravity="center_vertical"
+        android:padding="@dimen/text_item_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@+id/detail_amount"
+        tools:text="Category" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/detail_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_calender"
+        android:drawablePadding="@dimen/text_drawable_padding"
+        android:gravity="center_vertical"
+        android:padding="@dimen/text_item_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@+id/detail_category"
+        tools:text="Date" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/detail_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_short_text"
+        android:drawablePadding="@dimen/text_drawable_padding"
+        android:gravity="center_vertical"
+        android:padding="@dimen/text_item_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@+id/detail_date"
+        tools:text="Note" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/detail_paid_by"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_person"
+        android:drawablePadding="@dimen/text_drawable_padding"
+        android:gravity="center_vertical"
+        android:padding="@dimen/text_item_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@+id/detail_note"
+        tools:text="Paid by" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/detail_spenders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_users"
+        android:drawablePadding="@dimen/text_drawable_padding"
+        android:gravity="center_vertical"
+        android:padding="@dimen/text_item_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@+id/detail_paid_by"
+        tools:text="Spenders" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
