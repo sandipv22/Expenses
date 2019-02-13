@@ -1,57 +1,12 @@
 package com.afterroot.expenses.ui
 
-import android.Manifest
-import android.animation.ObjectAnimator
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
-import android.preference.PreferenceManager
-import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.v13.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentTransaction
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.AppCompatTextView
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.Toast
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.expenses.R
-import com.afterroot.expenses.fragment.*
-import com.afterroot.expenses.model.ExpenseItem
-import com.afterroot.expenses.model.Group
-import com.afterroot.expenses.model.User
-import com.afterroot.expenses.utils.*
-import com.afterroot.expenses.utils.Constants.PREF_KEY_FIRST_START
-import com.afterroot.expenses.utils.Constants.RC_PERMISSIONS
-import com.afterroot.expenses.utils.Constants.RC_SIGN_IN
-import com.firebase.ui.auth.ErrorCodes
-import com.firebase.ui.auth.IdpResponse
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.nav_header_main.view.*
-
+/*
 class MainActivity : AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
-        OnFragmentInteractionListener,
         OnSaveButtonClick {
 
     var db = FirebaseFirestore.getInstance()
-    val TAG = "MainActivity"
+    val TAG = this.javaClass.simpleName
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
@@ -82,22 +37,27 @@ class MainActivity : AppCompatActivity(),
 
     private fun updateHeader(view: View) {
         view.apply {
-            header_username.text = FirebaseUtils.NAME
-            header_email.text = FirebaseUtils.EMAIL
-
+            FirebaseAuth.getInstance().currentUser.let {
+                if (it != null) {
+                    header_username.text = it.displayName
+                    header_email.text = it.email
+                }
+            }
         }
     }
 
     private fun navigate() {
-        when {
-            supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
-            supportFragmentManager.backStackEntryCount == 1 -> {
-                supportFragmentManager.popBackStack()
-                animateArrow(0f)
-                fab.show()
+        supportFragmentManager.let {
+            when {
+                supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
+                supportFragmentManager.backStackEntryCount == 1 -> {
+                    supportFragmentManager.popBackStack()
+                    fab.show()
+                }
+                supportFragmentManager.backStackEntryCount == 0 -> drawer_layout.openDrawer(GravityCompat.START)
             }
-            supportFragmentManager.backStackEntryCount == 0 -> drawer_layout.openDrawer(GravityCompat.START)
         }
+
     }
 
     override fun onBackPressed() {
@@ -109,15 +69,15 @@ class MainActivity : AppCompatActivity(),
     }
 
     private val expenseItemListCallback = object : ListClickCallbacks<ExpenseItem> {
-        override fun onListItemClick(item: ExpenseItem?) {
-            replaceFragment(ExpenseDetailFragment.newInstance(item!!), R.id.fragment_container) {
+        override fun onListItemClick(item: ExpenseItem?, docId: String) {
+            val fragment = ExpenseDetailFragment.newInstance(item!!)
+            replaceFragment(fragment, R.id.fragment_container) {
                 addToBackStack("expense")
             }
-            animateArrow(1f)
             fab.show()
         }
 
-        override fun onListItemLongClick(item: ExpenseItem?) {
+        override fun onListItemLongClick(item: ExpenseItem?, docId: String) {
 
         }
 
@@ -131,41 +91,37 @@ class MainActivity : AppCompatActivity(),
     }
 
     private val groupItemCallbacks = object : ListClickCallbacks<Group> {
-        override fun onListItemClick(item: Group?) {
+        override fun onListItemClick(item: Group?, docId: String) {
             showProgress(true)
-            val query = db.collection(DBConstants.GROUPS).whereEqualTo(DBConstants.FIELD_GROUP_NAME, item?.group_name)
-            query.get().addOnCompleteListener { task ->
-                Log.d(TAG, "onListItemClick: ID ${task.result.documents[0].id}")
-                ObjectAnimator.ofFloat(toggle!!.drawerArrowDrawable, "progress", 1f).start()
-                toolbar.title = item!!.group_name
-                replaceFragment(ExpenseListFragment.with(task.result.documents[0].id, expenseItemListCallback), R.id.fragment_container) {
-                    addToBackStack("group")
-                }
-                fab.setOnClickListener {
-                    fab.hide()
-                    replaceFragment(AddExpenseFragment.newInstance(task.result.documents[0].id), R.id.fragment_container) {
-                        addToBackStack("expense")
-                    }
-                }
-                showProgress(false)
+            val fragment = AddExpenseFragment.newInstance(docId)
+            ObjectAnimator.ofFloat(toggle!!.drawerArrowDrawable, "progress", 1f).start()
+            val expenseListFragment = ExpenseListFragment.with(expenseItemListCallback)
+            expenseListFragment.arguments = Bundle().apply {
+                putString("GROUP_NAME", item!!.group_name)
             }
+            replaceFragment(expenseListFragment, R.id.fragment_container) {
+                addToBackStack("group")
+            }
+            fab.setOnClickListener {
+                replaceFragment(fragment, R.id.fragment_container) {
+                    addToBackStack("expense")
+                }
+                fab.hide()
+            }
+            showProgress(false)
         }
 
-        override fun onListItemLongClick(item: Group?) {
-            Toast.makeText(this@MainActivity, "Long Clicked: ${item?.group_name}", Toast.LENGTH_SHORT).show()
-            val query = db.collection(DBConstants.GROUPS).whereEqualTo(DBConstants.FIELD_GROUP_NAME, item?.group_name)
+        override fun onListItemLongClick(item: Group?, docId: String) {
             AlertDialog.Builder(this@MainActivity)
                     .setTitle("Delete ${item!!.group_name}")
                     .setMessage("Do you want to delete this group?")
-                    .setPositiveButton("Delete", { dialogInterface, i ->
+                    .setPositiveButton("Delete") { dialogInterface, _ ->
                         dialogInterface.dismiss()
                         val progress = MaterialDialog.Builder(this@MainActivity).progress(true, 1).content("Deleting").show()
-                        query.get().addOnCompleteListener { task ->
-                            db.collection(DBConstants.GROUPS).document(task.result.documents[0].id).delete().addOnSuccessListener {
-                                progress.dismiss()
-                            }
+                        db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                            progress.dismiss()
                         }
-                    }).show()
+                    }.show()
         }
 
     }
@@ -177,6 +133,10 @@ class MainActivity : AppCompatActivity(),
             groupsFragment = GroupsFragment.with(groupItemCallbacks)
             addFragment(groupsFragment!!, R.id.fragment_container)
             addUserInfoInDB()
+
+            val token = FirebaseInstanceId.getInstance().token
+
+            Log.d(TAG, "init: FCM token: $token")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -196,12 +156,12 @@ class MainActivity : AppCompatActivity(),
         return AlertDialog.Builder(this)
                 .setTitle("Sign In")
                 .setMessage("Please Sign In to Continue")
-                .setPositiveButton("Sign In", { _, _ ->
+                .setPositiveButton("Sign In") { _, _ ->
                     Utils.startFirebaseUI(this, RC_SIGN_IN)
-                })
-                .setNegativeButton("Cancel", { _, _ ->
+                }
+                .setNegativeButton("Cancel") { _, _ ->
                     finish()
-                }).setCancelable(false)
+                }.setCancelable(false)
     }
 
     private fun addUserInfoInDB() {
@@ -216,28 +176,28 @@ class MainActivity : AppCompatActivity(),
         val userRef = db.collection(DBConstants.USERS).document(curUser.uid)
         Log.d(TAG, "addUserInfoInDB: Started")
         userRef.get().addOnCompleteListener { getUserTask ->
-            if (getUserTask.isSuccessful) {
-                val uidDocSnapshot = getUserTask.result
-                when {
-                    uidDocSnapshot.exists() -> Log.d("MainActivity", "DocumentSnapshot data: " + uidDocSnapshot.data)
-                    else -> {
-                        val dialog = MaterialDialog.Builder(this).progress(true, 1).content("Creating User...").show()
-                        Log.d(TAG, "User not available. Creating User..")
-                        val user = User(curUser.displayName!!,
-                                curUser.email!!,
-                                curUser.uid,
-                                curUser.phoneNumber!!)
+            when {
+                getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
+                    val dialog = MaterialDialog.Builder(this).progress(true, 1).content("Creating User...").show()
+                    Log.d(TAG, "User not available. Creating User..")
+                    val firebaseUser = User(curUser.displayName!!,
+                            curUser.email!!,
+                            curUser.uid,
+                            curUser.phoneNumber!!)
 
-                        userRef.set(user).addOnCompleteListener { setUserTask ->
-                            if (setUserTask.isSuccessful) {
+                    userRef.set(firebaseUser).addOnCompleteListener { setUserTask ->
+                        when {
+                            setUserTask.isSuccessful -> {
                                 Log.d(TAG, "User Created")
-                                Log.d("MainActivity", "DocumentSnapshot data: " + setUserTask.result)
-                            } else Log.e(TAG, "Can't create user", setUserTask.exception)
-                            dialog.dismiss()
+                                Log.d(TAG, "DocumentSnapshot data: " + setUserTask.result)
+                            }
+                            else -> Log.e(TAG, "Can't create firebaseUser", setUserTask.exception)
                         }
+                        dialog.dismiss()
                     }
                 }
-            } else Log.e(TAG, "Unknown Error", getUserTask.exception)
+                else -> Log.e(TAG, "Unknown Error", getUserTask.exception)
+            }
         }
     }
 
@@ -279,7 +239,7 @@ class MainActivity : AppCompatActivity(),
     private fun checkPermissions(permissions: Array<out String>) {
         if (PermissionChecker(this).isPermissionsNeeded(*permissions)) {
             Log.d(TAG, "checkPermissions: Requesting Permissions")
-            ActivityCompat.requestPermissions(this, permissions, Constants.RC_PERMISSIONS)
+            androidx.legacy.app.ActivityCompat.requestPermissions(this, permissions, Constants.RC_PERMISSIONS)
         } else {
             Log.d(TAG, "checkPermissions: Permissions Granted. Now initializing")
             init()
@@ -297,7 +257,7 @@ class MainActivity : AppCompatActivity(),
                     }, 1000)
                 } else {
                     Log.d(TAG, "onRequestPermissionsResult: Permissions not granted")
-                    Snackbar.make(main_content, "Please grant permissions", Snackbar.LENGTH_INDEFINITE).setAction("GRANT", {
+                    com.google.android.material.snackbar.Snackbar.make(main_content, "Please grant permissions", com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE).setAction("GRANT", {
                         checkPermissions(permissions)
                     }).show()
                     setInfoMessage(main_info_message, "Please Grant Permissions")
@@ -327,15 +287,15 @@ class MainActivity : AppCompatActivity(),
                 when (resultCode) {
                     Activity.RESULT_OK -> {
                         Log.d(TAG, "onActivityResult: Result was ok")
-                        val user = FirebaseAuth.getInstance().currentUser
+                        val firebaseUser = FirebaseAuth.getInstance().currentUser
                         when {
-                            user != null -> {
+                            firebaseUser != null -> {
                                 PreferenceManager.getDefaultSharedPreferences(this).edit()
                                         .putBoolean(PREF_KEY_FIRST_START, false)
                                         .apply()
-                                Snackbar.make(main_content, "Welcome ${user.displayName}", Snackbar.LENGTH_SHORT).show()
+                                com.google.android.material.snackbar.Snackbar.make(main_content, "Welcome ${firebaseUser.displayName}", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
                                 val handler = Handler()
-                                handler.postDelayed({ addUserInfoInDB() }, 500)
+                                handler.postDelayed({ checkPermissions(permissions) }, 500)
                             }
                         }
                     }
@@ -345,11 +305,11 @@ class MainActivity : AppCompatActivity(),
                             Toast.makeText(this, "Sign In Cancelled", Toast.LENGTH_SHORT).show()
                             return
                         }
-                        response.errorCode == ErrorCodes.NO_NETWORK -> {
+                        response.error!!.errorCode == ErrorCodes.NO_NETWORK -> {
                             Toast.makeText(this, "No network", Toast.LENGTH_SHORT).show()
                             return
                         }
-                        response.errorCode == ErrorCodes.UNKNOWN_ERROR -> {
+                        response.error!!.errorCode == ErrorCodes.UNKNOWN_ERROR -> {
                             Toast.makeText(this, "Unknown Error", Toast.LENGTH_SHORT).show()
                             return
                         }
@@ -364,27 +324,25 @@ class MainActivity : AppCompatActivity(),
 
     }
 
-    override fun onFragmentInteraction(uri: Uri) {
-
-    }
-
-    /**
+    */
+/**
      * @see <a href="https://medium.com/thoughts-overflow/how-to-add-a-fragment-in-kotlin-way-73203c5a450b">Source: How to Add a Fragment the Kotlin way</a></p>
-     */
-    private inline fun FragmentManager.inTransaction(func: FragmentTransaction.() -> FragmentTransaction) {
+ *//*
+
+    private inline fun androidx.fragment.app.FragmentManager.inTransaction(func: androidx.fragment.app.FragmentTransaction.() -> androidx.fragment.app.FragmentTransaction) {
         beginTransaction().setCustomAnimations(R.anim.slide_in_right,
                 R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right).func().commit()
         resetInfoMessage(main_info_message)
     }
 
-    private fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int, func: (FragmentTransaction.() -> FragmentTransaction)? = null) {
+    private fun AppCompatActivity.addFragment(fragment: androidx.fragment.app.Fragment, frameId: Int, func: (androidx.fragment.app.FragmentTransaction.() -> androidx.fragment.app.FragmentTransaction)? = null) {
         when {
             func != null -> supportFragmentManager.inTransaction { add(frameId, fragment).func() }
             else -> supportFragmentManager.inTransaction { add(frameId, fragment) }
         }
     }
 
-    private fun AppCompatActivity.replaceFragment(fragment: Fragment, frameId: Int, func: (FragmentTransaction.() -> FragmentTransaction)? = null) {
+    private fun AppCompatActivity.replaceFragment(fragment: androidx.fragment.app.Fragment, frameId: Int, func: (androidx.fragment.app.FragmentTransaction.() -> androidx.fragment.app.FragmentTransaction)? = null) {
         when {
             func != null -> supportFragmentManager.inTransaction { replace(frameId, fragment).func() }
             else -> supportFragmentManager.inTransaction { replace(frameId, fragment) }
@@ -406,11 +364,6 @@ class MainActivity : AppCompatActivity(),
                 text = null
             }
         }
-
-        fun animateArrow(progress: Float) {
-            ObjectAnimator.ofFloat(toggle!!.drawerArrowDrawable, "progress", progress).start()
-        }
-
-        fun getProgress(): Float = toggle!!.drawerArrowDrawable.progress
     }
 }
+*/
