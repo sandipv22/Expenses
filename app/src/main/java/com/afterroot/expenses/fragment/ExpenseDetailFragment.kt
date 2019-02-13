@@ -1,64 +1,53 @@
 package com.afterroot.expenses.fragment
 
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.*
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.utils.Constants
-import com.afterroot.expenses.utils.OnFragmentInteractionListener
+import kotlinx.android.synthetic.main.fragment_expense_detail.*
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [ExpenseDetailFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [ExpenseDetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
-class ExpenseDetailFragment : Fragment() {
+class ExpenseDetailFragment : androidx.fragment.app.Fragment() {
     private var item: ExpenseItem? = null
-    private var listener: OnFragmentInteractionListener? = null
+    private var fragmentView: View? = null
+    private val TAG = "ExpenseDetailFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
         arguments?.let {
             item = it.getSerializable(Constants.KEY_EXPENSE_SERIALIZE) as ExpenseItem?
-            Log.d("ExpenseDetailFragment", "onAttach: ${item.toString()}")
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_expense_detail, container, false)
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
+        fragmentView = inflater.inflate(R.layout.fragment_expense_detail, container, false)
+        return fragmentView
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater!!.inflate(R.menu.menu_expense_detail, menu)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+    override fun onStart() {
+        super.onStart()
+        detail_category.text = item!!.category
+        detail_amount.text = String.format("%s%d", getString(R.string.rs_symbol), item!!.amount)
+        detail_date.text = item!!.date.toString()
+        detail_note.text = item!!.note
+        detail_paid_by.text = item!!.paidBy
+        val builder = StringBuilder()
+        var i = 0
+        item!!.with!!.forEach {
+            i++
+            when (i) {
+                item!!.with!!.size -> builder.append(it.value)
+                item!!.with!!.size - 1 -> builder.append(it.value + " and ")
+                else -> builder.append(it.value + ", ")
+            }
+            detail_spenders.text = builder
         }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
     }
 
     companion object {

@@ -1,35 +1,31 @@
 package com.afterroot.expenses.fragment
 
 import android.app.DatePickerDialog
-import android.app.ProgressDialog.show
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.app.Fragment
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.expenses.CategoryItemListDialogFragment
 import com.afterroot.expenses.R
-import com.afterroot.expenses.R.id.fab_add_transaction
+import com.afterroot.expenses.model.Category
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
 import com.afterroot.expenses.utils.DBConstants
 import com.afterroot.expenses.utils.FirebaseUtils
 import com.afterroot.expenses.utils.FirebaseUtils.getByID
+import com.afterroot.expenses.utils.ListClickCallbacks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import kotlinx.android.synthetic.main.fragment_add_expense.*
 import kotlinx.android.synthetic.main.fragment_add_expense.view.*
-import kotlinx.android.synthetic.main.fragment_categoryitem_list.view.*
-import kotlinx.android.synthetic.main.list_item_user.view.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Created by Sandip on 05-12-2017.
@@ -40,13 +36,12 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_add_expense, container, false)
-
         return fragmentView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        init(view)
+    override fun onStart() {
+        super.onStart()
+        init(fragmentView!!)
     }
 
     private var year: Int? = 0
@@ -57,7 +52,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         year = cal.get(Calendar.YEAR)
         month = cal.get(Calendar.MONTH)
         day = cal.get(Calendar.DAY_OF_MONTH)
-        val datePicker = DatePickerDialog(activity, this, year!!, month!!, day!!)
+        val datePicker = DatePickerDialog(fragmentView!!.context, this, year!!, month!!, day!!)
         datePicker.show()
     }
 
@@ -66,81 +61,136 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var pickedDate: GregorianCalendar? = null
     lateinit var groupID: String
 
+    val usersMap = HashMap<String, User>()
+    private val withUserMap = HashMap<String, User>()
+    private var paidByID: String = ""
+    private var paidByName: String = ""
+    private lateinit var category: String
+    private var millis: Long = 0
+
     private fun init(view: View) {
+        groupID = arguments!!.getString("id")!!
+        category = getString(R.string.text_uncategorized)
+        db = FirebaseFirestore.getInstance()
+        db!!.firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
+        getGroupUsers(null)
         fragmentView!!.apply {
             text_input_date.setOnClickListener {
                 showDatePicker()
             }
             text_input_category.setOnClickListener {
-                CategoryItemListDialogFragment.newInstance(30).show(activity!!.supportFragmentManager, "category")
+                CategoryItemListDialogFragment.with(groupID, object : ListClickCallbacks<Category> {
+                    override fun onListItemClick(item: Category?, docId: String) {
+                        category = item!!.name
+                        text_input_category.text = item.name
+                    }
+
+                    override fun onListItemLongClick(item: Category?, docId: String) {
+
+                    }
+
+                }).show(activity!!.supportFragmentManager, "category")
             }
             text_paid_by.apply {
                 setOnClickListener {
-                    val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
-                    val ref = db!!.collection(DBConstants.GROUPS).document(groupID)
-                    getByID(ref, object : FirebaseUtils.Callbacks<Group> {
-                        override fun onSuccess(value: Group) {
-                            val usersList = ArrayList<User>()
-                            val namesList = ArrayList<String>()
-                            var i = value.members!!.size
-                            for (item in value.members!!) {
-                                getByID(db!!.collection(DBConstants.USERS).document(item.key!!), object : FirebaseUtils.Callbacks<User> {
-                                    override fun onSuccess(user: User) {
-                                        i--
-                                        Log.d("TESTAG", "onSuccess: $user pos : $i")
-                                        usersList.add(user)
-                                        namesList.add(user.name)
-                                        if (i == 0) {
-                                            progress.dismiss()
-                                            MaterialDialog.Builder(activity!!).items(namesList).itemsCallback { dialog, itemView, position, text ->
-                                                Log.d("TESTAG", "onSuccess: $position $text ${usersList[position].name} ${usersList[position].uid}")
-
-                                            }.show()
-                                        }
-                                    }
-
-                                    override fun onFailed(message: String) {
-
-                                    }
-
-                                })
+                    if (isAllUsersAdded) {
+                        MaterialDialog.Builder(activity!!).items(usersMap.keys).itemsCallback { dialog, itemView, position, text ->
+                            Log.d("TESTAG", "onSuccess: Direct Load $position $text ${usersMap[text]!!.name} ${usersMap[text]!!.uid}")
+                            paidByID = usersMap[text]!!.uid
+                            paidByName = text as String
+                            view.text_paid_by.text = paidByName
+                        }.show()
+                    } else {
+                        val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
+                        getGroupUsers(object : FirebaseUtils.Callbacks<HashMap<String, User>> {
+                            override fun onSuccess(value: HashMap<String, User>) {
+                                progress.dismiss()
+                                MaterialDialog.Builder(activity!!).items(value.keys).itemsCallback { dialog, itemView, position, text ->
+                                    Log.d("TESTAG", "onSuccess: Wait Load $position $text ${value[text]!!.name} ${value[text]!!.uid}")
+                                    paidByID = value[text]!!.uid
+                                    paidByName = text as String
+                                    view.text_paid_by.text = paidByName
+                                }.show()
                             }
-                        }
 
-                        override fun onFailed(message: String) {
-                        }
+                            override fun onFailed(message: String) {
+                            }
 
-                    })
+                        })
+                    }
+
                 }
             }
             text_spenders.apply {
                 setOnClickListener {
+                    if (isAllUsersAdded) {
+                        //TODO add method to remove selected payer
+                        //referenceMap.remove(paidByName)
+                        val builder = StringBuilder()
+                        MaterialDialog.Builder(activity!!).items(referenceMap.keys)
+                                .itemsCallbackMultiChoice(null) { dialog: MaterialDialog, which: Array<Int>, text: Array<CharSequence> ->
+                                    var i = 0
+                                    text.forEach {
+                                        i++
+                                        when (i) {
+                                            text.size -> builder.append(it.toString())
+                                            text.size - 1 -> builder.append(it.toString() + " and ")
+                                            else -> builder.append(it.toString() + ", ")
+                                        }
+                                        Log.d("TESTAG", "$builder")
+                                        text_spenders.text = builder
+                                        val user = referenceMap[it.toString()]
+                                        withUserMap[user!!.name] = user
+                                        Log.d("TESTAG", "Added to Final Map ${user.name}")
+                                    }
+                                    return@itemsCallbackMultiChoice true
+                                }.positiveText("OK").onPositive { dialog, which ->
+                                }.show()
+                    } else {
+                        val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
+                        getGroupUsers(object : FirebaseUtils.Callbacks<HashMap<String, User>> {
+                            override fun onSuccess(value: HashMap<String, User>) {
+                                progress.dismiss()
+                                value.remove(paidByName)
+                                MaterialDialog.Builder(activity!!).items(value.keys)
+                                        .itemsCallbackMultiChoice(null) { materialDialog: MaterialDialog, ints: Array<Int>, arrayOfCharSequences: Array<CharSequence> ->
+                                            Log.d("TESTAG", "onSuccess: ${ints.size}")
+                                            return@itemsCallbackMultiChoice true
+                                        }.positiveText("OK").onPositive { dialog, which ->
 
+                                        }.show()
+                            }
+
+                            override fun onFailed(message: String) {
+                            }
+
+                        })
+                    }
                 }
             }
         }
-        db = FirebaseFirestore.getInstance()
-        db!!.firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
         Handler().postDelayed({
             fab_add_transaction.apply {
                 show()
                 setOnClickListener {
                     if (verifyData(view)) {
-                        /*val list = text_input_spenders.sortedRecipients
-                        val finalList: ArrayList<String> = ArrayList()
-                        list.mapTo(finalList) { it.toString() }
+                        /* val finalList = ArrayList<String>()
+                         withUserMap.values.mapTo(finalList) { it.uid }*/
+                        val map: HashMap<String, String>? = HashMap()
+                        withUserMap.values.forEach {
+                            map!![it.uid] = it.name
+                        }
                         item = ExpenseItem(view.text_input_amount.text.toString().toLong(),
-                                "Test",
+                                category,
                                 Date(millis),
-                                view.text_input_note.text.toString(), view.text_input_paid_by.text.toString(),
-                                finalList
+                                view.text_input_note.text.toString(), paidByID,
+                                map
                         )
                         db!!.collection(DBConstants.GROUPS)
                                 .document(groupID)
                                 .collection(DBConstants.EXPENSES).add(item!!).addOnSuccessListener { documentReference ->
-                            *//*activity!!.supportFragmentManager.popBackStack()*//*
-                            activity!!.onBackPressed()
-                        }*/
+                                    activity!!.supportFragmentManager.popBackStack()
+                                }
                     }
 
                 }
@@ -149,31 +199,49 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     }
 
-    class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val itemName = view.item_name
-        val itemEmail = view.item_email
+    var isAllUsersAdded: Boolean = false
+    val referenceMap: HashMap<String, User> = HashMap()
+
+    private fun getGroupUsers(callbacks: FirebaseUtils.Callbacks<HashMap<String, User>>?) {
+        val ref = db!!.collection(DBConstants.GROUPS).document(groupID)
+        getByID(ref, object : FirebaseUtils.Callbacks<Group> {
+            override fun onSuccess(value: Group) {
+                var i = value.members!!.size
+                for (user in value.members!!) {
+                    getByID(db!!.collection(DBConstants.USERS).document(user.key!!), object : FirebaseUtils.Callbacks<User> {
+                        override fun onSuccess(value: User) {
+                            i--
+                            Log.d("TESTAG", "onSuccess: $value pos : $i")
+                            if (!usersMap.containsKey(value.name)) usersMap[value.name] = value
+                            if (!referenceMap.containsKey(value.name)) referenceMap[value.name] = value
+                            if (i == 0) {
+                                isAllUsersAdded = true
+                                callbacks?.onSuccess(usersMap)
+                            }
+                        }
+
+                        override fun onFailed(message: String) {}
+                    })
+                }
+            }
+
+            override fun onFailed(message: String) {}
+        })
     }
 
     private fun verifyData(view: View): Boolean {
-        if (view.text_input_amount.text.isEmpty()) {
+        if (view.text_input_amount.text!!.isEmpty()) {
             view.text_input_amount.error = "Please enter amount"
             return false
         }
         return true
     }
 
-    private var millis: Long = 0
     override fun onDateSet(p0: DatePicker?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
         pickedDate = GregorianCalendar(year, monthOfYear, dayOfMonth)
         millis = pickedDate!!.timeInMillis
 
         val formatter = SimpleDateFormat("dd-MMM-yyyy", Locale.US)
         fragmentView!!.text_input_date.text = formatter.format(Date(millis))
-    }
-
-    companion object {
-        fun newInstance(id: String) = AddExpenseFragment().apply {
-            groupID = id
-        }
     }
 }

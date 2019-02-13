@@ -4,7 +4,11 @@ import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
 import java.util.*
 
-data class ExpenseItem(var amount: Long, var category: String, @ServerTimestamp var date: Date?, var note: String, var paidBy: String, var with: List<String>?) : Serializable {
+/*data class ExpenseItem(var amount: Long, var category: String, @ServerTimestamp var date: Date?, var note: String, var paidBy: String, var with: List<String>?) : Serializable {
+    constructor() : this(0, "", null, "", "", null)
+}*/
+
+data class ExpenseItem(var amount: Long, var category: String, @ServerTimestamp var date: Date?, var note: String, var paidBy: String, var with: HashMap<String, String>?) : Serializable {
     constructor() : this(0, "", null, "", "", null)
 }
 
@@ -14,4 +18,8 @@ data class Group(var group_name: String, @ServerTimestamp var date: Date?, var m
 
 data class User(var name: String, var email: String, var uid: String, var phone: String) : Serializable {
     constructor() : this("", "", "", "")
+}
+
+data class Category(var name: String) : Serializable {
+    constructor() : this("")
 }
