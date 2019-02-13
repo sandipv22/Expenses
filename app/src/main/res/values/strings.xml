@@ -13,5 +13,7 @@
     <string name="rs_symbol">₹</string>
     <string name="menu_search">Search</string>
     <string name="no_groups">No Groups.\nCreate Group by clicking \'+\' above.</string>
+    <string name="no_expenses">No Expenses.\nAdd by clicking \'+\'</string>
     <string name="menu_new_group">New Group</string>
+    <string name="text_uncategorized">Uncategorized</string>
 </resources>

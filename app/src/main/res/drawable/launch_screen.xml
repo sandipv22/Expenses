@@ -19,6 +19,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ar_logo"
-            android:tint="@color/colorPrimary" />
+            android:tint="@color/icon_fill" />
     </item>
 </layer-list>
