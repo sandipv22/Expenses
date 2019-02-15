@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Category
@@ -96,7 +98,9 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
         }
 
         list_category.apply {
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(view.context)
+            val lm = LinearLayoutManager(this.context)
+            layoutManager = lm
+            addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = fireCategoryAdapter
         }
 

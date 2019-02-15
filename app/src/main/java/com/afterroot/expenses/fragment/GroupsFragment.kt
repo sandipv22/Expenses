@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -234,7 +235,9 @@ class GroupsFragment : Fragment() {
         Log.d(_tag, "initFirebaseDb: Ended")
         progress.visibility = View.GONE
         list?.apply {
-            layoutManager = LinearLayoutManager(_context)
+            val lm = LinearLayoutManager(this.context)
+            layoutManager = lm
+            addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = groupsAdapter
         }
     }

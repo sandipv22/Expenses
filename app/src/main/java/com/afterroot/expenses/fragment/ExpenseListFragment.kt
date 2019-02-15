@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.utils.DBConstants
@@ -19,7 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.Query
-import kotlinx.android.synthetic.main.fragment_expense_list.view.*
+import kotlinx.android.synthetic.main.fragment_expense_list.*
 import kotlinx.android.synthetic.main.list_item_expense.view.*
 
 class ExpenseListFragment : androidx.fragment.app.Fragment() {
@@ -97,8 +99,10 @@ class ExpenseListFragment : androidx.fragment.app.Fragment() {
             }
         }
 
-        view.list.apply {
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(view.context)
+        list.apply {
+            val lm = LinearLayoutManager(this.context)
+            layoutManager = lm
+            addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = firestoreAdapter
         }
     }
