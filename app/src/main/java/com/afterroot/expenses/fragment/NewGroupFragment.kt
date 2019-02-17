@@ -40,7 +40,7 @@ class NewGroupFragment : Fragment() {
         text_input_group_members.setAdapter(recAdapter)
 
         activity!!.fab.apply {
-            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_done))
+            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save))
             setOnClickListener {
                 val selected = text_input_group_members.sortedRecipients
                 if (selected.isNotEmpty()) {
