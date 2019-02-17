@@ -3,7 +3,10 @@ package com.afterroot.expenses.utils
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.Log
+import android.view.View
 import androidx.core.content.ContextCompat
 import com.afterroot.expenses.BuildConfig
 import com.afterroot.expenses.model.User
@@ -87,6 +90,21 @@ object Utils {
         val number = phoneUtil.parse(phone, "IN")
         val test = number.nationalNumber.toString()
         return test.replace("[\\D]", "")
+    }
+}
+
+fun Activity.getDrawableExt(id: Int): Drawable {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        return resources.getDrawable(id, theme)
+    }
+    return resources.getDrawable(id)
+}
+
+fun View.setVisible(value: Boolean) {
+    visibility = if (value) {
+        View.VISIBLE
+    } else {
+        View.INVISIBLE
     }
 }
 
