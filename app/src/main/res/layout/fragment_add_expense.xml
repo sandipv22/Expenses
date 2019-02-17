@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card1"
@@ -27,7 +28,7 @@
                 android:layout_gravity="bottom"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:hint="Amount"
+                android:hint="@string/text_amount"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -36,7 +37,7 @@
                     android:id="@+id/text_input_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_money"
+                    android:drawableStart="@drawable/ic_money"
                     android:drawablePadding="@dimen/text_drawable_padding"
                     android:inputType="number"
                     android:singleLine="true" />
@@ -48,10 +49,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="?attr/selectableItemBackground"
-                android:drawableLeft="@drawable/ic_list"
+                android:drawableStart="@drawable/ic_list"
                 android:drawablePadding="@dimen/text_drawable_padding"
                 android:padding="@dimen/text_item_padding"
-                android:text="Choose Category"
+                android:text="@string/choose_category"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -62,10 +63,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:drawableLeft="@drawable/ic_calender"
+                android:drawableStart="@drawable/ic_calender"
                 android:drawablePadding="@dimen/text_drawable_padding"
                 android:padding="@dimen/text_item_padding"
-                android:text="Select Date"
+                android:text="@string/select_date"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +79,7 @@
                 android:layout_gravity="bottom"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:hint="Note"
+                android:hint="@string/note"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_input_date">
@@ -87,7 +88,7 @@
                     android:id="@+id/text_input_note"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_short_text"
+                    android:drawableStart="@drawable/ic_short_text"
                     android:drawablePadding="@dimen/text_drawable_padding"
                     android:inputType="text|textCapWords"
                     android:singleLine="true" />
@@ -99,10 +100,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="?attr/selectableItemBackground"
-                android:drawableLeft="@drawable/ic_person"
+                android:drawableStart="@drawable/ic_person"
                 android:drawablePadding="@dimen/text_drawable_padding"
                 android:padding="@dimen/text_item_padding"
-                android:text="Paid By"
+                android:text="@string/paid_by"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -115,10 +116,10 @@
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="8dp"
                 android:background="?attr/selectableItemBackground"
-                android:drawableLeft="@drawable/ic_users"
+                android:drawableStart="@drawable/ic_users"
                 android:drawablePadding="@dimen/text_drawable_padding"
                 android:padding="@dimen/text_item_padding"
-                android:text="With.."
+                android:text="@string/with"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -128,17 +129,4 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
-
-    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_transaction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:visibility="invisible"
-        app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_done" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>
