@@ -16,7 +16,7 @@ data class Group(var group_name: String, @ServerTimestamp var date: Date?, var m
     constructor() : this("", null, null)
 }
 
-data class User(var name: String, var email: String, var uid: String, var phone: String) : Serializable {
+data class User(var name: String, var email: String, var uid: String, var phone: String?) : Serializable {
     constructor() : this("", "", "", "")
 }
 
