@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Category
@@ -21,7 +22,7 @@ import com.afterroot.expenses.utils.FirebaseUtils.getByID
 import com.afterroot.expenses.utils.ListClickCallbacks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import kotlinx.android.synthetic.main.fragment_add_expense.*
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_add_expense.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,6 +34,7 @@ import kotlin.collections.HashMap
 class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     private var fragmentView: View? = null
+    val _tag = "AddExpenseFragment"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_add_expense, container, false)
@@ -67,9 +69,11 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var paidByName: String = ""
     private lateinit var category: String
     private var millis: Long = 0
+    val args: AddExpenseFragmentArgs by navArgs()
 
     private fun init(view: View) {
-        groupID = arguments!!.getString("id")!!
+        groupID = args.groupDocId
+        Log.d(_tag, "init: $groupID")
         category = getString(R.string.text_uncategorized)
         db = FirebaseFirestore.getInstance()
         db!!.firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
@@ -170,7 +174,8 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
         }
         Handler().postDelayed({
-            fab_add_transaction.apply {
+            activity!!.fab.apply {
+                setImageDrawable(activity!!.resources.getDrawable(R.drawable.ic_done))
                 show()
                 setOnClickListener {
                     if (verifyData(view)) {

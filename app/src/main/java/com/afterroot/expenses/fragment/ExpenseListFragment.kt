@@ -7,13 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
+import com.afterroot.expenses.utils.Constants
 import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.ListClickCallbacks
 import com.afterroot.expenses.utils.Utils
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -21,11 +23,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.Query
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_expense_list.*
 import kotlinx.android.synthetic.main.list_item_expense.view.*
 
-class ExpenseListFragment : androidx.fragment.app.Fragment() {
-    private var listener: ListClickCallbacks<ExpenseItem>? = null
+class ExpenseListFragment : Fragment() {
     private var firestoreAdapter: FirestoreRecyclerAdapter<ExpenseItem, ExpenseViewHolder>? = null
     private var db: FirebaseFirestore? = null
     lateinit var groupDocID: String
@@ -38,21 +40,25 @@ class ExpenseListFragment : androidx.fragment.app.Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        groupDocID = args.docId
+        groupDocID = args.groupDocId
         db = FirebaseFirestore.getInstance().apply {
             firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
         }
-        initFirebaseDb(view)
-        //activity!!.fab.show()
-        //activity!!.toolbar.title = arguments!!.getString("GROUP_NAME")
+        progress.visibility = View.VISIBLE
+        initFirebaseDb()
+        activity!!.fab.setOnClickListener {
+            Log.d(_tag, "onViewCreated: FAB Clicked")
+            val action = ExpenseListFragmentDirections.actionExpenseListFragmentToAddExpenseFragment(groupDocID)
+            view.findNavController().navigate(action)
+        }
     }
 
-    private fun initFirebaseDb(view: View) {
+    private fun initFirebaseDb() {
         val query = db!!.collection(DBConstants.GROUPS)
                 .document(groupDocID)
                 .collection(DBConstants.EXPENSES).orderBy("date", Query.Direction.DESCENDING)
 
-        Log.d(_tag, "initFirebaseDb: $query")
+        Log.d(_tag, "initFirebaseDb: groupId: $groupDocID")
 
         val options = FirestoreRecyclerOptions.Builder<ExpenseItem>()
                 .setQuery(query, ExpenseItem::class.java)
@@ -75,22 +81,26 @@ class ExpenseListFragment : androidx.fragment.app.Fragment() {
                     tag = model
                     val id = snapshots.getSnapshot(holder.adapterPosition).id
                     setOnClickListener {
-                        listener!!.onListItemClick(tag as ExpenseItem, id)
+                        val bundle = Bundle().apply {
+                            putSerializable(Constants.KEY_EXPENSE_SERIALIZE, tag as ExpenseItem)
+                        }
+                        view!!.findNavController().navigate(R.id.action_expenseListFragment_to_expenseDetailFragment, bundle)
+                        //listener!!.onListItemClick(tag as ExpenseItem, id)
                     }
 
                     setOnLongClickListener {
-                        listener!!.onListItemLongClick(tag as ExpenseItem, id)
+                        //listener!!.onListItemLongClick(tag as ExpenseItem, id)
                         return@setOnLongClickListener true
                     }
                 }
             }
 
             override fun onDataChanged() {
+                Log.d(_tag, "onDataChanged: ItemCount: $itemCount")
                 if (itemCount == 0) {
-                    //MainActivity.setInfoMessage(activity!!.main_info_message, activity!!.resources.getString(R.string.no_expenses))
-                    Toast.makeText(activity!!, getString(R.string.no_expenses), Toast.LENGTH_SHORT).show()
+                    activity!!.text_no_expenses.visibility = View.VISIBLE
                 } else {
-                    //MainActivity.resetInfoMessage(activity!!.main_info_message)
+                    activity!!.text_no_expenses.visibility = View.INVISIBLE
                 }
             }
 
@@ -99,24 +109,12 @@ class ExpenseListFragment : androidx.fragment.app.Fragment() {
             }
         }
 
+        progress.visibility = View.GONE
         list.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = firestoreAdapter
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
-
-    }
-
-    companion object {
-        @JvmStatic
-        fun with(listItemClickCallbacks: ListClickCallbacks<ExpenseItem>) = ExpenseListFragment().apply {
-            listener = listItemClickCallbacks
         }
     }
 

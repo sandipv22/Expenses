@@ -10,6 +10,7 @@ import android.os.Handler
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -64,6 +66,30 @@ class GroupsFragment : Fragment() {
             PreferenceManager.getDefaultSharedPreferences(view.context).getBoolean(Constants.PREF_KEY_FIRST_START, true)
                     or !FirebaseUtils.isUserSignedIn -> signInDialog().show()
             else -> checkPermissions(permissions)
+        }
+
+        activity!!.bottom_appbar.setNavigationOnClickListener {
+            val fragment = BottomNavigationDrawerFragment.with(object : NavigationItemClickCallback {
+                override fun onClick(item: MenuItem) {
+                    when (item.itemId) {
+                        R.id.action_settings -> {
+                            Toast.makeText(_context, "Clicked", Toast.LENGTH_SHORT).show()
+                        }
+                        R.id.sign_out -> {
+                            AuthUI.getInstance().signOut(_context).addOnSuccessListener {
+                                Toast.makeText(_context, "Signed Out", Toast.LENGTH_SHORT).show()
+                                signInDialog().show()
+                            }
+                        }
+                        R.id.edit_profile -> {
+                            findNavController().navigate(R.id.edit_profile)
+                        }
+                    }
+
+                }
+
+            })
+            fragment.show(fragmentManager, fragment.tag)
         }
     }
 
@@ -117,21 +143,21 @@ class GroupsFragment : Fragment() {
                             }
                         }
                     }
-                    else -> when {
-                        response == null -> {
-                            // User pressed back button
-                            Toast.makeText(_context, "Sign In Cancelled", Toast.LENGTH_SHORT).show()
-                            return
+                    else -> {
+                        when {
+                            response == null -> {
+                                // User pressed back button
+                                Toast.makeText(_context, "Sign In Cancelled", Toast.LENGTH_SHORT).show()
+                            }
+                            response.error!!.errorCode == ErrorCodes.NO_NETWORK -> {
+                                Toast.makeText(_context, "No network", Toast.LENGTH_SHORT).show()
+                            }
+                            response.error!!.errorCode == ErrorCodes.UNKNOWN_ERROR -> {
+                                Toast.makeText(_context, "Unknown Error", Toast.LENGTH_SHORT).show()
+                            }
+                            else -> Toast.makeText(_context, "Sign In failed. Please try again.", Toast.LENGTH_SHORT).show()
                         }
-                        response.error!!.errorCode == ErrorCodes.NO_NETWORK -> {
-                            Toast.makeText(_context, "No network", Toast.LENGTH_SHORT).show()
-                            return
-                        }
-                        response.error!!.errorCode == ErrorCodes.UNKNOWN_ERROR -> {
-                            Toast.makeText(_context, "Unknown Error", Toast.LENGTH_SHORT).show()
-                            return
-                        }
-                        else -> Toast.makeText(_context, "Sign In failed. Please try again.", Toast.LENGTH_SHORT).show()
+                        activity!!.finish()
                     }
                 }
             }
@@ -152,11 +178,12 @@ class GroupsFragment : Fragment() {
                 getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
                     val dialog = MaterialDialog.Builder(_context).progress(true, 1).content("Creating User...").show()
                     Log.d(_tag, "User not available. Creating User..")
+                    val phone = curUser.phoneNumber
                     val user = User(curUser.displayName!!,
                             curUser.email!!,
                             curUser.uid,
-                            curUser.phoneNumber!!)
-
+                            phone)
+                    //TODO add dialog to add phone number
                     userRef.set(user).addOnCompleteListener { setUserTask ->
                         when {
                             setUserTask.isSuccessful -> {
@@ -187,7 +214,7 @@ class GroupsFragment : Fragment() {
                             .build(), Constants.RC_SIGN_IN)
                 }
                 .setNegativeButton("Cancel") { _, _ ->
-
+                    activity!!.finish()
                 }.setCancelable(false)
     }
 
@@ -220,10 +247,9 @@ class GroupsFragment : Fragment() {
                     tag = model
                     setOnClickListener {
                         //callbacks!!.onListItemClick(tag as Group, id)
-                        val bundle = Bundle().apply {
-                            putString("id", snapshots.getSnapshot(holder.adapterPosition).id)
-                        }
-                        it.findNavController().navigate(com.afterroot.expenses.R.id.action_groupsFragment2_to_expenseListFragment, bundle)
+                        val action = GroupsFragmentDirections
+                                .actionGroupsFragment2ToExpenseListFragment(snapshots.getSnapshot(holder.adapterPosition).id)
+                        it.findNavController().navigate(action)
                     }
                     setOnLongClickListener {
                         return@setOnLongClickListener true
@@ -233,7 +259,7 @@ class GroupsFragment : Fragment() {
 
         }
         Log.d(_tag, "initFirebaseDb: Ended")
-        progress.visibility = View.GONE
+        //progress?.visibility = View.GONE
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm

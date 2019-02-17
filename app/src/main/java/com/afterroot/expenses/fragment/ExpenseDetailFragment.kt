@@ -2,15 +2,16 @@ package com.afterroot.expenses.fragment
 
 import android.os.Bundle
 import android.view.*
+import androidx.fragment.app.Fragment
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.utils.Constants
 import kotlinx.android.synthetic.main.fragment_expense_detail.*
 
-class ExpenseDetailFragment : androidx.fragment.app.Fragment() {
+class ExpenseDetailFragment : Fragment() {
     private var item: ExpenseItem? = null
     private var fragmentView: View? = null
-    private val TAG = "ExpenseDetailFragment"
+    private val _tag = "ExpenseDetailFragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
