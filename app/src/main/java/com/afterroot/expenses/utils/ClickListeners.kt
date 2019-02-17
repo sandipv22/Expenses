@@ -1,5 +1,6 @@
 package com.afterroot.expenses.utils
 
+import android.view.MenuItem
 import com.afterroot.expenses.model.ExpenseItem
 
 interface ExpenseClickCallbacks {
@@ -12,6 +13,6 @@ interface ListClickCallbacks<in T> {
     fun onListItemLongClick(item: T?, docId: String)
 }
 
-interface OnSaveButtonClick {
-    fun onSaveButtonClicked()
+interface NavigationItemClickCallback {
+    fun onClick(item: MenuItem)
 }
