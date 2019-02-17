@@ -2,7 +2,6 @@ package com.afterroot.expenses.fragment
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +19,7 @@ import com.afterroot.expenses.utils.DBConstants
 import com.afterroot.expenses.utils.FirebaseUtils
 import com.afterroot.expenses.utils.FirebaseUtils.getByID
 import com.afterroot.expenses.utils.ListClickCallbacks
+import com.afterroot.expenses.utils.getDrawableExt
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import kotlinx.android.synthetic.main.activity_home.*
@@ -173,34 +173,32 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 }
             }
         }
-        Handler().postDelayed({
-            activity!!.fab.apply {
-                setImageDrawable(activity!!.resources.getDrawable(R.drawable.ic_done))
-                show()
-                setOnClickListener {
-                    if (verifyData(view)) {
-                        /* val finalList = ArrayList<String>()
-                         withUserMap.values.mapTo(finalList) { it.uid }*/
-                        val map: HashMap<String, String>? = HashMap()
-                        withUserMap.values.forEach {
-                            map!![it.uid] = it.name
-                        }
-                        item = ExpenseItem(view.text_input_amount.text.toString().toLong(),
-                                category,
-                                Date(millis),
-                                view.text_input_note.text.toString(), paidByID,
-                                map
-                        )
-                        db!!.collection(DBConstants.GROUPS)
-                                .document(groupID)
-                                .collection(DBConstants.EXPENSES).add(item!!).addOnSuccessListener { documentReference ->
-                                    activity!!.supportFragmentManager.popBackStack()
-                                }
+        activity!!.fab.apply {
+            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_done))
+            show()
+            setOnClickListener {
+                if (verifyData(view)) {
+                    /* val finalList = ArrayList<String>()
+                     withUserMap.values.mapTo(finalList) { it.uid }*/
+                    val map: HashMap<String, String>? = HashMap()
+                    withUserMap.values.forEach {
+                        map!![it.uid] = it.name
                     }
-
+                    item = ExpenseItem(view.text_input_amount.text.toString().toLong(),
+                            category,
+                            Date(millis),
+                            view.text_input_note.text.toString(), paidByID,
+                            map
+                    )
+                    db!!.collection(DBConstants.GROUPS)
+                            .document(groupID)
+                            .collection(DBConstants.EXPENSES).add(item!!).addOnSuccessListener { documentReference ->
+                                activity!!.supportFragmentManager.popBackStack()
+                            }
                 }
+
             }
-        }, 200)
+        }
 
     }
 

@@ -17,6 +17,7 @@ import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.utils.Constants
 import com.afterroot.expenses.utils.DBConstants
 import com.afterroot.expenses.utils.Utils
+import com.afterroot.expenses.utils.getDrawableExt
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_expense_list.*
 import kotlinx.android.synthetic.main.list_item_expense.view.*
 
@@ -44,12 +46,15 @@ class ExpenseListFragment : Fragment() {
         db = FirebaseFirestore.getInstance().apply {
             firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
         }
-        progress.visibility = View.VISIBLE
+        activity!!.progress.visibility = View.VISIBLE
         initFirebaseDb()
-        activity!!.fab.setOnClickListener {
-            Log.d(_tag, "onViewCreated: FAB Clicked")
-            val action = ExpenseListFragmentDirections.actionExpenseListFragmentToAddExpenseFragment(groupDocID)
-            view.findNavController().navigate(action)
+        activity!!.fab.apply {
+            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_add))
+            setOnClickListener {
+                Log.d(_tag, "onViewCreated: FAB Clicked")
+                val action = ExpenseListFragmentDirections.toAddExpense(groupDocID)
+                view.findNavController().navigate(action)
+            }
         }
     }
 
@@ -84,7 +89,7 @@ class ExpenseListFragment : Fragment() {
                         val bundle = Bundle().apply {
                             putSerializable(Constants.KEY_EXPENSE_SERIALIZE, tag as ExpenseItem)
                         }
-                        view!!.findNavController().navigate(R.id.action_expenseListFragment_to_expenseDetailFragment, bundle)
+                        view!!.findNavController().navigate(R.id.toExpenseDetail, bundle)
                         //listener!!.onListItemClick(tag as ExpenseItem, id)
                     }
 
@@ -109,13 +114,14 @@ class ExpenseListFragment : Fragment() {
             }
         }
 
-        progress.visibility = View.GONE
+        activity!!.progress.visibility = View.GONE
         list.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = firestoreAdapter
         }
+        activity!!.fab.show()
     }
 
     inner class ExpenseViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {

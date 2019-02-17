@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import com.afterroot.expenses.R
 import com.afterroot.expenses.utils.NavigationItemClickCallback
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.fragment_bottomsheet.*
+import kotlinx.android.synthetic.main.fragment_bottomsheet_nav.*
 
 class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
 
     val _tag = "NavigationFragment"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_bottomsheet, container, false)
+        return inflater.inflate(R.layout.fragment_bottomsheet_nav, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,7 +1,9 @@
 package com.afterroot.expenses.fragment
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
@@ -27,10 +29,6 @@ class ExpenseDetailFragment : Fragment() {
         return fragmentView
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.menu_expense_detail, menu)
-    }
-
     override fun onStart() {
         super.onStart()
         detail_category.text = item!!.category
@@ -49,15 +47,5 @@ class ExpenseDetailFragment : Fragment() {
             }
             detail_spenders.text = builder
         }
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(item: ExpenseItem) =
-                ExpenseDetailFragment().apply {
-                    arguments = Bundle().apply {
-                        putSerializable(Constants.KEY_EXPENSE_SERIALIZE, item)
-                    }
-                }
     }
 }

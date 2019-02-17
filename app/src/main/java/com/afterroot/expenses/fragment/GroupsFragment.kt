@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_groups.*
 import kotlinx.android.synthetic.main.list_item_group.view.*
 import org.jetbrains.anko.design.snackbar
@@ -57,7 +58,7 @@ class GroupsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        progress.visibility = View.VISIBLE
+        activity!!.progress.visibility = View.VISIBLE
         createdView = view
         _context = createdView.context
         val dbSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
@@ -68,28 +69,37 @@ class GroupsFragment : Fragment() {
             else -> checkPermissions(permissions)
         }
 
-        activity!!.bottom_appbar.setNavigationOnClickListener {
-            val fragment = BottomNavigationDrawerFragment.with(object : NavigationItemClickCallback {
-                override fun onClick(item: MenuItem) {
-                    when (item.itemId) {
-                        R.id.action_settings -> {
-                            Toast.makeText(_context, "Clicked", Toast.LENGTH_SHORT).show()
-                        }
-                        R.id.sign_out -> {
-                            AuthUI.getInstance().signOut(_context).addOnSuccessListener {
-                                Toast.makeText(_context, "Signed Out", Toast.LENGTH_SHORT).show()
-                                signInDialog().show()
+        activity!!.apply {
+            fab.apply {
+                setImageDrawable(getDrawableExt(R.drawable.ic_add))
+                setOnClickListener {
+                    view.findNavController().navigate(R.id.newGroupFragment)
+                }
+            }
+
+            bottom_appbar.setNavigationOnClickListener {
+                val fragment = BottomNavigationDrawerFragment.with(object : NavigationItemClickCallback {
+                    override fun onClick(item: MenuItem) {
+                        when (item.itemId) {
+                            R.id.action_settings -> {
+                                Toast.makeText(_context, "Clicked", Toast.LENGTH_SHORT).show()
+                            }
+                            R.id.sign_out -> {
+                                AuthUI.getInstance().signOut(_context).addOnSuccessListener {
+                                    Toast.makeText(_context, "Signed Out", Toast.LENGTH_SHORT).show()
+                                    signInDialog().show()
+                                }
+                            }
+                            R.id.edit_profile -> {
+                                findNavController().navigate(R.id.edit_profile)
                             }
                         }
-                        R.id.edit_profile -> {
-                            findNavController().navigate(R.id.edit_profile)
-                        }
+
                     }
 
-                }
-
-            })
-            fragment.show(fragmentManager, fragment.tag)
+                })
+                fragment.show(supportFragmentManager, fragment.tag)
+            }
         }
     }
 
@@ -246,10 +256,9 @@ class GroupsFragment : Fragment() {
                 with(holder.itemView) {
                     tag = model
                     setOnClickListener {
-                        //callbacks!!.onListItemClick(tag as Group, id)
                         val action = GroupsFragmentDirections
-                                .actionGroupsFragment2ToExpenseListFragment(snapshots.getSnapshot(holder.adapterPosition).id)
-                        it.findNavController().navigate(action)
+                                .toExpenseList(snapshots.getSnapshot(holder.adapterPosition).id)
+                        activity!!.host_nav_fragment.findNavController().navigate(action)
                     }
                     setOnLongClickListener {
                         return@setOnLongClickListener true
@@ -259,7 +268,8 @@ class GroupsFragment : Fragment() {
 
         }
         Log.d(_tag, "initFirebaseDb: Ended")
-        //progress?.visibility = View.GONE
+        activity!!.progress?.visibility = View.GONE
+        activity!!.fab.show()
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm

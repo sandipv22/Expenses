@@ -25,22 +25,21 @@ class HomeActivity : AppCompatActivity() {
             Log.d(_tag, "onDestinationChange: ${destination.label}")
             action_title.text = destination.label
             when (destination.id) {
-                com.afterroot.expenses.R.id.groupsFragment -> {
+                R.id.groupsFragment -> {
                     fab.show()
                     bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
-                    fab.setOnClickListener {
-                        controller.navigate(com.afterroot.expenses.R.id.newGroupFragment)
-                        fab.hide()
-                    }
                 }
-                com.afterroot.expenses.R.id.expenseListFragment -> {
+                R.id.expenseListFragment -> {
                     fab.show()
                     bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_CENTER
                 }
-                com.afterroot.expenses.R.id.newGroupFragment -> {
+                R.id.newGroupFragment -> {
+
+                }
+                R.id.addExpenseFragment -> {
                     fab.hide()
                 }
-                com.afterroot.expenses.R.id.addExpenseFragment -> {
+                R.id.expenseDetailFragment -> {
                     fab.hide()
                 }
             }
