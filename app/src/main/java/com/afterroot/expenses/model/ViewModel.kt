@@ -1,10 +1,25 @@
+/*
+ * Copyright 2018-2019 Sandip Vaghela
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.afterroot.expenses.model
 
-import android.os.Handler
-import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class UserViewModel : ViewModel() {
@@ -20,41 +35,14 @@ class UserViewModel : ViewModel() {
     }
 }
 
-class FirestoreQueryLiveData(private var query: Query) : LiveData<QuerySnapshot>() {
-    val _tag = "FirestoreQueryLiveData"
-    private val listener = MyValueEventListener()
-    private lateinit var listenerRegistration: ListenerRegistration
+//TODO Migrate to ViewModel
+class ExpenseViewModel : ViewModel() {
+    var expenses: MutableLiveData<List<ExpenseItem>> = MutableLiveData()
 
-    private var listenerRemovePending = false
-    private val handler = Handler()
-
-    private val removeListener = Runnable {
-        Log.d(_tag, "onInactive: removeListener")
-        listenerRegistration.remove()
-        listenerRemovePending = false
-    }
-
-    override fun onActive() {
-        super.onActive()
-        Log.d(_tag, "onActive")
-
-        if (listenerRemovePending) {
-            handler.removeCallbacks(removeListener)
-        } else {
-            listenerRegistration = query.addSnapshotListener(listener)
+    fun getExpenses(): LiveData<List<ExpenseItem>> {
+        if (expenses.value == null) {
+            FirebaseFirestore.getInstance()
         }
-
-        listenerRemovePending = false
-    }
-
-
-    private inner class MyValueEventListener : EventListener<QuerySnapshot> {
-        override fun onEvent(queryDocumentSnapshots: QuerySnapshot?, e: FirebaseFirestoreException?) {
-            if (e != null) {
-                Log.e(_tag, "Can't listen to doc snapshots: " + queryDocumentSnapshots + ":::" + e.message)
-                return
-            }
-            value = queryDocumentSnapshots
-        }
+        return expenses
     }
 }
