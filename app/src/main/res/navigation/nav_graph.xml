@@ -2,17 +2,18 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:label="Expenses"
     app:startDestination="@id/groupsFragment">
 
     <fragment
         android:id="@+id/newGroupFragment"
         android:name="com.afterroot.expenses.fragment.NewGroupFragment"
-        android:label="NewGroupFragment"
+        android:label="New Group"
         tools:layout="@layout/fragment_new_group" />
     <fragment
         android:id="@+id/groupsFragment"
         android:name="com.afterroot.expenses.fragment.GroupsFragment"
-        android:label="@string/app_name"
+        android:label="Groups"
         tools:layout="@layout/fragment_groups">
         <action
             android:id="@+id/action_groupsFragment2_to_newGroupFragment"
@@ -24,29 +25,29 @@
         <action
             android:id="@+id/action_groupsFragment2_to_expenseListFragment"
             app:destination="@id/expenseListFragment"
-            app:enterAnim="@anim/fui_slide_in_right"
-            app:exitAnim="@anim/fui_slide_out_left"
-            app:popEnterAnim="@anim/fui_slide_in_right"
-            app:popExitAnim="@anim/fui_slide_out_left"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@+id/groupsFragment">
             <argument
-                android:name="docId"
+                android:name="groupDocId"
                 android:defaultValue="null" />
         </action>
         <action
-            android:id="@+id/action_groupsFragment_to_editProfileFragment"
-            app:destination="@id/editProfileFragment" />
+            android:id="@+id/edit_profile"
+            app:destination="@+id/editProfileFragment" />
     </fragment>
     <fragment
         android:id="@+id/expenseListFragment"
         android:name="com.afterroot.expenses.fragment.ExpenseListFragment"
-        android:label="ExpenseListFragment"
+        android:label="Expenses"
         tools:layout="@layout/fragment_expense_list">
         <action
             android:id="@+id/action_expenseListFragment_to_expenseDetailFragment"
             app:destination="@id/expenseDetailFragment" />
         <argument
-            android:name="docId"
+            android:name="groupDocId"
             app:argType="string" />
         <action
             android:id="@+id/action_expenseListFragment_to_addExpenseFragment"
@@ -55,7 +56,7 @@
     <fragment
         android:id="@+id/expenseDetailFragment"
         android:name="com.afterroot.expenses.fragment.ExpenseDetailFragment"
-        android:label="fragment_expense_detail"
+        android:label="Expense Detail"
         tools:layout="@layout/fragment_expense_detail" />
     <fragment
         android:id="@+id/editProfileFragment"
@@ -68,5 +69,9 @@
     <fragment
         android:id="@+id/addExpenseFragment"
         android:name="com.afterroot.expenses.fragment.AddExpenseFragment"
-        android:label="AddExpenseFragment" />
+        android:label="Add Expense">
+        <argument
+            android:name="groupDocId"
+            app:argType="string" />
+    </fragment>
 </navigation>

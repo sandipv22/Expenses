@@ -3,15 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="none">
         <item
+            android:id="@+id/edit_profile"
+            android:title="Edit Profile" />
+        <item
             android:id="@+id/action_settings"
             android:orderInCategory="100"
             android:title="@string/action_settings"
+            android:icon="@drawable/ic_settings"
             app:showAsAction="never" />
         <item
             android:id="@+id/sign_out"
+            android:icon="@drawable/ic_person"
             android:title="Sign Out" />
-        <item
-            android:id="@+id/reset_start_code"
-            android:title="Reset Code" />
     </group>
 </menu>

@@ -7,13 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".ui.HomeActivity">
 
+    <include layout="@layout/content_home" />
+
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottom_appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:backgroundTint="@color/primaryColor"
+        app:fabAlignmentMode="center"
         app:hideOnScroll="true"
+        app:layout_scrollFlags="scroll|enterAlways"
         app:navigationIcon="@drawable/ic_menu_black" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -22,13 +26,5 @@
         android:layout_height="wrap_content"
         app:layout_anchor="@id/bottom_appbar"
         app:srcCompat="@drawable/ic_add" />
-
-    <fragment
-        android:id="@+id/host_nav_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
