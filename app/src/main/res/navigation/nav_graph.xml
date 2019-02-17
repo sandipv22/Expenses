@@ -16,15 +16,15 @@
         android:label="Groups"
         tools:layout="@layout/fragment_groups">
         <action
-            android:id="@+id/action_groupsFragment2_to_newGroupFragment"
-            app:destination="@id/newGroupFragment"
+            android:id="@+id/toNewGroup"
+            app:destination="@+id/newGroupFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_groupsFragment2_to_expenseListFragment"
-            app:destination="@id/expenseListFragment"
+            android:id="@+id/toExpenseList"
+            app:destination="@+id/expenseListFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -44,13 +44,13 @@
         android:label="Expenses"
         tools:layout="@layout/fragment_expense_list">
         <action
-            android:id="@+id/action_expenseListFragment_to_expenseDetailFragment"
+            android:id="@+id/toExpenseDetail"
             app:destination="@id/expenseDetailFragment" />
         <argument
             android:name="groupDocId"
             app:argType="string" />
         <action
-            android:id="@+id/action_expenseListFragment_to_addExpenseFragment"
+            android:id="@+id/toAddExpense"
             app:destination="@id/addExpenseFragment" />
     </fragment>
     <fragment
