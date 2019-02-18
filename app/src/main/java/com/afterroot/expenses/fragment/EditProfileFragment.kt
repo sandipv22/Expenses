@@ -44,7 +44,7 @@ class EditProfileFragment : Fragment() {
     private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(com.afterroot.expenses.R.layout.fragment_edit_profile, container, false)
+        return inflater.inflate(R.layout.fragment_edit_profile, container, false)
     }
 
     private lateinit var firebaseUser: FirebaseUser
@@ -64,7 +64,7 @@ class EditProfileFragment : Fragment() {
                 activity!!.progress.setVisible(false)
             }
             activity!!.fab.apply {
-                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_done))
+                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save))
                 setOnClickListener {
                     activity!!.progress.setVisible(true)
                     val phoneText = this@EditProfileFragment.input_phone.text.toString()

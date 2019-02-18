@@ -48,17 +48,17 @@ class NewGroupFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        text_input_group_members.apply {
+        edit_text_group_members.apply {
             setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
         }
         val recAdapter = BaseRecipientAdapter(BaseRecipientAdapter.QUERY_TYPE_PHONE, activity!!)
         recAdapter.isShowMobileOnly = false
-        text_input_group_members.setAdapter(recAdapter)
+        edit_text_group_members.setAdapter(recAdapter)
 
         activity!!.fab.apply {
             setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save))
             setOnClickListener {
-                val selected = text_input_group_members.sortedRecipients
+                val selected = edit_text_group_members.sortedRecipients
                 if (selected.isNotEmpty()) {
                     val userMAp = HashMap<String?, Int>()
                     activity!!.progress.visibility = View.VISIBLE
@@ -81,7 +81,7 @@ class NewGroupFragment : Fragment() {
                                             userMAp[FirebaseUtils.firebaseUser!!.uid] = DBConstants.TYPE_ADMIN
                                             activity!!.progress.visibility = View.VISIBLE
                                             Log.d(_tag, "onCreateOptionsMenu: Creating Group")
-                                            val group = Group(input_group_name.text.toString(), Date(), userMAp)
+                                            val group = Group(edit_text_group_name.text.toString(), Date(), userMAp)
                                             db.collection(DBConstants.GROUPS).add(group).addOnSuccessListener {
                                                 activity!!.root_layout.snackbar("Group Created")
                                                 activity!!.progress.visibility = View.INVISIBLE
