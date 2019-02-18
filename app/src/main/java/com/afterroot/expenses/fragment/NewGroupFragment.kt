@@ -61,7 +61,7 @@ class NewGroupFragment : Fragment() {
                 val selected = text_input_group_members.sortedRecipients
                 if (selected.isNotEmpty()) {
                     val userMAp = HashMap<String?, Int>()
-                    progress.visibility = View.VISIBLE
+                    activity!!.progress.visibility = View.VISIBLE
                     Log.d(_tag, "onActivityResult: Adding contacts to Map")
                     var size = selected.size
                     for (item in selected) {
@@ -79,16 +79,16 @@ class NewGroupFragment : Fragment() {
                                         size--
                                         if (size == 0) {
                                             userMAp[FirebaseUtils.firebaseUser!!.uid] = DBConstants.TYPE_ADMIN
-                                            progress.visibility = View.VISIBLE
+                                            activity!!.progress.visibility = View.VISIBLE
                                             Log.d(_tag, "onCreateOptionsMenu: Creating Group")
                                             val group = Group(input_group_name.text.toString(), Date(), userMAp)
                                             db.collection(DBConstants.GROUPS).add(group).addOnSuccessListener {
                                                 activity!!.root_layout.snackbar("Group Created")
-                                                progress.visibility = View.INVISIBLE
+                                                activity!!.progress.visibility = View.INVISIBLE
                                                 activity!!.supportFragmentManager.popBackStack()
                                             }.addOnFailureListener {
                                                 activity!!.root_layout.snackbar("Group not created.")
-                                                progress.visibility = View.INVISIBLE
+                                                activity!!.progress.visibility = View.INVISIBLE
                                             }
                                         }
                                     } else {

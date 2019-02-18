@@ -284,8 +284,10 @@ class GroupsFragment : Fragment() {
 
         }
         Log.d(_tag, "initFirebaseDb: Ended")
-        activity!!.progress?.visibility = View.GONE
-        activity!!.fab.show()
+        activity?.apply {
+            progress?.visibility = View.GONE
+            fab.show()
+        }
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm

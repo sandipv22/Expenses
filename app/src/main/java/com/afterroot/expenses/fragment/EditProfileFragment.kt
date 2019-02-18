@@ -32,7 +32,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
-import kotlinx.android.synthetic.main.fragment_edit_profile.view.*
 import org.jetbrains.anko.design.snackbar
 
 
@@ -68,16 +67,16 @@ class EditProfileFragment : Fragment() {
                 setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_done))
                 setOnClickListener {
                     activity!!.progress.setVisible(true)
-                    val phoneText = input_phone.text.toString()
+                    val phoneText = this@EditProfileFragment.input_phone.text.toString()
                     val phone: String = Utils.formatPhone(activity!!, phoneText)
                     val request = UserProfileChangeRequest.Builder()
-                            .setDisplayName(input_profile_name.text.toString())
+                            .setDisplayName(this@EditProfileFragment.input_profile_name.text.toString())
                             .build()
                     firebaseUser.updateProfile(request).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             db.collection(DBConstants.USERS)
                                     .document(FirebaseUtils.auth!!.currentUser!!.uid)
-                                    .set(User(input_profile_name.text.toString(),
+                                    .set(User(this@EditProfileFragment.input_profile_name.text.toString(),
                                             if (firebaseUser.email == null) "" else firebaseUser.email!!,
                                             firebaseUser.uid,
                                             phone))
