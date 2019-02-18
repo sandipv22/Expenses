@@ -61,7 +61,6 @@ class HomeActivity : AppCompatActivity() {
                             start()
                         }
                     }, 100)
-                    return@addOnDestinationChangedListener
                 }
                 R.id.expenseListFragment -> {
                     handler.postDelayed({
@@ -78,17 +77,20 @@ class HomeActivity : AppCompatActivity() {
                     fab.hide()
                 }
             }
-            handler.postDelayed({
-                val anim = ValueAnimator.ofFloat(0F, 1F)
-                anim.apply {
-                    addUpdateListener {
-                        drawerArrowDrawable.progress = it.animatedValue as Float
+            if (destination.id != R.id.groupsFragment) {
+                bottom_appbar.setNavigationOnClickListener { controller.navigateUp() }
+                handler.postDelayed({
+                    val anim = ValueAnimator.ofFloat(0F, 1F)
+                    anim.apply {
+                        addUpdateListener {
+                            drawerArrowDrawable.progress = it.animatedValue as Float
+                        }
+                        interpolator = DecelerateInterpolator()
+                        duration = 200
+                        start()
                     }
-                    interpolator = DecelerateInterpolator()
-                    duration = 200
-                    start()
-                }
-            }, 100)
+                }, 100)
+            }
 
         }
     }
