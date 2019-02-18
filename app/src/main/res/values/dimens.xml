@@ -25,5 +25,5 @@
     <dimen name="list_item_spacing_half">8dp</dimen>
     <dimen name="card_corner_radius">16dp</dimen>
     <dimen name="text_drawable_padding">8dp</dimen>
-    <dimen name="text_item_padding">12dp</dimen>
+    <dimen name="text_item_padding">16dp</dimen>
 </resources>

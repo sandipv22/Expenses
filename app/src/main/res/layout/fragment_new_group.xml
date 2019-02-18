@@ -28,6 +28,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:hint="@string/text_group_name"
+        app:helperText="Type Group Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -35,7 +36,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text_group_name"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -48,6 +50,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:hint="@string/text_members"
+        app:helperText="Enter Group members"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,10 +60,9 @@
             android:id="@+id/edit_text_group_members"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:drawableStart="@drawable/ic_users" />
+            android:drawableStart="@drawable/ic_users"
+            android:drawablePadding="@dimen/text_drawable_padding"
+            android:padding="@dimen/text_item_padding" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
