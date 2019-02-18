@@ -33,8 +33,7 @@
         app:backgroundTint="@color/primaryColor"
         app:fabAlignmentMode="center"
         app:hideOnScroll="true"
-        app:layout_scrollFlags="scroll|enterAlways"
-        app:navigationIcon="@drawable/ic_menu_black" />
+        app:layout_scrollFlags="scroll|enterAlways" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

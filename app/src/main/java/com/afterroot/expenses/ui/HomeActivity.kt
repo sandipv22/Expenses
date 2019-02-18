@@ -16,9 +16,13 @@
 
 package com.afterroot.expenses.ui
 
+import android.animation.ValueAnimator
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.navigation.fragment.findNavController
 import com.afterroot.expenses.R
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -36,18 +40,33 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         setSupportActionBar(bottom_appbar)
+        val drawerArrowDrawable = DrawerArrowDrawable(this)
+        bottom_appbar.navigationIcon = drawerArrowDrawable
+        val handler = Handler()
 
         host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, arguments ->
             Log.d(_tag, "onDestinationChange: ${destination.label}")
             action_title.text = destination.label
             when (destination.id) {
                 R.id.groupsFragment -> {
-                    fab.show()
-                    bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
+                    handler.postDelayed({
+                        bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
+                        val anim = ValueAnimator.ofFloat(1F, 0F)
+                        anim.apply {
+                            addUpdateListener {
+                                drawerArrowDrawable.progress = it.animatedValue as Float
+                            }
+                            interpolator = DecelerateInterpolator()
+                            duration = 200
+                            start()
+                        }
+                    }, 100)
+                    return@addOnDestinationChangedListener
                 }
                 R.id.expenseListFragment -> {
-                    fab.show()
-                    bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_CENTER
+                    handler.postDelayed({
+                        bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_CENTER
+                    }, 100)
                 }
                 R.id.newGroupFragment -> {
 
@@ -59,6 +78,18 @@ class HomeActivity : AppCompatActivity() {
                     fab.hide()
                 }
             }
+            handler.postDelayed({
+                val anim = ValueAnimator.ofFloat(0F, 1F)
+                anim.apply {
+                    addUpdateListener {
+                        drawerArrowDrawable.progress = it.animatedValue as Float
+                    }
+                    interpolator = DecelerateInterpolator()
+                    duration = 200
+                    start()
+                }
+            }, 100)
+
         }
     }
 }
