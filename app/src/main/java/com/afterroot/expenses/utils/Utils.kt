@@ -78,10 +78,14 @@ object Utils {
 
             val builder = StringBuilder()
             when {
-                diffInDays > 0 -> builder.append("$diffInDays days ago")
-                diffInHours > 0 -> builder.append("$diffInHours hours ago")
-                diffInMinutes > 0 -> builder.append("$diffInMinutes minutes ago")
-                else -> builder.append("$diffInSec seconds ago")
+                diffInDays > 1 -> builder.append("$diffInDays days ago")
+                diffInDays == 1 -> builder.append("$diffInDays day ago")
+                diffInHours > 1 -> builder.append("$diffInHours hours ago")
+                diffInHours == 1 -> builder.append("$diffInHours hour ago")
+                diffInMinutes > 1 -> builder.append("$diffInMinutes minutes ago")
+                diffInMinutes == 1 -> builder.append("$diffInMinutes minute ago")
+                diffInSec > 1 -> builder.append("$diffInSec seconds ago")
+                else -> builder.append("$diffInSec second ago")
             }
             builder.toString()
         }
