@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.expenses.model
+package com.afterroot.expenses.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.expenses.R
+import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.utils.ListClickCallbacks
 import com.afterroot.expenses.utils.Utils
 import com.google.firebase.firestore.QuerySnapshot
