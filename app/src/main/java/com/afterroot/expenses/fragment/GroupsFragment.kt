@@ -99,10 +99,7 @@ class GroupsFragment : Fragment() {
                                 Toast.makeText(_context, "Clicked", Toast.LENGTH_SHORT).show()
                             }
                             R.id.sign_out -> {
-                                AuthUI.getInstance().signOut(_context).addOnSuccessListener {
-                                    Toast.makeText(_context, "Signed Out", Toast.LENGTH_SHORT).show()
-                                    signInDialog().show()
-                                }
+                                signOutDialog().show()
                             }
                             R.id.edit_profile -> {
                                 findNavController().navigate(R.id.edit_profile)
@@ -242,6 +239,20 @@ class GroupsFragment : Fragment() {
                 }.setCancelable(false)
     }
 
+    private fun signOutDialog(): AlertDialog.Builder {
+        return AlertDialog.Builder(_context)
+                .setTitle("Sign Out")
+                .setMessage("Do you want to Sign Out?")
+                .setPositiveButton("Sign Out") { _, _ ->
+                    AuthUI.getInstance().signOut(_context).addOnSuccessListener {
+                        Toast.makeText(_context, "Signed Out", Toast.LENGTH_SHORT).show()
+                        signInDialog().show()
+                    }
+                }
+                .setNegativeButton("Cancel") { _, _ ->
+
+                }.setCancelable(true)
+    }
 
     private fun initFirebaseDb() {
         Log.d(_tag, "initFirebaseDb: Started")
