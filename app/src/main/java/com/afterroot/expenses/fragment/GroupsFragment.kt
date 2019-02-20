@@ -31,16 +31,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.R
-import com.afterroot.expenses.model.Group
+import com.afterroot.expenses.model.GroupAdapter
+import com.afterroot.expenses.model.GroupsViewModel
 import com.afterroot.expenses.model.User
 import com.afterroot.expenses.utils.*
 import com.afterroot.expenses.utils.Constants.PREF_KEY_FIRST_START
@@ -48,20 +49,17 @@ import com.afterroot.expenses.utils.Constants.RC_SIGN_IN
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_groups.*
-import kotlinx.android.synthetic.main.list_item_group.view.*
 import org.jetbrains.anko.design.snackbar
-import java.util.*
 
 class GroupsFragment : Fragment() {
-    private var groupsAdapter: FirestoreRecyclerAdapter<Group, ViewHolder>? = null
+    private var groupsAdapter: GroupAdapter? = null
     lateinit var db: FirebaseFirestore
     private val _tag = "GroupsFragment"
     private lateinit var _context: Context
@@ -247,58 +245,33 @@ class GroupsFragment : Fragment() {
 
     private fun initFirebaseDb() {
         Log.d(_tag, "initFirebaseDb: Started")
-        val uid = FirebaseAuth.getInstance().uid
-        val query = db.collection(DBConstants.GROUPS)
-                .whereGreaterThanOrEqualTo(
-                        "${DBConstants.FIELD_GROUP_MEMBERS}.$uid",
-                        DBConstants.TYPE_MEMBER
-                )
-        val options = FirestoreRecyclerOptions.Builder<Group>()
-                .setQuery(query, Group::class.java)
-                .setLifecycleOwner(this)
-                .build()
-        groupsAdapter = object : FirestoreRecyclerAdapter<Group, ViewHolder>(options) {
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-                val holderView = LayoutInflater.from(parent.context).inflate(R.layout.list_item_group, parent, false)
-                return ViewHolder(holderView)
+        groupsAdapter = GroupAdapter(object : ListClickCallbacks<QuerySnapshot> {
+            override fun onListItemClick(item: QuerySnapshot?, docId: String) {
+                val action = GroupsFragmentDirections
+                        .toExpenseList(docId)
+                activity!!.host_nav_fragment.findNavController().navigate(action)
             }
 
-            override fun onBindViewHolder(holder: GroupsFragment.ViewHolder, position: Int, model: Group) {
-                holder.apply {
-                    itemName.text = model.group_name
-                    itemDate.text = Utils.getDateDiff(model.date!!, Calendar.getInstance().time)
-                }
+            override fun onListItemLongClick(item: QuerySnapshot?, docId: String) {
 
-                with(holder.itemView) {
-                    tag = model
-                    setOnClickListener {
-                        val action = GroupsFragmentDirections
-                                .toExpenseList(snapshots.getSnapshot(holder.adapterPosition).id)
-                        activity!!.host_nav_fragment.findNavController().navigate(action)
-                    }
-                    setOnLongClickListener {
-                        return@setOnLongClickListener true
-                    }
-                }
             }
 
-        }
-        Log.d(_tag, "initFirebaseDb: Ended")
-        activity?.apply {
-            progress?.visibility = View.GONE
-            fab.show()
-        }
+        })
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
-            adapter = groupsAdapter
         }
-    }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val itemName: AppCompatTextView = view.item_name
-        val itemEmail: AppCompatTextView = view.item_email
-        val itemDate: AppCompatTextView = view.item_time
+        val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
+        groupsViewModel.getGroupSnapshots(FirebaseAuth.getInstance().uid!!).observe(this, Observer<QuerySnapshot> { snapshot ->
+            groupsAdapter!!.setSnapshots(snapshot)
+            list.adapter = groupsAdapter
+            activity?.apply {
+                progress?.visibility = View.GONE
+                fab.show()
+            }
+        })
+        Log.d(_tag, "initFirebaseDb: Ended")
     }
 }

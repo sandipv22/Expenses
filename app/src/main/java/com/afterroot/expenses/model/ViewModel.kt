@@ -16,10 +16,13 @@
 
 package com.afterroot.expenses.model
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.afterroot.expenses.utils.DBConstants
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 
 
 class UserViewModel : ViewModel() {
@@ -32,6 +35,25 @@ class UserViewModel : ViewModel() {
 
     fun getUser(): LiveData<User>? {
         return user
+    }
+}
+
+class GroupsViewModel : ViewModel() {
+    var groupSnapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
+
+    fun getGroupSnapshots(userId: String): LiveData<QuerySnapshot> {
+        if (groupSnapshot.value == null) {
+            Log.d("GroupViewModel", "getGroupSnapshots: Getting Snapshots")
+            FirebaseFirestore.getInstance().collection(DBConstants.GROUPS).whereGreaterThanOrEqualTo(
+                    "${DBConstants.FIELD_GROUP_MEMBERS}.$userId",
+                    DBConstants.TYPE_MEMBER
+            ).addSnapshotListener { querySnapshot, _ ->
+                if (querySnapshot != null) {
+                    groupSnapshot.value = querySnapshot
+                }
+            }
+        }
+        return groupSnapshot
     }
 }
 
