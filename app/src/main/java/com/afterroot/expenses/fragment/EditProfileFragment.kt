@@ -21,10 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.User
-import com.afterroot.expenses.model.UserViewModel
 import com.afterroot.expenses.utils.*
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -40,8 +38,6 @@ import org.jetbrains.anko.design.snackbar
  */
 class EditProfileFragment : Fragment() {
 
-    private val args: EditProfileFragmentArgs by navArgs()
-    private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_edit_profile, container, false)
@@ -54,19 +50,19 @@ class EditProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
             firebaseUser = FirebaseUtils.auth?.currentUser!!
-            activity!!.progress.setVisible(true)
+            activity!!.progress.visible(true)
             input_profile_name.setText(firebaseUser.displayName)
             input_email.setText(firebaseUser.email)
             input_email.isEnabled = false
             db.collection(DBConstants.USERS).document(firebaseUser.uid).get().addOnSuccessListener { documentSnapshot ->
                 val user = documentSnapshot.toObject(User::class.java)
                 input_phone.setText(user!!.phone)
-                activity!!.progress.setVisible(false)
+                activity!!.progress.visible(false)
             }
             activity!!.fab.apply {
                 setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save))
                 setOnClickListener {
-                    activity!!.progress.setVisible(true)
+                    activity!!.progress.visible(true)
                     val phoneText = this@EditProfileFragment.input_phone.text.toString()
                     val phone: String = Utils.formatPhone(activity!!, phoneText)
                     val request = UserProfileChangeRequest.Builder()
@@ -82,7 +78,7 @@ class EditProfileFragment : Fragment() {
                                             phone))
                                     .addOnSuccessListener {
                                         activity!!.apply {
-                                            progress.setVisible(false)
+                                            progress.visible(false)
                                             root_layout.snackbar("Profile Updated")
                                         }
                                     }

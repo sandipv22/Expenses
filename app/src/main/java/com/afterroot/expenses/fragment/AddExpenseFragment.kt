@@ -85,7 +85,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var paidByName: String = ""
     private lateinit var category: String
     private var millis: Long = 0
-    val args: AddExpenseFragmentArgs by navArgs()
+    private val args: AddExpenseFragmentArgs by navArgs()
 
     private fun init(view: View) {
         groupID = args.groupDocId
@@ -114,8 +114,8 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             text_paid_by.apply {
                 setOnClickListener {
                     if (isAllUsersAdded) {
-                        MaterialDialog.Builder(activity!!).items(usersMap.keys).itemsCallback { dialog, itemView, position, text ->
-                            Log.d("TESTAG", "onSuccess: Direct Load $position $text ${usersMap[text]!!.name} ${usersMap[text]!!.uid}")
+                        MaterialDialog.Builder(activity!!).items(usersMap.keys).itemsCallback { _, _, position, text ->
+                            Log.d(_tag, "onSuccess: Direct Load $position $text ${usersMap[text]!!.name} ${usersMap[text]!!.uid}")
                             paidByID = usersMap[text]!!.uid
                             paidByName = text as String
                             view.text_paid_by.text = paidByName
@@ -125,8 +125,8 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                         getGroupUsers(object : FirebaseUtils.Callbacks<HashMap<String, User>> {
                             override fun onSuccess(value: HashMap<String, User>) {
                                 progress.dismiss()
-                                MaterialDialog.Builder(activity!!).items(value.keys).itemsCallback { dialog, itemView, position, text ->
-                                    Log.d("TESTAG", "onSuccess: Wait Load $position $text ${value[text]!!.name} ${value[text]!!.uid}")
+                                MaterialDialog.Builder(activity!!).items(value.keys).itemsCallback { _, _, position, text ->
+                                    Log.d(_tag, "onSuccess: Wait Load $position $text ${value[text]!!.name} ${value[text]!!.uid}")
                                     paidByID = value[text]!!.uid
                                     paidByName = text as String
                                     view.text_paid_by.text = paidByName
@@ -154,14 +154,14 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                                         i++
                                         when (i) {
                                             text.size -> builder.append(it.toString())
-                                            text.size - 1 -> builder.append(it.toString() + " and ")
-                                            else -> builder.append(it.toString() + ", ")
+                                            text.size - 1 -> builder.append("$it and ")
+                                            else -> builder.append("$it, ")
                                         }
-                                        Log.d("TESTAG", "$builder")
+                                        Log.d(_tag, "$builder")
                                         text_spenders.text = builder
                                         val user = referenceMap[it.toString()]
                                         withUserMap[user!!.name] = user
-                                        Log.d("TESTAG", "Added to Final Map ${user.name}")
+                                        Log.d(_tag, "Added to Final Map ${user.name}")
                                     }
                                     return@itemsCallbackMultiChoice true
                                 }.positiveText("OK").onPositive { dialog, which ->
@@ -174,7 +174,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                                 value.remove(paidByName)
                                 MaterialDialog.Builder(activity!!).items(value.keys)
                                         .itemsCallbackMultiChoice(null) { materialDialog: MaterialDialog, ints: Array<Int>, arrayOfCharSequences: Array<CharSequence> ->
-                                            Log.d("TESTAG", "onSuccess: ${ints.size}")
+                                            Log.d(_tag, "onSuccess: ${ints.size}")
                                             return@itemsCallbackMultiChoice true
                                         }.positiveText("OK").onPositive { dialog, which ->
 
@@ -230,7 +230,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     getByID(db!!.collection(DBConstants.USERS).document(user.key!!), object : FirebaseUtils.Callbacks<User> {
                         override fun onSuccess(value: User) {
                             i--
-                            Log.d("TESTAG", "onSuccess: $value pos : $i")
+                            Log.d(_tag, "onSuccess: $value pos : $i")
                             if (!usersMap.containsKey(value.name)) usersMap[value.name] = value
                             if (!referenceMap.containsKey(value.name)) referenceMap[value.name] = value
                             if (i == 0) {

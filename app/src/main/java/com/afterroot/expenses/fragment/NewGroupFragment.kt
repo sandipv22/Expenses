@@ -23,12 +23,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.MultiAutoCompleteTextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Group
-import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.FirebaseUtils
-import com.afterroot.expenses.utils.Utils
-import com.afterroot.expenses.utils.getDrawableExt
+import com.afterroot.expenses.utils.*
 import com.android.ex.chips.BaseRecipientAdapter
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
@@ -83,18 +81,24 @@ class NewGroupFragment : Fragment() {
                                             Log.d(_tag, "onCreateOptionsMenu: Creating Group")
                                             val group = Group(edit_text_group_name.text.toString(), Date(), userMAp)
                                             db.collection(DBConstants.GROUPS).add(group).addOnSuccessListener {
-                                                activity!!.root_layout.snackbar("Group Created")
-                                                activity!!.progress.visibility = View.INVISIBLE
-                                                activity!!.supportFragmentManager.popBackStack()
+                                                activity!!.apply {
+                                                    root_layout.snackbar("Group Created")
+                                                    progress.visible(false)
+                                                    host_nav_fragment.findNavController().navigateUp()
+                                                }
                                             }.addOnFailureListener {
-                                                activity!!.root_layout.snackbar("Group not created.")
-                                                activity!!.progress.visibility = View.INVISIBLE
+                                                activity!!.apply {
+                                                    root_layout.snackbar("Group not created.")
+                                                    progress.visible(false)
+                                                }
                                             }
                                         }
                                     } else {
                                         Log.d(_tag, "getUID: User Not Available")
-                                        activity!!.root_layout.snackbar("${item.entry.destination} is not available")
-                                        progress.visibility = View.INVISIBLE
+                                        activity!!.apply {
+                                            root_layout.snackbar("${item.entry.destination} is not available")
+                                            progress.visible(false)
+                                        }
                                     }
                                 }.addOnFailureListener { Log.d(_tag, "getUID: Query Failed") }
                     }
