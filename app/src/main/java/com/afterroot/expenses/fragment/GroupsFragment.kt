@@ -40,7 +40,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.R
-import com.afterroot.expenses.model.GroupAdapter
+import com.afterroot.expenses.adapter.GroupAdapter
 import com.afterroot.expenses.model.GroupsViewModel
 import com.afterroot.expenses.model.User
 import com.afterroot.expenses.utils.*
