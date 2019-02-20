@@ -120,7 +120,7 @@ fun Activity.getDrawableExt(id: Int): Drawable {
     return resources.getDrawable(id)
 }
 
-fun View.setVisible(value: Boolean) {
+fun View.visible(value: Boolean) {
     visibility = if (value) {
         View.VISIBLE
     } else {
