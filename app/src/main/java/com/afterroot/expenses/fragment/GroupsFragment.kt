@@ -135,7 +135,7 @@ class GroupsFragment : Fragment() {
                     }, 1000)
                 } else {
                     Log.d(_tag, "onRequestPermissionsResult: Permissions not granted")
-                    activity!!.root_layout.snackbar("Please grant permissions", "GRANT") {
+                    activity!!.root_layout.snackbar(getString(R.string.msg_grant_permission_request), getString(R.string.text_action_grant)) {
                         checkPermissions(permissions)
                     }
                     //TODO MainInfoFragment
@@ -159,8 +159,7 @@ class GroupsFragment : Fragment() {
                                 PreferenceManager.getDefaultSharedPreferences(_context).edit()
                                         .putBoolean(PREF_KEY_FIRST_START, false)
                                         .apply()
-                                val handler = Handler()
-                                handler.postDelayed({ checkPermissions(permissions) }, 500)
+                                Handler().postDelayed({ checkPermissions(permissions) }, 500)
                             }
                         }
                     }
@@ -178,7 +177,6 @@ class GroupsFragment : Fragment() {
                             }
                             else -> Toast.makeText(_context, "Sign In failed. Please try again.", Toast.LENGTH_SHORT).show()
                         }
-                        activity!!.finish()
                     }
                 }
             }
@@ -189,7 +187,7 @@ class GroupsFragment : Fragment() {
         val auth = FirebaseAuth.getInstance()
         val curUser = auth.currentUser
         /*if (curUser?.displayName == null || curUser.email == null || curUser.phoneNumber == null) {
-            createdView.findNavController().navigate(R.id.action_groupsFragment_to_editProfileFragment)
+            createdView.findNavController().navigate(R.id.edit_profile)
             return
         }*/
         val userRef = db.collection(DBConstants.USERS).document(curUser!!.uid)
@@ -224,32 +222,33 @@ class GroupsFragment : Fragment() {
 
     private fun signInDialog(): AlertDialog.Builder {
         return AlertDialog.Builder(_context)
-                .setTitle("Sign In")
-                .setMessage("Please Sign In to Continue")
-                .setPositiveButton("Sign In") { _, _ ->
+                .setTitle(getString(R.string.text_sign_in))
+                .setMessage(getString(R.string.msg_dialog_sign_in))
+                .setPositiveButton(R.string.text_sign_in) { _, _ ->
                     startActivityForResult(AuthUI.getInstance()
                             .createSignInIntentBuilder()
                             .setIsSmartLockEnabled(false)
+                            .setTheme(R.style.AppTheme)
                             .setAvailableProviders(arrayListOf(AuthUI.IdpConfig.PhoneBuilder().build(),
                                     AuthUI.IdpConfig.GoogleBuilder().build()))
                             .build(), Constants.RC_SIGN_IN)
                 }
-                .setNegativeButton("Cancel") { _, _ ->
+                .setNegativeButton(getString(R.string.text_cancel)) { _, _ ->
                     activity!!.finish()
                 }.setCancelable(false)
     }
 
     private fun signOutDialog(): AlertDialog.Builder {
         return AlertDialog.Builder(_context)
-                .setTitle("Sign Out")
-                .setMessage("Do you want to Sign Out?")
-                .setPositiveButton("Sign Out") { _, _ ->
+                .setTitle(getString(R.string.text_sign_out))
+                .setMessage(getString(R.string.msg_dialog_sign_out))
+                .setPositiveButton(R.string.text_sign_out) { _, _ ->
                     AuthUI.getInstance().signOut(_context).addOnSuccessListener {
-                        Toast.makeText(_context, "Signed Out", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(_context, getString(R.string.text_sign_out_success), Toast.LENGTH_SHORT).show()
                         signInDialog().show()
                     }
                 }
-                .setNegativeButton("Cancel") { _, _ ->
+                .setNegativeButton(R.string.text_cancel) { _, _ ->
 
                 }.setCancelable(true)
     }
