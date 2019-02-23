@@ -78,6 +78,7 @@
         android:drawablePadding="@dimen/text_drawable_padding"
         android:gravity="center_vertical"
         android:padding="@dimen/text_item_padding"
+        android:text="Loading..."
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintTop_toBottomOf="@+id/detail_note"
         tools:text="Paid by" />
