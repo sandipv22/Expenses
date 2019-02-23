@@ -26,7 +26,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.afterroot.expenses.BuildConfig
 import com.afterroot.expenses.model.User
-import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
@@ -39,22 +38,6 @@ import java.util.*
  * Created by Sandip on 04-12-2017.
  */
 object Utils {
-    private var providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.PhoneBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build())
-    /*     AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
-         AuthUI.IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build())*/
-
-    fun startFirebaseUI(activity: Activity, requestCode: Int) {
-        activity.startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setIsSmartLockEnabled(false)
-                        .setAvailableProviders(providers)
-                        .build(), requestCode)
-    }
-
     fun getDateDiff(fromDate: Date, toDate: Date = Calendar.getInstance().time): String {
         val fromCal = Calendar.getInstance()
         fromCal.time = fromDate
@@ -140,30 +123,30 @@ class PermissionChecker(private val mContext: Context) {
 }
 
 object Constants {
-    val RC_SIGN_IN = 479
-    val RC_PERMISSIONS = 8649
-    val RC_CONTACTS_PICKER = 461
-    val PREF_KEY_FIRST_START = "${BuildConfig.APPLICATION_ID}.PREF_KEY_FIRST_START"
-    val KEY_EXPENSE_SERIALIZE = "EXPENSE_ITEM_SERIALIZE"
+    const val RC_SIGN_IN = 479
+    const val RC_PERMISSIONS = 8649
+    const val RC_CONTACTS_PICKER = 461
+    const val PREF_KEY_FIRST_START = "${BuildConfig.APPLICATION_ID}.PREF_KEY_FIRST_START"
+    const val KEY_EXPENSE_SERIALIZE = "EXPENSE_ITEM_SERIALIZE"
 }
 
 object DBConstants {
-    val USERS = "users"
-    val EXPENSES = "expenses"
-    val GROUPS = "groups"
-    val CATEGORIES = "categories"
+    const val USERS = "users"
+    const val EXPENSES = "expenses"
+    const val GROUPS = "groups"
+    const val CATEGORIES = "categories"
 
-    val FIELD_NAME = "name"
-    val FIELD_EMAIL = "email"
-    val FIELD_UID = "uid"
-    val FIELD_PHONE = "phone"
+    const val FIELD_NAME = "name"
+    const val FIELD_EMAIL = "email"
+    const val FIELD_UID = "uid"
+    const val FIELD_PHONE = "phone"
 
-    val FIELD_ADMIN_ID = "admin_id"
-    val FIELD_GROUP_NAME = "group_name"
-    val FIELD_GROUP_MEMBERS = "members"
+    const val FIELD_ADMIN_ID = "admin_id"
+    const val FIELD_GROUP_NAME = "group_name"
+    const val FIELD_GROUP_MEMBERS = "members"
 
-    val TYPE_MEMBER = 0
-    val TYPE_ADMIN = 1
+    const val TYPE_MEMBER = 0
+    const val TYPE_ADMIN = 1
 }
 
 object FirebaseUtils {
@@ -186,10 +169,6 @@ object FirebaseUtils {
             }
             return true
         }
-    val EMAIL = auth?.currentUser?.email
-    val UID = auth?.currentUser?.uid
-    val NAME = auth?.currentUser?.displayName
-    val PHONE = auth?.currentUser?.phoneNumber
 
     interface Callbacks<in T> {
         fun onSuccess(value: T)
