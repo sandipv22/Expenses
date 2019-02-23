@@ -18,6 +18,8 @@ package com.afterroot.expenses.fragment
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -39,6 +41,7 @@ import com.afterroot.expenses.utils.getDrawableExt
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.fragment_add_expense.*
 import kotlinx.android.synthetic.main.fragment_add_expense.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -193,7 +196,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_done))
             show()
             setOnClickListener {
-                if (verifyData(view)) {
+                if (verifyData()) {
                     /* val finalList = ArrayList<String>()
                      withUserMap.values.mapTo(finalList) { it.uid }*/
                     val map: HashMap<String, String>? = HashMap()
@@ -248,12 +251,26 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         })
     }
 
-    private fun verifyData(view: View): Boolean {
-        if (view.text_input_amount.text!!.isEmpty()) {
-            view.text_input_amount.error = "Please enter amount"
-            return false
+    private fun verifyData(): Boolean {
+        return when {
+            text_input_amount.text!!.isEmpty() -> {
+                text_input_amount.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                    }
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        text_input_layout_amount.isErrorEnabled = false
+                    }
+
+                })
+                text_input_layout_amount.error = "Please enter amount"
+                false
+            }
+            else -> true
         }
-        return true
     }
 
     override fun onDateSet(p0: DatePicker?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
