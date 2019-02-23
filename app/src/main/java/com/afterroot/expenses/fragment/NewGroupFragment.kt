@@ -17,6 +17,8 @@
 package com.afterroot.expenses.fragment
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +34,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_new_group.*
+import kotlinx.android.synthetic.main.fragment_new_group.view.*
 import org.jetbrains.anko.design.snackbar
 import java.util.*
 
@@ -56,8 +59,8 @@ class NewGroupFragment : Fragment() {
         activity!!.fab.apply {
             setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save))
             setOnClickListener {
-                val selected = edit_text_group_members.sortedRecipients
-                if (selected.isNotEmpty()) {
+                if (verifyData()) {
+                    val selected = edit_text_group_members.sortedRecipients
                     val userMAp = HashMap<String?, Int>()
                     activity!!.progress.visibility = View.VISIBLE
                     Log.d(_tag, "onActivityResult: Adding contacts to Map")
@@ -104,6 +107,44 @@ class NewGroupFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun verifyData(): Boolean {
+        return when {
+            edit_text_group_name.text!!.isEmpty() -> {
+                edit_text_group_name.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                    }
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        ti_layout_group_name.isErrorEnabled = false
+                    }
+
+                })
+                ti_layout_group_name.error = "Group name can not be empty"
+                false
+            }
+            edit_text_group_members.sortedRecipients.isEmpty() -> {
+                edit_text_group_members.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                    }
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        ti_layout_group_members.isErrorEnabled = false
+                    }
+
+                })
+                ti_layout_group_members.error = "Group memebers can not be empty"
+                false
+            }
+            else -> true
         }
     }
 }
