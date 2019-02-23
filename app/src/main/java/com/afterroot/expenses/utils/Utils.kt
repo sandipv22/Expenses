@@ -197,19 +197,19 @@ object FirebaseUtils {
     }
 
     fun getUserByID(uid: String, callbacks: Callbacks<User>) {
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection(DBConstants.USERS).document(FirebaseAuth.getInstance().currentUser!!.uid)
-        userRef.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot.exists()) {
-                Log.d("FirebaseUser", "DocumentSnapshot data: " + documentSnapshot.data)
-                callbacks.onSuccess(documentSnapshot.toObject(User::class.java)!!)
-            } else {
-                callbacks.onFailed("User Not Exists")
-            }
-        }.addOnFailureListener { exception ->
-            Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
-            callbacks.onFailed(exception.message!!)
-        }
+        FirebaseFirestore.getInstance().collection(DBConstants.USERS).document(uid)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        Log.d("FirebaseUser", "DocumentSnapshot data: " + documentSnapshot.data)
+                        callbacks.onSuccess(documentSnapshot.toObject(User::class.java)!!)
+                    } else {
+                        callbacks.onFailed("User Not Exists")
+                    }
+                }.addOnFailureListener { exception ->
+                    Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
+                    callbacks.onFailed(exception.message!!)
+                }
     }
 
     inline fun <reified T> getByID(ref: DocumentReference, callbacks: FirebaseUtils.Callbacks<T>) {
