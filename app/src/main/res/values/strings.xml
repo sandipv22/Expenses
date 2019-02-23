@@ -41,4 +41,13 @@
     <string name="with">With..</string>
     <string name="text_group_name">Group Name</string>
     <string name="text_members">Members</string>
+    <string name="text_sign_in">Sign In</string>
+    <string name="msg_dialog_sign_in">Please Sign In to Continue</string>
+    <string name="text_cancel">Cancel</string>
+    <string name="text_sign_out">Sign Out</string>
+    <string name="msg_dialog_sign_out">Do you want to Sign Out?</string>
+    <string name="text_sign_out_success">Signed Out</string>
+    <string name="msg_grant_permission_request">Please grant permissions</string>
+    <string name="text_action_grant">GRANT</string>
+    <string name="text_edit_profile">Edit Profile</string>
 </resources>

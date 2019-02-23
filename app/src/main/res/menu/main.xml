@@ -19,7 +19,8 @@
     <group android:checkableBehavior="none">
         <item
             android:id="@+id/edit_profile"
-            android:title="Edit Profile" />
+            android:icon="@drawable/ic_edit"
+            android:title="@string/text_edit_profile" />
         <item
             android:id="@+id/action_settings"
             android:orderInCategory="100"
@@ -29,6 +30,6 @@
         <item
             android:id="@+id/sign_out"
             android:icon="@drawable/ic_person"
-            android:title="Sign Out" />
+            android:title="@string/text_sign_out" />
     </group>
 </menu>

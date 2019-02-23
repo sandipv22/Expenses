@@ -14,26 +14,20 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.AppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/category_text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground">
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/category_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/list_item_spacing_half"
-        android:layout_marginTop="@dimen/list_item_spacing_half"
-        android:layout_marginEnd="@dimen/list_item_spacing_half"
-        android:layout_marginBottom="@dimen/list_item_spacing_half"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        app:fontFamily="sans-serif-smallcaps"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Category" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:background="?attr/selectableItemBackground"
+    android:paddingStart="@dimen/list_item_spacing"
+    android:paddingTop="@dimen/list_item_spacing_half"
+    android:paddingEnd="0dp"
+    android:paddingBottom="@dimen/list_item_spacing_half"
+    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:text="Category" />
