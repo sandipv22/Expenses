@@ -57,10 +57,11 @@ class NewGroupFragment : Fragment() {
         edit_text_group_members.setAdapter(recAdapter)
 
         activity!!.fab.apply {
-            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save))
+            val icon = activity!!.getDrawableExt(R.drawable.ic_save, R.color.icon_fill)
+            setImageDrawable(icon)
             setOnClickListener {
                 if (verifyData()) {
-                    val selected = edit_text_group_members.sortedRecipients
+                    val selected = view.edit_text_group_members.sortedRecipients
                     val userMAp = HashMap<String?, Int>()
                     activity!!.progress.visibility = View.VISIBLE
                     Log.d(_tag, "onActivityResult: Adding contacts to Map")
@@ -82,7 +83,7 @@ class NewGroupFragment : Fragment() {
                                             userMAp[FirebaseUtils.firebaseUser!!.uid] = DBConstants.TYPE_ADMIN
                                             activity!!.progress.visibility = View.VISIBLE
                                             Log.d(_tag, "onCreateOptionsMenu: Creating Group")
-                                            val group = Group(edit_text_group_name.text.toString(), Date(), userMAp)
+                                            val group = Group(view.edit_text_group_name.text.toString(), Date(), userMAp)
                                             db.collection(DBConstants.GROUPS).add(group).addOnSuccessListener {
                                                 activity!!.apply {
                                                     root_layout.snackbar("Group Created")
