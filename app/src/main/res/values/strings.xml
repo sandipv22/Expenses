@@ -50,4 +50,6 @@
     <string name="msg_grant_permission_request">Please grant permissions</string>
     <string name="text_action_grant">GRANT</string>
     <string name="text_edit_profile">Edit Profile</string>
+    <string name="text_edit">Edit</string>
+    <string name="text_delete">Delete</string>
 </resources>
