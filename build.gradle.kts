@@ -20,12 +20,14 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url = uri("https://maven.fabric.io/public") }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.3.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21")
         classpath("com.google.gms:google-services:4.2.0")
         classpath("android.arch.navigation:navigation-safe-args-gradle-plugin:1.0.0-beta02")
+        classpath("io.fabric.tools:gradle:1.27.1")
     }
 }
 
