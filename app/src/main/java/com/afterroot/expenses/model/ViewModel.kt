@@ -55,6 +55,10 @@ class GroupsViewModel : ViewModel() {
         }
         return groupSnapshot
     }
+    
+    fun getGroups(userId: String): LiveData<List<Group>> {
+        return getGroupSnapshots(userId).toObjects(Group::class.java)
+    }
 }
 
 //TODO Migrate to ViewModel
