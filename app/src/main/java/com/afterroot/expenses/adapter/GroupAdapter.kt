@@ -62,6 +62,7 @@ class GroupAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerView.
                 mCallbacks.onListItemClick(mSnapshot, mSnapshot.documents[holder.adapterPosition].id)
             }
             setOnLongClickListener {
+                mCallbacks.onListItemLongClick(mSnapshot, mSnapshot.documents[holder.adapterPosition].id)
                 return@setOnLongClickListener true
             }
         }
