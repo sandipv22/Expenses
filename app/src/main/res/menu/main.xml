@@ -18,7 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="none">
         <item
-            android:id="@+id/edit_profile"
+            android:id="@+id/action_edit_profile"
             android:icon="@drawable/ic_edit"
             android:title="@string/text_edit_profile" />
         <item
