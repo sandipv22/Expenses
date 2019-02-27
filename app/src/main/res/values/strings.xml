@@ -52,4 +52,5 @@
     <string name="text_edit_profile">Edit Profile</string>
     <string name="text_edit">Edit</string>
     <string name="text_delete">Delete</string>
+    <string name="text_loading">Loading...</string>
 </resources>
