@@ -17,18 +17,19 @@
 package com.afterroot.expenses.utils
 
 import android.view.MenuItem
-import com.afterroot.expenses.model.ExpenseItem
-
-interface ExpenseClickCallbacks {
-    fun onExpenseClick(item: ExpenseItem?)
-    fun onExpenseLongClick(item: ExpenseItem?)
-}
+import com.google.firebase.firestore.DocumentSnapshot
 
 interface ListClickCallbacks<in T> {
-    fun onListItemClick(item: T?, docId: String)
-    fun onListItemLongClick(item: T?, docId: String)
+    fun onListItemClick(item: T?, docId: String, position: Int)
+    fun onListItemLongClick(item: T?, docId: String, position: Int)
 }
 
 interface NavigationItemClickCallback {
     fun onClick(item: MenuItem)
+}
+
+interface Callbacks<in T> {
+    fun onSuccess(value: T)
+    fun onFailed(message: String)
+    fun onSnapshot(snapshot: DocumentSnapshot)
 }
