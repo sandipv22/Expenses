@@ -17,6 +17,7 @@
 package com.afterroot.expenses.fragment
 
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,10 +31,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
-import com.afterroot.expenses.utils.Constants
-import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.Utils
-import com.afterroot.expenses.utils.getDrawableExt
+import com.afterroot.expenses.utils.*
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
@@ -62,10 +60,13 @@ class ExpenseListFragment : Fragment() {
         db = FirebaseFirestore.getInstance().apply {
             firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
         }
-        activity!!.progress.visibility = View.VISIBLE
-        initFirebaseDb()
+        activity!!.progress.visible(true)
+        Handler().postDelayed({
+            initFirebaseDb()
+        }, 200)
+
         activity!!.fab.apply {
-            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_add))
+            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
             setOnClickListener {
                 Log.d(_tag, "onViewCreated: FAB Clicked")
                 val action = ExpenseListFragmentDirections.toAddExpense(groupDocID)
@@ -119,9 +120,9 @@ class ExpenseListFragment : Fragment() {
             override fun onDataChanged() {
                 Log.d(_tag, "onDataChanged: ItemCount: $itemCount")
                 if (itemCount == 0) {
-                    activity!!.text_no_expenses.visibility = View.VISIBLE
+                    activity!!.text_no_expenses.visible(true)
                 } else {
-                    activity!!.text_no_expenses.visibility = View.INVISIBLE
+                    activity!!.text_no_expenses.visible(false)
                 }
             }
 
@@ -130,14 +131,13 @@ class ExpenseListFragment : Fragment() {
             }
         }
 
-        activity!!.progress.visibility = View.GONE
         list.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
             adapter = firestoreAdapter
         }
-        activity!!.fab.show()
+        activity!!.progress.visible(false)
     }
 
     inner class ExpenseViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
