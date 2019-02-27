@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afterroot.expenses.utils.DBConstants
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 
 
@@ -40,10 +41,12 @@ class UserViewModel : ViewModel() {
 
 class GroupsViewModel : ViewModel() {
     var groupSnapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
+    var groups: MutableLiveData<List<Group>> = MutableLiveData()
 
-    fun getGroupSnapshots(userId: String): LiveData<QuerySnapshot> {
+
+    fun getGroupSnapshot(userId: String): LiveData<QuerySnapshot> {
         if (groupSnapshot.value == null) {
-            Log.d("GroupViewModel", "getGroupSnapshots: Getting Snapshots")
+            Log.d("GroupViewModel", "getGroupSnapshot: Getting Snapshots")
             FirebaseFirestore.getInstance().collection(DBConstants.GROUPS).whereGreaterThanOrEqualTo(
                     "${DBConstants.FIELD_GROUP_MEMBERS}.$userId",
                     DBConstants.TYPE_MEMBER
@@ -55,19 +58,40 @@ class GroupsViewModel : ViewModel() {
         }
         return groupSnapshot
     }
-    
+
     fun getGroups(userId: String): LiveData<List<Group>> {
-        return getGroupSnapshots(userId).toObjects(Group::class.java)
+        if (groups.value == null) {
+            groups.value = getGroupSnapshot(userId).value?.toObjects(Group::class.java)
+        }
+        return groups
     }
 }
 
 //TODO Migrate to ViewModel
-class ExpenseViewModel : ViewModel() {
+class ExpensesViewModel : ViewModel() {
+    var snapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
     var expenses: MutableLiveData<List<ExpenseItem>> = MutableLiveData()
 
-    fun getExpenses(): LiveData<List<ExpenseItem>> {
-        if (expenses.value == null) {
+    fun getSnapshot(groupId: String): LiveData<QuerySnapshot> {
+        if (snapshot.value == null) {
+            Log.d("ExpensesViewModel", "getGroupSnapshot: ")
             FirebaseFirestore.getInstance()
+                    .collection(DBConstants.GROUPS)
+                    .document(groupId)
+                    .collection(DBConstants.EXPENSES)
+                    .orderBy("date", Query.Direction.DESCENDING)
+                    .addSnapshotListener { querySnapshot, _ ->
+                        if (querySnapshot != null) {
+                            snapshot.value = querySnapshot
+                        }
+                    }
+        }
+        return snapshot
+    }
+
+    fun getExpenses(groupId: String): LiveData<List<ExpenseItem>> {
+        if (expenses.value == null) {
+            expenses.value = getSnapshot(groupId).value?.toObjects(ExpenseItem::class.java)
         }
         return expenses
     }
