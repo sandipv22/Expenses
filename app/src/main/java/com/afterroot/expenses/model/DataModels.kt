@@ -24,11 +24,30 @@ import java.util.*
     constructor() : this(0, "", null, "", "", null)
 }*/
 
-data class ExpenseItem(var amount: Long, var category: String, @ServerTimestamp var date: Date?, var note: String, var paidBy: String, var with: HashMap<String, String>?) : Serializable {
+data class ExpenseItem(
+        var amount: Long,
+        var category: String,
+        @ServerTimestamp var date: Date?,
+        var note: String,
+        var paidBy: String,
+        var with: HashMap<String, String>?
+) : Serializable, Expense {
+    override fun getType(): Int {
+        return Expense.TYPE_EXPENSE
+    }
+
     constructor() : this(0, "", null, "", "", null)
 }
 
-data class Group(var group_name: String, @ServerTimestamp var date: Date?, var members: HashMap<String?, Int>?) : Serializable {
+data class Group(
+        var group_name: String,
+        @ServerTimestamp var date: Date?,
+        var members: HashMap<String?, Int>?
+) : Serializable, Expense {
+    override fun getType(): Int {
+        return Expense.TYPE_GROUP
+    }
+
     constructor() : this("", null, null)
 }
 
@@ -38,4 +57,14 @@ data class User(var name: String, var email: String, var uid: String, var phone:
 
 data class Category(var name: String) : Serializable {
     constructor() : this("")
+}
+
+interface Expense {
+
+    fun getType(): Int
+
+    companion object {
+        const val TYPE_GROUP = 1
+        const val TYPE_EXPENSE = 2
+    }
 }
