@@ -60,6 +60,7 @@
         android:padding="@dimen/text_item_padding"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintTop_toBottomOf="@+id/detail_category"
+        tools:targetApi="m"
         tools:text="Date" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -73,6 +74,7 @@
         android:padding="@dimen/text_item_padding"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintTop_toBottomOf="@+id/detail_date"
+        tools:targetApi="m"
         tools:text="Note" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -84,9 +86,10 @@
         android:drawableTint="@color/secondaryColor"
         android:gravity="center_vertical"
         android:padding="@dimen/text_item_padding"
-        android:text="Loading..."
+        android:text="@string/text_loading"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintTop_toBottomOf="@+id/detail_note"
+        tools:targetApi="m"
         tools:text="Paid by" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -100,6 +103,7 @@
         android:padding="@dimen/text_item_padding"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintTop_toBottomOf="@+id/detail_paid_by"
+        tools:targetApi="m"
         tools:text="Spenders" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
