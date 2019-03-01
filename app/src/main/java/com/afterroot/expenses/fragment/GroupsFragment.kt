@@ -30,14 +30,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.R
-import com.afterroot.expenses.adapter.GroupAdapter
+import com.afterroot.expenses.adapter.ExpenseAdapter
+import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.GroupsViewModel
 import com.afterroot.expenses.utils.DBConstants
+import com.afterroot.expenses.utils.Database
+import com.afterroot.expenses.utils.DeleteListener
 import com.afterroot.expenses.utils.ListClickCallbacks
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
@@ -45,8 +47,8 @@ import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_groups.*
 import org.jetbrains.anko.design.snackbar
 
-class GroupsFragment : Fragment() {
-    private var groupsAdapter: GroupAdapter? = null
+class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
+    private var groupsAdapter: ExpenseAdapter? = null
     lateinit var db: FirebaseFirestore
     private val _tag = "GroupsFragment"
     private lateinit var _context: Context
@@ -60,9 +62,7 @@ class GroupsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         createdView = view
         _context = createdView.context
-        val dbSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
-        db = FirebaseFirestore.getInstance().apply { firestoreSettings = dbSettings }
-
+        db = Database.getInstance()
         activity!!.apply {
             fab.apply {
                 setOnClickListener {
@@ -76,72 +76,7 @@ class GroupsFragment : Fragment() {
     private fun initFirebaseDb() {
         Log.d(_tag, "initFirebaseDb: Started")
         activity!!.progress.visibility = View.VISIBLE
-        groupsAdapter = GroupAdapter(object : ListClickCallbacks<QuerySnapshot> {
-            override fun onListItemClick(item: QuerySnapshot?, docId: String) {
-                val action = GroupsFragmentDirections.toExpenseList(docId)
-                activity!!.host_nav_fragment.findNavController().navigate(action)
-            }
-
-            override fun onListItemLongClick(item: QuerySnapshot?, docId: String) {
-                val bottomSheetDialog = BottomSheetDialog(activity!!)
-                with(bottomSheetDialog) {
-                    setContentView(R.layout.context_group)
-                    show()
-                    item_edit.setOnClickListener {
-                        Log.d(_tag, "onListItemLongClick: Clicked")
-                    }
-                    item_delete.setOnClickListener {
-                        db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.CATEGORIES).get().addOnSuccessListener {
-                            if (it.documents.isNotEmpty()) {
-                                it.documents.forEach { documentSnapshot ->
-                                    documentSnapshot.reference.delete().addOnSuccessListener {
-                                        db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.EXPENSES).get().addOnSuccessListener { querySnapshot ->
-                                            if (querySnapshot.documents.isNotEmpty()) {
-                                                querySnapshot.documents.forEach { documentSnapshot ->
-                                                    documentSnapshot.reference.delete().addOnSuccessListener {
-                                                        db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                                            Log.d(_tag, "onListItemLongClick: Deleted Group")
-                                                            activity!!.root_layout.snackbar("Group Deleted.")
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                                    Log.d(_tag, "onListItemLongClick: Deleted Group")
-                                                    activity!!.root_layout.snackbar("Group Deleted.")
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }
-                            } else {
-                                db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.EXPENSES).get().addOnSuccessListener {
-                                    if (it.documents.isNotEmpty()) {
-                                        it.documents.forEach { documentSnapshot ->
-                                            documentSnapshot.reference.delete().addOnSuccessListener {
-                                                db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                                    Log.d(_tag, "onListItemLongClick: Deleted Group")
-                                                    activity!!.root_layout.snackbar("Group Deleted.")
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                            Log.d(_tag, "onListItemLongClick: Deleted Group")
-                                            activity!!.root_layout.snackbar("Group Deleted.")
-                                        }
-                                    }
-
-                                }
-                            }
-
-                        }
-                    }
-                }
-            }
-
-        })
+        groupsAdapter = ExpenseAdapter(this)
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
@@ -149,8 +84,8 @@ class GroupsFragment : Fragment() {
         }
 
         val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
-        groupsViewModel.getGroupSnapshots(FirebaseAuth.getInstance().uid!!).observe(this, Observer<QuerySnapshot> { snapshot ->
-            groupsAdapter!!.setSnapshots(snapshot)
+        groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<QuerySnapshot> { snapshot ->
+            groupsAdapter!!.setSnapshot(snapshot, Expense.TYPE_GROUP)
             list.adapter = groupsAdapter
             activity?.apply {
                 progress?.visibility = View.GONE
@@ -158,5 +93,84 @@ class GroupsFragment : Fragment() {
             }
         })
         Log.d(_tag, "initFirebaseDb: Ended")
+    }
+
+    override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int) {
+        val action = GroupsFragmentDirections.toExpenseList(docId)
+        activity!!.host_nav_fragment.findNavController().navigate(action)
+    }
+
+    override fun onListItemLongClick(item: QuerySnapshot?, docId: String, position: Int) {
+        val bottomSheetDialog = BottomSheetDialog(activity!!)
+        val categoryReference = db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.CATEGORIES)
+        val expensesReference = db.collection(DBConstants.GROUPS)
+                .document(docId).collection(DBConstants.EXPENSES)
+        with(bottomSheetDialog) {
+            setContentView(R.layout.context_group)
+            show()
+            item_edit.setOnClickListener {
+                Log.d(_tag, "onListItemLongClick: Clicked")
+            }
+            item_delete.setOnClickListener {
+                categoryReference.get().addOnSuccessListener { categories ->
+                    if (categories.documents.isNotEmpty()) { //check group has categories
+                        categories.documents.forEach { category ->
+                            Database.delete(category.reference, object : DeleteListener {
+                                override fun onDeleteSuccess() {
+                                    expensesReference.get().addOnSuccessListener { expenses ->
+                                        if (expenses.documents.isNotEmpty()) {
+                                            expenses.documents.forEach { expense ->
+                                                Database.delete(expense.reference, object : DeleteListener {
+                                                    override fun onDeleteSuccess() {
+                                                        db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                                                            Log.d(_tag, "onListItemLongClick: Deleted Group")
+                                                            activity!!.root_layout.snackbar("Group Deleted.")
+                                                        }
+                                                    }
+
+                                                    override fun onDeleteFailed() {
+                                                    }
+
+                                                })
+                                            }
+                                        } else {
+                                            db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                                                Log.d(_tag, "onListItemLongClick: Deleted Group")
+                                                activity!!.root_layout.snackbar("Group Deleted.")
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                override fun onDeleteFailed() {
+                                }
+
+                            })
+                        }
+                    } else { //no categories, direct delete expenses
+                        db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.EXPENSES).get().addOnSuccessListener {
+                            if (it.documents.isNotEmpty()) {
+                                it.documents.forEach { documentSnapshot ->
+                                    documentSnapshot.reference.delete().addOnSuccessListener {
+                                        db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                                            Log.d(_tag, "onListItemLongClick: Deleted Group")
+                                            activity!!.root_layout.snackbar("Group Deleted.")
+                                        }
+                                    }
+                                }
+                            } else {
+                                db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                                    Log.d(_tag, "onListItemLongClick: Deleted Group")
+                                    activity!!.root_layout.snackbar("Group Deleted.")
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }
