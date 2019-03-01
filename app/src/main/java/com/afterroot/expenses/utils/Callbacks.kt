@@ -33,3 +33,8 @@ interface Callbacks<in T> {
     fun onFailed(message: String)
     fun onSnapshot(snapshot: DocumentSnapshot)
 }
+
+interface DeleteListener {
+    fun onDeleteSuccess()
+    fun onDeleteFailed()
+}
