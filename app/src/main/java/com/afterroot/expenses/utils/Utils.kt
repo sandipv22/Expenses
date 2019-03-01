@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
 import java.util.*
 
@@ -48,8 +49,6 @@ object Utils {
         val fromMS = fromCal.timeInMillis
         val toMS = toCal.timeInMillis
         val diff: Long = toMS - fromMS
-
-        Log.d("Expenses", "getDateDiff: fromMillis $fromMS, toMillis $toMS, diff $diff")
 
         return if (diff < 0) {
             "Just now"
@@ -96,9 +95,17 @@ object Utils {
     }
 }
 
-fun Activity.getDrawableExt(id: Int): Drawable {
+fun Activity.getDrawableExt(id: Int, tint: Int? = null): Drawable {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        return resources.getDrawable(id, theme)
+        val drawable = resources.getDrawable(id, theme)
+        if (tint != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                drawable.setTint(resources.getColor(tint, theme))
+            } else {
+                drawable.setTint(resources.getColor(tint))
+            }
+        }
+        return drawable
     }
     return resources.getDrawable(id)
 }
@@ -150,13 +157,13 @@ object DBConstants {
 }
 
 object FirebaseUtils {
-    var auth: FirebaseAuth? = null
+    var auth: FirebaseAuth? = FirebaseAuth.getInstance()
         get() {
             Log.d("FirebaseUtils", "FirebaseUtils.auth: initializing Auth")
             return field ?: FirebaseAuth.getInstance()
         }
 
-    val firebaseUser: FirebaseUser? = null
+    val firebaseUser: FirebaseUser? = auth!!.currentUser
         get() {
             Log.d("FirebaseUtils", "FirebaseUtils.getFirebaseUser: getting firebaseUser")
             return field ?: auth!!.currentUser
@@ -169,14 +176,16 @@ object FirebaseUtils {
             }
             return true
         }
+}
 
-    interface Callbacks<in T> {
-        fun onSuccess(value: T)
-        fun onFailed(message: String)
+object Database {
+
+    fun getInstance() = FirebaseFirestore.getInstance().apply {
+        firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
     }
 
     fun getUserByID(uid: String, callbacks: Callbacks<User>) {
-        FirebaseFirestore.getInstance().collection(DBConstants.USERS).document(uid)
+        getInstance().collection(DBConstants.USERS).document(uid)
                 .get()
                 .addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
@@ -191,11 +200,12 @@ object FirebaseUtils {
                 }
     }
 
-    inline fun <reified T> getByID(ref: DocumentReference, callbacks: FirebaseUtils.Callbacks<T>) {
+    inline fun <reified T> getByID(ref: DocumentReference, callbacks: Callbacks<T>) {
         ref.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
                 Log.d("FirebaseUser", "DocumentSnapshot data: " + documentSnapshot.data)
                 callbacks.onSuccess(documentSnapshot.toObject(T::class.java)!!)
+                callbacks.onSnapshot(documentSnapshot)
             } else {
                 callbacks.onFailed("User Not Exists")
             }
@@ -205,4 +215,9 @@ object FirebaseUtils {
         }
     }
 
+    fun delete(ref: DocumentReference, callbacks: DeleteListener) {
+        ref.delete().addOnSuccessListener {
+            callbacks.onDeleteSuccess()
+        }.addOnFailureListener { callbacks.onDeleteFailed() }
+    }
 }
