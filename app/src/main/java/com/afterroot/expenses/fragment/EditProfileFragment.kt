@@ -26,7 +26,7 @@ import com.afterroot.expenses.model.User
 import com.afterroot.expenses.utils.*
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
@@ -44,23 +44,30 @@ class EditProfileFragment : Fragment() {
     }
 
     private lateinit var firebaseUser: FirebaseUser
-    private val db = FirebaseFirestore.getInstance()
+    private val db = Database.getInstance()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (FirebaseUtils.isUserSignedIn) {
             firebaseUser = FirebaseUtils.auth?.currentUser!!
             activity!!.progress.visible(true)
-            input_profile_name.setText(firebaseUser.displayName)
-            input_email.setText(firebaseUser.email)
-            input_email.isEnabled = false
-            db.collection(DBConstants.USERS).document(firebaseUser.uid).get().addOnSuccessListener { documentSnapshot ->
-                val user = documentSnapshot.toObject(User::class.java)
-                input_phone.setText(user!!.phone)
-                activity!!.progress.visible(false)
-            }
+            Database.getUserByID(firebaseUser.uid, object : Callbacks<User> {
+                override fun onSuccess(value: User) {
+                    input_phone?.setText(value.phone)
+                    input_profile_name.setText(firebaseUser.displayName)
+                    input_email.setText(firebaseUser.email)
+                    input_email.isEnabled = false
+                    activity!!.progress.visible(false)
+                }
+
+                override fun onFailed(message: String) {
+                }
+
+                override fun onSnapshot(snapshot: DocumentSnapshot) {
+                }
+
+            })
             activity!!.fab.apply {
-                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save))
                 setOnClickListener {
                     activity!!.progress.visible(true)
                     val phoneText = this@EditProfileFragment.input_phone.text.toString()

@@ -24,8 +24,10 @@ import androidx.fragment.app.Fragment
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.User
+import com.afterroot.expenses.utils.Callbacks
 import com.afterroot.expenses.utils.Constants
-import com.afterroot.expenses.utils.FirebaseUtils
+import com.afterroot.expenses.utils.Database
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.fragment_expense_detail.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,9 +58,13 @@ class ExpenseDetailFragment : Fragment() {
         val formatter = SimpleDateFormat("dd-MMM-yyyy", Locale.US)
         detail_date.text = formatter.format(Date(item!!.date!!.time))
         detail_note.text = item!!.note
-        FirebaseUtils.getUserByID(item!!.paidBy, object : FirebaseUtils.Callbacks<User> {
+        Database.getUserByID(item!!.paidBy, object : Callbacks<User> {
+            override fun onSnapshot(snapshot: DocumentSnapshot) {
+
+            }
+
             override fun onSuccess(value: User) {
-                detail_paid_by.text = value.name
+                detail_paid_by?.text = value.name
             }
 
             override fun onFailed(message: String) {
