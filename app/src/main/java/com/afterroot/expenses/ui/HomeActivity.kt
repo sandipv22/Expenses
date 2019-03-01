@@ -85,12 +85,14 @@ class HomeActivity : AppCompatActivity() {
             host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
                 Log.d(_tag, "onDestinationChange: ${destination.label}")
                 action_title.text = destination.label
-                mFab.hide()
-                mFab.setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
+                with(mFab) {
+                    hide()
+                    setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
+                }
                 when (destination.id) {
                     R.id.groupsFragment -> {
                         bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
-                        fab.show()
+                        mFab.show()
                     }
                     R.id.expenseListFragment -> {
                         bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_CENTER
@@ -98,19 +100,26 @@ class HomeActivity : AppCompatActivity() {
                     }
                     R.id.newGroupFragment -> {
                         handler.postDelayed({
-                            mFab.show()
-                            mFab.setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                            with(mFab) {
+                                show()
+                                setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                            }
                         }, 150)
                     }
                     R.id.addExpenseFragment -> {
-                        mFab.show()
+                        with(mFab) {
+                            setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.icon_fill))
+                            show()
+                        }
                     }
                     R.id.expenseDetailFragment -> {
                     }
                     R.id.editProfileFragment -> {
                         handler.postDelayed({
-                            mFab.show()
-                            mFab.setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                            with(mFab) {
+                                show()
+                                setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                            }
                         }, 150)
                     }
                 }

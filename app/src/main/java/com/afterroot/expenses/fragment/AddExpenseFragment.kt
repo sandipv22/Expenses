@@ -33,13 +33,13 @@ import com.afterroot.expenses.model.Category
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
+import com.afterroot.expenses.utils.Callbacks
 import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.FirebaseUtils
-import com.afterroot.expenses.utils.FirebaseUtils.getByID
+import com.afterroot.expenses.utils.Database
+import com.afterroot.expenses.utils.Database.getByID
 import com.afterroot.expenses.utils.ListClickCallbacks
-import com.afterroot.expenses.utils.getDrawableExt
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_add_expense.*
 import kotlinx.android.synthetic.main.fragment_add_expense.view.*
@@ -53,7 +53,7 @@ import kotlin.collections.HashMap
 class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     private var fragmentView: View? = null
-    val _tag = "AddExpenseFragment"
+    private val _tag = "AddExpenseFragment"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_add_expense, container, false)
@@ -77,7 +77,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         datePicker.show()
     }
 
-    private var db: FirebaseFirestore? = null
+    private var db: FirebaseFirestore = Database.getInstance()
     var item: ExpenseItem? = null
     private var pickedDate: GregorianCalendar? = null
     lateinit var groupID: String
@@ -94,8 +94,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         groupID = args.groupDocId
         Log.d(_tag, "init: $groupID")
         category = getString(R.string.text_uncategorized)
-        db = FirebaseFirestore.getInstance()
-        db!!.firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
         getGroupUsers(null)
         fragmentView!!.apply {
             text_input_date.setOnClickListener {
@@ -103,12 +101,12 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
             text_input_category.setOnClickListener {
                 CategoryItemListDialogFragment.with(groupID, object : ListClickCallbacks<Category> {
-                    override fun onListItemClick(item: Category?, docId: String) {
+                    override fun onListItemClick(item: Category?, docId: String, position: Int) {
                         category = item!!.name
                         text_input_category.text = item.name
                     }
 
-                    override fun onListItemLongClick(item: Category?, docId: String) {
+                    override fun onListItemLongClick(item: Category?, docId: String, position: Int) {
 
                     }
 
@@ -125,7 +123,11 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                         }.show()
                     } else {
                         val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
-                        getGroupUsers(object : FirebaseUtils.Callbacks<HashMap<String, User>> {
+                        getGroupUsers(object : Callbacks<HashMap<String, User>> {
+                            override fun onSnapshot(snapshot: DocumentSnapshot) {
+
+                            }
+
                             override fun onSuccess(value: HashMap<String, User>) {
                                 progress.dismiss()
                                 MaterialDialog.Builder(activity!!).items(value.keys).itemsCallback { _, _, position, text ->
@@ -171,7 +173,11 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                                 }.show()
                     } else {
                         val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
-                        getGroupUsers(object : FirebaseUtils.Callbacks<HashMap<String, User>> {
+                        getGroupUsers(object : Callbacks<HashMap<String, User>> {
+                            override fun onSnapshot(snapshot: DocumentSnapshot) {
+
+                            }
+
                             override fun onSuccess(value: HashMap<String, User>) {
                                 progress.dismiss()
                                 value.remove(paidByName)
@@ -193,8 +199,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
         }
         activity!!.fab.apply {
-            setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_done))
-            show()
             setOnClickListener {
                 if (verifyData()) {
                     /* val finalList = ArrayList<String>()
@@ -209,7 +213,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                             view.text_input_note.text.toString(), paidByID,
                             map
                     )
-                    db!!.collection(DBConstants.GROUPS)
+                    db.collection(DBConstants.GROUPS)
                             .document(groupID)
                             .collection(DBConstants.EXPENSES).add(item!!).addOnSuccessListener { documentReference ->
                                 activity!!.supportFragmentManager.popBackStack()
@@ -224,13 +228,21 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     var isAllUsersAdded: Boolean = false
     val referenceMap: HashMap<String, User> = HashMap()
 
-    private fun getGroupUsers(callbacks: FirebaseUtils.Callbacks<HashMap<String, User>>?) {
-        val ref = db!!.collection(DBConstants.GROUPS).document(groupID)
-        getByID(ref, object : FirebaseUtils.Callbacks<Group> {
+    private fun getGroupUsers(callbacks: Callbacks<HashMap<String, User>>?) {
+        val ref = db.collection(DBConstants.GROUPS).document(groupID)
+        getByID(ref, object : Callbacks<Group> {
+            override fun onSnapshot(snapshot: DocumentSnapshot) {
+
+            }
+
             override fun onSuccess(value: Group) {
                 var i = value.members!!.size
                 for (user in value.members!!) {
-                    getByID(db!!.collection(DBConstants.USERS).document(user.key!!), object : FirebaseUtils.Callbacks<User> {
+                    getByID(db.collection(DBConstants.USERS).document(user.key!!), object : Callbacks<User> {
+                        override fun onSnapshot(snapshot: DocumentSnapshot) {
+
+                        }
+
                         override fun onSuccess(value: User) {
                             i--
                             Log.d(_tag, "onSuccess: $value pos : $i")
