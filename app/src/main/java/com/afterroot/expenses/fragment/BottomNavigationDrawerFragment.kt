@@ -27,8 +27,6 @@ import kotlinx.android.synthetic.main.fragment_bottomsheet_nav.*
 
 class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
 
-    val _tag = "NavigationFragment"
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_bottomsheet_nav, container, false)
     }
