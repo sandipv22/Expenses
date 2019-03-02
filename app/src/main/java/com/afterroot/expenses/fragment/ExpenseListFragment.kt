@@ -22,6 +22,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -34,19 +35,18 @@ import com.afterroot.expenses.adapter.ExpenseAdapter
 import com.afterroot.expenses.model.Expense.Companion.TYPE_EXPENSE
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.ExpensesViewModel
-import com.afterroot.expenses.utils.Constants
-import com.afterroot.expenses.utils.ListClickCallbacks
-import com.afterroot.expenses.utils.visible
+import com.afterroot.expenses.utils.*
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
+import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_expense_list.*
 
 class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
     private var adapter: ExpenseAdapter? = null
-    private var db: FirebaseFirestore? = null
+    private var db: FirebaseFirestore = Database.getInstance()
     lateinit var groupDocID: String
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
@@ -58,9 +58,6 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         groupDocID = args.groupDocId
-        db = FirebaseFirestore.getInstance().apply {
-            firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
-        }
         activity!!.progress.visible(true)
         Handler().postDelayed({
             initFirebaseDb()
@@ -103,5 +100,39 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
     }
 
     override fun onListItemLongClick(item: QuerySnapshot?, docId: String, position: Int) {
+        val bottomSheetDialog = BottomSheetDialog(context!!)
+        with(bottomSheetDialog) {
+            setContentView(R.layout.context_group)
+            show()
+            item_edit.setOnClickListener {
+                dismiss()
+                Log.d(_tag, "onListItemLongClick: Clicked")
+            }
+            item_delete.setOnClickListener {
+                dismiss()
+                AlertDialog.Builder(view!!.context)
+                        .setTitle("Confirm")
+                        .setMessage("Are you sure you want to delete this expense?")
+                        .setPositiveButton("Delete") { _, _ ->
+                            item?.documents?.forEach {
+                                Database.delete(it.reference, object : DeleteListener {
+                                    override fun onDeleteSuccess() {
+                                        adapter?.notifyItemRemoved(position)
+                                    }
+
+                                    override fun onDeleteFailed() {
+
+                                    }
+
+                                })
+                            }
+                        }.setNegativeButton(getString(R.string.text_cancel)) { _, _ ->
+
+                        }
+
+            }
+
+        }
+
     }
 }
