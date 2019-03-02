@@ -109,9 +109,11 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
             setContentView(R.layout.context_group)
             show()
             item_edit.setOnClickListener {
+                dismiss()
                 Log.d(_tag, "onListItemLongClick: Clicked")
             }
             item_delete.setOnClickListener {
+                dismiss()
                 categoryReference.get().addOnSuccessListener { categories ->
                     if (categories.documents.isNotEmpty()) { //check group has categories
                         categories.documents.forEach { category ->
