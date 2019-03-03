@@ -101,5 +101,9 @@
         <argument
             android:name="groupDocId"
             app:argType="string" />
+        <argument
+            android:name="expenseDocNo"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

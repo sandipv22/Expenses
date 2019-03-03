@@ -37,7 +37,6 @@ import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.ExpensesViewModel
 import com.afterroot.expenses.utils.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
@@ -46,7 +45,6 @@ import kotlinx.android.synthetic.main.fragment_expense_list.*
 
 class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
     private var adapter: ExpenseAdapter? = null
-    private var db: FirebaseFirestore = Database.getInstance()
     lateinit var groupDocID: String
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
@@ -66,7 +64,7 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
         activity!!.fab.apply {
             setOnClickListener {
                 Log.d(_tag, "onViewCreated: FAB Clicked")
-                val action = ExpenseListFragmentDirections.toAddExpense(groupDocID)
+                val action = ExpenseListFragmentDirections.toAddExpense(groupDocID, null)
                 view.findNavController().navigate(action)
             }
         }
@@ -105,15 +103,23 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
             setContentView(R.layout.context_group)
             show()
             item_edit.setOnClickListener {
+                val expenseItem = item!!.documents[position].toObject(ExpenseItem::class.java)
+                val action = ExpenseListFragmentDirections.toAddExpense(groupDocID, docId)
+                with(Bundle()) {
+                    putAll(action.arguments)
+                    putSerializable(Constants.KEY_EXPENSE_SERIALIZE, expenseItem)
+                    Log.d(_tag, "onListItemLongClick: $this")
+                    view!!.findNavController().navigate(action.actionId, this)
+                }
+
                 dismiss()
-                Log.d(_tag, "onListItemLongClick: Clicked")
             }
             item_delete.setOnClickListener {
                 dismiss()
                 AlertDialog.Builder(view!!.context)
-                        .setTitle("Confirm")
-                        .setMessage("Are you sure you want to delete this expense?")
-                        .setPositiveButton("Delete") { _, _ ->
+                        .setTitle(getString(R.string.text_dialog_confirm))
+                        .setMessage(getString(R.string.msg_dialog_delete_expense))
+                        .setPositiveButton(getString(R.string.text_delete)) { _, _ ->
                             item?.documents?.forEach {
                                 Database.delete(it.reference, object : DeleteListener {
                                     override fun onDeleteSuccess() {
@@ -128,7 +134,7 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                             }
                         }.setNegativeButton(getString(R.string.text_cancel)) { _, _ ->
 
-                        }
+                        }.show()
 
             }
 

@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.R
@@ -33,14 +34,12 @@ import com.afterroot.expenses.model.Category
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
-import com.afterroot.expenses.utils.Callbacks
-import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.Database
+import com.afterroot.expenses.utils.*
 import com.afterroot.expenses.utils.Database.getByID
-import com.afterroot.expenses.utils.ListClickCallbacks
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_add_expense.*
 import kotlinx.android.synthetic.main.fragment_add_expense.view.*
 import java.text.SimpleDateFormat
@@ -54,6 +53,27 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     private var fragmentView: View? = null
     private val _tag = "AddExpenseFragment"
+    private var db: FirebaseFirestore = Database.getInstance()
+    var item: ExpenseItem? = null
+    private var pickedDate: GregorianCalendar? = null
+    val usersMap = HashMap<String, User>()
+
+    private val withUserMap = HashMap<String, User>()
+    private var paidByID: String = ""
+    private var paidByName: String = ""
+    private lateinit var groupID: String
+    private var expenseDocNo: String? = null
+    private lateinit var category: String
+    private var millis: Long = 0
+    private val args: AddExpenseFragmentArgs by navArgs()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments.let {
+            item = it?.getSerializable(Constants.KEY_EXPENSE_SERIALIZE) as ExpenseItem?
+            Log.d(_tag, "onCreate: $item")
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_add_expense, container, false)
@@ -77,25 +97,46 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         datePicker.show()
     }
 
-    private var db: FirebaseFirestore = Database.getInstance()
-    var item: ExpenseItem? = null
-    private var pickedDate: GregorianCalendar? = null
-    lateinit var groupID: String
-
-    val usersMap = HashMap<String, User>()
-    private val withUserMap = HashMap<String, User>()
-    private var paidByID: String = ""
-    private var paidByName: String = ""
-    private lateinit var category: String
-    private var millis: Long = 0
-    private val args: AddExpenseFragmentArgs by navArgs()
-
     private fun init(view: View) {
         groupID = args.groupDocId
+        expenseDocNo = args.expenseDocNo
         Log.d(_tag, "init: $groupID")
         category = getString(R.string.text_uncategorized)
         getGroupUsers(null)
         fragmentView!!.apply {
+            if (item != null) {
+                activity!!.progress.visible(true)
+                Database.getUserByID(item!!.paidBy, object : Callbacks<User> {
+                    override fun onSuccess(value: User) {
+                        text_input_amount.setText(item!!.amount.toString())
+
+                        category = item!!.category
+                        text_input_category.text = category
+
+                        fragmentView!!.text_input_date.text =
+                                SimpleDateFormat("dd-MMM-yyyy", Locale.US)
+                                        .format(item!!.date)
+
+                        text_input_note.setText(item!!.note)
+
+                        paidByID = item!!.paidBy
+                        text_paid_by.text = value.name
+
+                        withUserMap.values.forEach {
+                            item!!.with!![it.uid] = it.name
+                        }
+                        activity!!.progress.visible(false)
+                    }
+
+                    override fun onFailed(message: String) {
+                    }
+
+                    override fun onSnapshot(snapshot: DocumentSnapshot) {
+                    }
+
+                })
+
+            }
             text_input_date.setOnClickListener {
                 showDatePicker()
             }
@@ -199,6 +240,9 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
         }
         activity!!.fab.apply {
+            if (item != null) {
+                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+            }
             setOnClickListener {
                 if (verifyData()) {
                     /* val finalList = ArrayList<String>()
@@ -207,17 +251,29 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     withUserMap.values.forEach {
                         map!![it.uid] = it.name
                     }
-                    item = ExpenseItem(view.text_input_amount.text.toString().toLong(),
-                            category,
-                            Date(millis),
-                            view.text_input_note.text.toString(), paidByID,
-                            map
-                    )
-                    db.collection(DBConstants.GROUPS)
-                            .document(groupID)
-                            .collection(DBConstants.EXPENSES).add(item!!).addOnSuccessListener { documentReference ->
-                                activity!!.supportFragmentManager.popBackStack()
-                            }
+
+                    val reference = db.collection(DBConstants.GROUPS).document(groupID).collection(DBConstants.EXPENSES)
+                    if (item != null) {
+                        item = ExpenseItem(view.text_input_amount.text.toString().toLong(),
+                                category,
+                                Date(millis),
+                                view.text_input_note.text.toString(), paidByID,
+                                map
+                        )
+                        reference.document(expenseDocNo!!).set(item!!).addOnSuccessListener {
+                            this@AddExpenseFragment.view!!.findNavController().popBackStack()
+                        }
+                    } else {
+                        item = ExpenseItem(view.text_input_amount.text.toString().toLong(),
+                                category,
+                                Date(millis),
+                                view.text_input_note.text.toString(), paidByID,
+                                map
+                        )
+                        reference.add(item!!).addOnSuccessListener {
+                            this@AddExpenseFragment.view!!.findNavController().popBackStack()
+                        }
+                    }
                 }
 
             }

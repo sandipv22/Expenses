@@ -110,7 +110,6 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
             show()
             item_edit.setOnClickListener {
                 dismiss()
-                Log.d(_tag, "onListItemLongClick: Clicked")
             }
             item_delete.setOnClickListener {
                 dismiss()
@@ -125,7 +124,6 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                                                 Database.delete(expense.reference, object : DeleteListener {
                                                     override fun onDeleteSuccess() {
                                                         db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                                            Log.d(_tag, "onListItemLongClick: Deleted Group")
                                                             activity!!.root_layout.snackbar("Group Deleted.")
                                                         }
                                                     }
@@ -137,7 +135,6 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                                             }
                                         } else {
                                             db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                                Log.d(_tag, "onListItemLongClick: Deleted Group")
                                                 activity!!.root_layout.snackbar("Group Deleted.")
                                             }
                                         }
@@ -156,14 +153,12 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                                 it.documents.forEach { documentSnapshot ->
                                     documentSnapshot.reference.delete().addOnSuccessListener {
                                         db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                            Log.d(_tag, "onListItemLongClick: Deleted Group")
                                             activity!!.root_layout.snackbar("Group Deleted.")
                                         }
                                     }
                                 }
                             } else {
                                 db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                    Log.d(_tag, "onListItemLongClick: Deleted Group")
                                     activity!!.root_layout.snackbar("Group Deleted.")
                                 }
                             }
