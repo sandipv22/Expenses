@@ -125,7 +125,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                         text_input_category.text = category
 
                         fragmentView!!.text_input_date.text =
-                                SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.US)
+                                SimpleDateFormat(getString(R.string.date_time_format), Locale.US)
                                         .format(item!!.date)
 
                         text_input_note.setText(item!!.note)
@@ -363,7 +363,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
         pickedDate = GregorianCalendar(year!!, month!!, day!!, hourOfDay, minute)
         millis = pickedDate!!.timeInMillis
 
-        val formatter = SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.US)
+        val formatter = SimpleDateFormat(getString(R.string.date_time_format), Locale.US)
         fragmentView!!.text_input_date.text = formatter.format(Date(millis))
     }
 

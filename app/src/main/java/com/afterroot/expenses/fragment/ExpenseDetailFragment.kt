@@ -71,7 +71,7 @@ class ExpenseDetailFragment : Fragment() {
         super.onStart()
         detail_category.text = item!!.category
         detail_amount.text = String.format("%s%d", getString(R.string.rs_symbol), item!!.amount)
-        val formatter = SimpleDateFormat("dd-MMM-yyyy", Locale.US)
+        val formatter = SimpleDateFormat(getString(R.string.date_time_format), Locale.US)
         detail_date.text = formatter.format(Date(item!!.date!!.time))
         detail_note.text = item!!.note
         Database.getUserByID(item!!.paidBy, object : Callbacks<User> {
