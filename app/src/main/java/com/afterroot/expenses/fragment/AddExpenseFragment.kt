@@ -17,6 +17,7 @@
 package com.afterroot.expenses.fragment
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -49,7 +51,7 @@ import kotlin.collections.HashMap
 /**
  * Created by Sandip on 05-12-2017.
  */
-class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
+class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     private var fragmentView: View? = null
     private val _tag = "AddExpenseFragment"
@@ -88,13 +90,22 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private var year: Int? = 0
     private var month: Int? = 0
     private var day: Int? = 0
+    private var hourOfDay: Int? = 0
+    private var minute: Int? = 0
     private fun showDatePicker() {
         val cal = Calendar.getInstance()
         year = cal.get(Calendar.YEAR)
         month = cal.get(Calendar.MONTH)
         day = cal.get(Calendar.DAY_OF_MONTH)
+        hourOfDay = cal.get(Calendar.HOUR_OF_DAY)
+        minute = cal.get(Calendar.MINUTE)
         val datePicker = DatePickerDialog(fragmentView!!.context, this, year!!, month!!, day!!)
         datePicker.show()
+    }
+
+    private fun showTimePicker() {
+        val picker = TimePickerDialog(this.context, this, hourOfDay!!, minute!!, false)
+        picker.show()
     }
 
     private fun init(view: View) {
@@ -114,7 +125,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                         text_input_category.text = category
 
                         fragmentView!!.text_input_date.text =
-                                SimpleDateFormat("dd-MMM-yyyy", Locale.US)
+                                SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.US)
                                         .format(item!!.date)
 
                         text_input_note.setText(item!!.note)
@@ -342,10 +353,18 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     override fun onDateSet(p0: DatePicker?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
-        pickedDate = GregorianCalendar(year, monthOfYear, dayOfMonth)
+        this.year = year
+        this.month = monthOfYear
+        this.day = dayOfMonth
+        showTimePicker()
+    }
+
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        pickedDate = GregorianCalendar(year!!, month!!, day!!, hourOfDay, minute)
         millis = pickedDate!!.timeInMillis
 
-        val formatter = SimpleDateFormat("dd-MMM-yyyy", Locale.US)
+        val formatter = SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.US)
         fragmentView!!.text_input_date.text = formatter.format(Date(millis))
     }
+
 }
