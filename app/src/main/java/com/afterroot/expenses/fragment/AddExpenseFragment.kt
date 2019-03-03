@@ -142,7 +142,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
             text_input_category.setOnClickListener {
                 CategoryItemListDialogFragment.with(groupID, object : ListClickCallbacks<Category> {
-                    override fun onListItemClick(item: Category?, docId: String, position: Int) {
+                    override fun onListItemClick(item: Category?, docId: String, position: Int, view: View?) {
                         category = item!!.name
                         text_input_category.text = item.name
                     }

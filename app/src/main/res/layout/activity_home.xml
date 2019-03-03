@@ -33,6 +33,7 @@
         app:backgroundTint="@color/primaryColor"
         app:fabAlignmentMode="center"
         app:hideOnScroll="true"
+        app:fabCradleRoundedCornerRadius="24dp"
         app:layout_scrollFlags="scroll|enterAlways" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

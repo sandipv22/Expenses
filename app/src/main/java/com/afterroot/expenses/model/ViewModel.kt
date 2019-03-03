@@ -67,7 +67,6 @@ class GroupsViewModel : ViewModel() {
     }
 }
 
-//TODO Migrate to ViewModel
 class ExpensesViewModel : ViewModel() {
     var snapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
     var expenses: MutableLiveData<List<ExpenseItem>> = MutableLiveData()

@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Expense
@@ -117,10 +118,14 @@ class ExpenseAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerVie
             noteText.text = String.format("%s, with %s", expenseItem.note, Utils.formatNames(expenseItem.with!!))
             categoryText.text = expenseItem.category
 
+            ViewCompat.setTransitionName(amountText, amountText.toString())
+            ViewCompat.setTransitionName(noteText, noteText.toString())
+            ViewCompat.setTransitionName(categoryText, categoryText.toString())
+
             with(itemView) {
                 tag = expenseItem
                 setOnClickListener {
-                    mCallbacks.onListItemClick(mSnapshot, mSnapshot.documents[adapterPosition].id, position)
+                    mCallbacks.onListItemClick(mSnapshot, mSnapshot.documents[adapterPosition].id, position, this)
                 }
                 setOnLongClickListener {
                     mCallbacks.onListItemLongClick(mSnapshot, mSnapshot.documents[adapterPosition].id, position)

@@ -16,7 +16,7 @@
 
 <resources>
     <declare-styleable name="CustomWithIconView">
-        <attr name="icon" format="reference"/>
-        <attr name="text" format="string"/>
+        <attr name="icon" format="reference" />
+        <attr name="text" format="string" />
     </declare-styleable>
 </resources>

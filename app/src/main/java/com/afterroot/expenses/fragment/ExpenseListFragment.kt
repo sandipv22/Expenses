@@ -23,13 +23,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.Explode
 import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapter
 import com.afterroot.expenses.model.Expense.Companion.TYPE_EXPENSE
@@ -42,6 +45,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_expense_list.*
+import kotlinx.android.synthetic.main.list_item_expense.view.*
 
 class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
     private var adapter: ExpenseAdapter? = null
@@ -51,6 +55,7 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        enterTransition = Explode()
         return inflater.inflate(R.layout.fragment_expense_list, container, false)
     }
 
@@ -89,12 +94,21 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
         })
     }
 
-    override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int) {
+    override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int, view: View?) {
         val bundle = Bundle().apply {
             putSerializable(Constants.KEY_EXPENSE_SERIALIZE, adapter!!.mList[position] as ExpenseItem)
+            putString("ANIM_AMOUNT", ViewCompat.getTransitionName(view!!.item_amount))
+            putString("ANIM_CATEGORY", ViewCompat.getTransitionName(view.item_category))
+            putString("ANIM_NOTE", ViewCompat.getTransitionName(view.item_note))
         }
         Log.d(_tag, "onListItemClick: ${bundle.getSerializable(Constants.KEY_EXPENSE_SERIALIZE)}")
-        view!!.findNavController().navigate(R.id.toExpenseDetail, bundle)
+        with(view!!) {
+            val extras = FragmentNavigatorExtras(this.item_amount to ViewCompat.getTransitionName(this.item_amount)!!,
+                    this.item_category to ViewCompat.getTransitionName(this.item_category)!!,
+                    this.item_note to ViewCompat.getTransitionName(this.item_note)!!)
+            this@ExpenseListFragment.view!!.findNavController().navigate(R.id.toExpenseDetail, bundle, null, extras)
+        }
+
     }
 
     override fun onListItemLongClick(item: QuerySnapshot?, docId: String, position: Int) {
@@ -120,18 +134,17 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                         .setTitle(getString(R.string.text_dialog_confirm))
                         .setMessage(getString(R.string.msg_dialog_delete_expense))
                         .setPositiveButton(getString(R.string.text_delete)) { _, _ ->
-                            item?.documents?.forEach {
-                                Database.delete(it.reference, object : DeleteListener {
-                                    override fun onDeleteSuccess() {
-                                        adapter?.notifyItemRemoved(position)
-                                    }
+                            val reference = Database.getInstance().collection(DBConstants.GROUPS).document(groupDocID).collection(DBConstants.EXPENSES)
+                            Database.delete(reference.document(docId), object : DeleteListener {
+                                override fun onDeleteSuccess() {
+                                    adapter?.notifyItemRemoved(position)
+                                }
 
-                                    override fun onDeleteFailed() {
+                                override fun onDeleteFailed() {
 
-                                    }
+                                }
 
-                                })
-                            }
+                            })
                         }.setNegativeButton(getString(R.string.text_cancel)) { _, _ ->
 
                         }.show()

@@ -20,7 +20,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.transition.ChangeBounds
+import androidx.transition.ChangeTransform
+import androidx.transition.Fade
+import androidx.transition.TransitionSet
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.User
@@ -29,6 +35,7 @@ import com.afterroot.expenses.utils.Constants
 import com.afterroot.expenses.utils.Database
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.fragment_expense_detail.*
+import kotlinx.android.synthetic.main.fragment_expense_detail.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,11 +49,21 @@ class ExpenseDetailFragment : Fragment() {
         arguments?.let {
             item = it.getSerializable(Constants.KEY_EXPENSE_SERIALIZE) as ExpenseItem?
         }
+        val transitionSet = TransitionSet().addTransition(ChangeBounds()).addTransition(Fade()).addTransition(ChangeTransform())
+        transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
+        //transitionSet.duration = 100
+        transitionSet.interpolator = AccelerateDecelerateInterpolator()
+        sharedElementEnterTransition = transitionSet
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_expense_detail, container, false)
+        arguments?.let {
+            ViewCompat.setTransitionName(fragmentView!!.detail_amount, it.getString("ANIM_AMOUNT"))
+            ViewCompat.setTransitionName(fragmentView!!.detail_category, it.getString("ANIM_CATEGORY"))
+            ViewCompat.setTransitionName(fragmentView!!.detail_note, it.getString("ANIM_NOTE"))
+        }
         return fragmentView
     }
 

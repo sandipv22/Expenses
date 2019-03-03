@@ -29,6 +29,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.Slide
 import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapter
 import com.afterroot.expenses.model.Expense
@@ -52,6 +53,7 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
     private lateinit var createdView: View
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        exitTransition = Slide()
         return inflater.inflate(R.layout.fragment_groups, container, false)
     }
 
@@ -94,7 +96,7 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
         Log.d(_tag, "initFirebaseDb: Ended")
     }
 
-    override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int) {
+    override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int, view: View?) {
         val action = GroupsFragmentDirections.toExpenseList(docId)
         activity!!.host_nav_fragment.findNavController().navigate(action)
     }

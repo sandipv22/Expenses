@@ -17,10 +17,11 @@
 package com.afterroot.expenses.utils
 
 import android.view.MenuItem
+import android.view.View
 import com.google.firebase.firestore.DocumentSnapshot
 
 interface ListClickCallbacks<in T> {
-    fun onListItemClick(item: T?, docId: String, position: Int)
+    fun onListItemClick(item: T?, docId: String, position: Int, view: View? = null)
     fun onListItemLongClick(item: T?, docId: String, position: Int)
 }
 

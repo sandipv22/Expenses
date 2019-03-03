@@ -23,9 +23,9 @@
             android:title="@string/text_edit_profile" />
         <item
             android:id="@+id/action_settings"
+            android:icon="@drawable/ic_settings"
             android:orderInCategory="100"
             android:title="@string/action_settings"
-            android:icon="@drawable/ic_settings"
             app:showAsAction="never" />
         <item
             android:id="@+id/sign_out"

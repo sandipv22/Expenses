@@ -19,7 +19,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_item_height_two_line"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    android:transitionGroup="true"
+    tools:targetApi="lollipop">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_category"
