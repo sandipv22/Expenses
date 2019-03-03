@@ -62,11 +62,7 @@ class HomeActivity : AppCompatActivity() {
 
         setSupportActionBar(bottom_appbar)
 
-        when {
-            PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.PREF_KEY_FIRST_START, true)
-                    or !FirebaseUtils.isUserSignedIn -> signInDialog().show()
-            else -> checkPermissions(permissions)
-        }
+        checkPermissions(permissions)
     }
 
     override fun onResume() {
@@ -179,9 +175,11 @@ class HomeActivity : AppCompatActivity() {
             }
         } else {
             Log.d(_tag, "checkPermissions: Permissions Granted. Now initializing")
-            addUserInfoInDB()
-            setUpNavigation()
-            setUpBottomNavDrawer()
+            if (FirebaseUtils.isUserSignedIn) {
+                addUserInfoInDB()
+                setUpNavigation()
+                setUpBottomNavDrawer()
+            }
         }
     }
 
@@ -193,9 +191,15 @@ class HomeActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && !grantResults.contains(PackageManager.PERMISSION_DENIED)) {
                     Log.d(_tag, "onRequestPermissionsResult: Permission Granted")
                     Handler().postDelayed({
-                        addUserInfoInDB()
-                        setUpNavigation()
-                        setUpBottomNavDrawer()
+                        when {
+                            PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.PREF_KEY_FIRST_START, true)
+                                    or !FirebaseUtils.isUserSignedIn -> signInDialog().show()
+                            else -> {
+                                addUserInfoInDB()
+                                setUpNavigation()
+                                setUpBottomNavDrawer()
+                            }
+                        }
                     }, 1000)
                 } else {
                     Log.d(_tag, "onRequestPermissionsResult: Permissions not granted")
