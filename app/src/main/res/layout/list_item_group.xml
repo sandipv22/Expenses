@@ -18,18 +18,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/list_item_height_two_line"
     android:background="?android:attr/selectableItemBackground">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/list_item_spacing"
+        android:layout_marginTop="12dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        app:layout_constraintEnd_toStartOf="@+id/item_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Group Name" />
@@ -38,9 +36,7 @@
         android:id="@+id/item_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="@dimen/list_item_spacing"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_name"
         tools:text="other text" />
@@ -49,9 +45,9 @@
         android:id="@+id/item_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:textSize="12sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/item_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="10:42 AM" />

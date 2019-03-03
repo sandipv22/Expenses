@@ -18,15 +18,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/list_item_height_two_line"
     android:background="?attr/selectableItemBackground">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="@dimen/list_item_spacing"
+        android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Text Category" />
@@ -35,11 +35,10 @@
         android:id="@+id/item_note"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/item_amount"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_category"
         tools:text="Description" />
@@ -48,11 +47,11 @@
         android:id="@+id/item_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/list_item_spacing"
         android:singleLine="true"
         android:textSize="22sp"
         app:fontFamily="sans-serif-light"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_category"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="50" />
