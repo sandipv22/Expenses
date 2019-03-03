@@ -33,10 +33,7 @@ import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapter
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.GroupsViewModel
-import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.Database
-import com.afterroot.expenses.utils.DeleteListener
-import com.afterroot.expenses.utils.ListClickCallbacks
+import com.afterroot.expenses.utils.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -70,7 +67,9 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                 }
             }
         }
-        initFirebaseDb()
+        if (FirebaseUtils.isUserSignedIn) {
+            initFirebaseDb()
+        }
     }
 
     private fun initFirebaseDb() {
@@ -113,6 +112,7 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
             }
             item_delete.setOnClickListener {
                 dismiss()
+                activity!!.progress.visible(true)
                 categoryReference.get().addOnSuccessListener { categories ->
                     if (categories.documents.isNotEmpty()) { //check group has categories
                         categories.documents.forEach { category ->
@@ -124,11 +124,15 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                                                 Database.delete(expense.reference, object : DeleteListener {
                                                     override fun onDeleteSuccess() {
                                                         db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                                            activity!!.root_layout.snackbar("Group Deleted.")
+                                                            activity!!.apply {
+                                                                root_layout.snackbar("Group Deleted.")
+                                                                progress.visible(false)
+                                                            }
                                                         }
                                                     }
 
                                                     override fun onDeleteFailed() {
+                                                        activity!!.progress.visible(false)
                                                     }
 
                                                 })
@@ -136,6 +140,7 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                                         } else {
                                             db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
                                                 activity!!.root_layout.snackbar("Group Deleted.")
+                                                activity!!.progress.visible(true)
                                             }
                                         }
 
@@ -143,6 +148,7 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                                 }
 
                                 override fun onDeleteFailed() {
+                                    activity!!.progress.visible(false)
                                 }
 
                             })
@@ -153,13 +159,19 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                                 it.documents.forEach { documentSnapshot ->
                                     documentSnapshot.reference.delete().addOnSuccessListener {
                                         db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                            activity!!.root_layout.snackbar("Group Deleted.")
+                                            activity!!.apply {
+                                                root_layout.snackbar("Group Deleted.")
+                                                progress.visible(false)
+                                            }
                                         }
                                     }
                                 }
                             } else {
                                 db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
-                                    activity!!.root_layout.snackbar("Group Deleted.")
+                                    activity!!.apply {
+                                        root_layout.snackbar("Group Deleted.")
+                                        progress.visible(false)
+                                    }
                                 }
                             }
 
