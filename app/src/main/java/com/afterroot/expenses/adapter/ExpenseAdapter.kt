@@ -134,4 +134,25 @@ class ExpenseAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerVie
             }
         }
     }
+
+    inner class GroupAltViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        var text1: TextView = itemView.findViewById(android.R.id.text1)
+
+        fun bindView(position: Int) {
+            val group = mList[position] as GroupAlt
+            text1.text = group.group_name
+
+            with(itemView) {
+                tag = group
+                setOnClickListener {
+                    mCallbacks.onListItemClick(mSnapshot, mSnapshot.documents[adapterPosition].id, position)
+                }
+                setOnLongClickListener {
+                    mCallbacks.onListItemLongClick(mSnapshot, mSnapshot.documents[adapterPosition].id, position)
+                    return@setOnLongClickListener true
+                }
+            }
+        }
+    }
+
 }

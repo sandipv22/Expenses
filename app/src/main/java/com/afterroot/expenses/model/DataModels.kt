@@ -51,6 +51,19 @@ data class Group(
     constructor() : this("", null, null)
 }
 
+data class GroupAlt(
+        var group_name: String,
+        @ServerTimestamp var date: Date?,
+        var members: HashMap<String?, Int>?
+) : Serializable, Expense {
+    override fun getType(): Int {
+        return Expense.TYPE_GROUP_ALT
+    }
+
+    constructor() : this("", null, null)
+}
+
+
 data class User(var name: String, var email: String, var uid: String, var phone: String?) : Serializable {
     constructor() : this("", "", "", "")
 }
@@ -66,5 +79,6 @@ interface Expense {
     companion object {
         const val TYPE_GROUP = 1
         const val TYPE_EXPENSE = 2
+        const val TYPE_GROUP_ALT = 3
     }
 }

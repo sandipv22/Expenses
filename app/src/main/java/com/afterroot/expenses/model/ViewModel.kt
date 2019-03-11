@@ -21,7 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afterroot.expenses.utils.DBConstants
-import com.google.firebase.firestore.FirebaseFirestore
+import com.afterroot.expenses.utils.Database
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 
@@ -47,7 +47,7 @@ class GroupsViewModel : ViewModel() {
     fun getGroupSnapshot(userId: String): LiveData<QuerySnapshot> {
         if (groupSnapshot.value == null) {
             Log.d("GroupViewModel", "getGroupSnapshot: Getting Snapshots")
-            FirebaseFirestore.getInstance().collection(DBConstants.GROUPS).whereGreaterThanOrEqualTo(
+            Database.getInstance().collection(DBConstants.GROUPS).whereGreaterThanOrEqualTo(
                     "${DBConstants.FIELD_GROUP_MEMBERS}.$userId",
                     DBConstants.TYPE_MEMBER
             ).addSnapshotListener { querySnapshot, _ ->
@@ -74,7 +74,7 @@ class ExpensesViewModel : ViewModel() {
     fun getSnapshot(groupId: String): LiveData<QuerySnapshot> {
         if (snapshot.value == null) {
             Log.d("ExpensesViewModel", "getGroupSnapshot: ")
-            FirebaseFirestore.getInstance()
+            Database.getInstance()
                     .collection(DBConstants.GROUPS)
                     .document(groupId)
                     .collection(DBConstants.EXPENSES)
