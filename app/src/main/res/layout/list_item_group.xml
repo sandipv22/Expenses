@@ -30,6 +30,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:drawableStart="@drawable/ic_users"
+        android:drawablePadding="4dp"
         tools:text="Group Name" />
 
     <androidx.appcompat.widget.AppCompatTextView
