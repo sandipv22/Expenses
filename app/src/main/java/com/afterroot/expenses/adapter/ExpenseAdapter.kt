@@ -19,6 +19,7 @@ package com.afterroot.expenses.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,7 @@ import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
+import com.afterroot.expenses.model.GroupAlt
 import com.afterroot.expenses.utils.ListClickCallbacks
 import com.afterroot.expenses.utils.Utils
 import com.google.firebase.firestore.QuerySnapshot
@@ -44,8 +46,9 @@ class ExpenseAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerVie
         when (type) {
             Expense.TYPE_GROUP -> mList = snapshot.toObjects(Group::class.java)
             Expense.TYPE_EXPENSE -> mList = snapshot.toObjects(ExpenseItem::class.java)
+            Expense.TYPE_GROUP_ALT -> mList = snapshot.toObjects(GroupAlt::class.java)
         }
-        notifyDataSetChanged()
+        notifyItemRangeInserted(0, mList.size)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -64,6 +67,10 @@ class ExpenseAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerVie
                 itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item_expense, parent, false)
                 holder = ExpenseViewHolder(itemView)
             }
+            Expense.TYPE_GROUP_ALT -> {
+                itemView = LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+                holder = GroupAltViewHolder(itemView)
+            }
         }
         return holder!!
     }
@@ -79,6 +86,9 @@ class ExpenseAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerVie
             }
             Expense.TYPE_EXPENSE -> {
                 (holder as ExpenseViewHolder).bindView(position)
+            }
+            Expense.TYPE_GROUP_ALT -> {
+                (holder as GroupAltViewHolder).bindView(position)
             }
         }
     }
