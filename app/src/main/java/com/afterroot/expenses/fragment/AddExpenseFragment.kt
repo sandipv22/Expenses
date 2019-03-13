@@ -21,7 +21,6 @@ import android.app.TimePickerDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,6 +46,7 @@ import kotlinx.android.synthetic.main.fragment_add_expense.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.collections.set
 
 /**
  * Created by Sandip on 05-12-2017.
@@ -73,7 +73,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
         super.onCreate(savedInstanceState)
         arguments.let {
             item = it?.getSerializable(Constants.KEY_EXPENSE_SERIALIZE) as ExpenseItem?
-            Log.d(_tag, "onCreate: $item")
         }
     }
 
@@ -111,7 +110,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
     private fun init(view: View) {
         groupID = args.groupDocId
         expenseDocNo = args.expenseDocNo
-        Log.d(_tag, "init: $groupID")
         category = getString(R.string.text_uncategorized)
         getGroupUsers(null)
         fragmentView!!.apply {
@@ -168,7 +166,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                 setOnClickListener {
                     if (isAllUsersAdded) {
                         MaterialDialog.Builder(activity!!).items(usersMap.keys).itemsCallback { _, _, position, text ->
-                            Log.d(_tag, "onSuccess: Direct Load $position $text ${usersMap[text]!!.name} ${usersMap[text]!!.uid}")
                             paidByID = usersMap[text]!!.uid
                             paidByName = text as String
                             view.text_paid_by.text = paidByName
@@ -183,7 +180,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                             override fun onSuccess(value: HashMap<String, User>) {
                                 progress.dismiss()
                                 MaterialDialog.Builder(activity!!).items(value.keys).itemsCallback { _, _, position, text ->
-                                    Log.d(_tag, "onSuccess: Wait Load $position $text ${value[text]!!.name} ${value[text]!!.uid}")
                                     paidByID = value[text]!!.uid
                                     paidByName = text as String
                                     view.text_paid_by.text = paidByName
@@ -214,11 +210,9 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                             text.size - 1 -> builder.append("$it and ")
                                             else -> builder.append("$it, ")
                                         }
-                                        Log.d(_tag, "$builder")
                                         text_spenders.text = builder
                                         val user = referenceMap[it.toString()]
                                         withUserMap[user!!.name] = user
-                                        Log.d(_tag, "Added to Final Map ${user.name}")
                                     }
                                     return@itemsCallbackMultiChoice true
                                 }.positiveText("OK").onPositive { dialog, which ->
@@ -235,7 +229,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 value.remove(paidByName)
                                 MaterialDialog.Builder(activity!!).items(value.keys)
                                         .itemsCallbackMultiChoice(null) { materialDialog: MaterialDialog, ints: Array<Int>, arrayOfCharSequences: Array<CharSequence> ->
-                                            Log.d(_tag, "onSuccess: ${ints.size}")
                                             return@itemsCallbackMultiChoice true
                                         }.positiveText("OK").onPositive { dialog, which ->
 
@@ -312,7 +305,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
 
                         override fun onSuccess(value: User) {
                             i--
-                            Log.d(_tag, "onSuccess: $value pos : $i")
                             if (!usersMap.containsKey(value.name)) usersMap[value.name] = value
                             if (!referenceMap.containsKey(value.name)) referenceMap[value.name] = value
                             if (i == 0) {
