@@ -16,12 +16,15 @@
 
 package com.afterroot.expenses.fragment
 
+import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.GroupsViewModel
@@ -31,13 +34,19 @@ import com.google.firebase.firestore.QuerySnapshot
 
 class SettingsFragment : PreferenceFragmentCompat() {
     private var querySnapshot: QuerySnapshot? = null
+    private lateinit var sharedPref: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
     }
 
+    @SuppressLint("CommitPrefEdits")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
+        editor = sharedPref.edit()
 
         val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
         groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<QuerySnapshot> { snapshot ->
@@ -47,7 +56,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onPreferenceTreeClick(preference: androidx.preference.Preference?): Boolean {
         when (preference!!.key) {
-            "pref_main_screen" -> {
+            getString(R.string.pref_main_screen) -> {
                 ListBottomSheetDialog.also {
                     it.with(
                             querySnapshot!!,
@@ -56,6 +65,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             object : ListClickCallbacks<QuerySnapshot> {
                                 override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int, view: View?) {
                                     it.dismiss()
+                                    editor.putString(getString(R.string.pref_main_screen), docId).apply()
                                     Toast.makeText(this@SettingsFragment.activity, "Clicked with id: $docId", Toast.LENGTH_SHORT).show()
                                 }
 
