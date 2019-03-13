@@ -17,6 +17,7 @@
 package com.afterroot.expenses.fragment
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -27,12 +28,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.Slide
 import com.afterroot.expenses.R
-import com.afterroot.expenses.adapter.ExpenseAdapter
-import com.afterroot.expenses.model.Expense
+import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
+import com.afterroot.expenses.adapter.ItemSelectedCallback
+import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.GroupsViewModel
 import com.afterroot.expenses.utils.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -45,15 +47,15 @@ import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_groups.*
 import org.jetbrains.anko.design.snackbar
 
-class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
-    private var groupsAdapter: ExpenseAdapter? = null
+class GroupsFragment : Fragment(), ItemSelectedCallback {
+    private var groupsAdapter: ExpenseAdapterDelegate? = null
     lateinit var db: FirebaseFirestore
     private val _tag = "GroupsFragment"
     private lateinit var _context: Context
     private lateinit var createdView: View
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        exitTransition = Slide()
         return inflater.inflate(R.layout.fragment_groups, container, false)
     }
 
@@ -61,6 +63,7 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
         super.onViewCreated(view, savedInstanceState)
         createdView = view
         _context = createdView.context
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         db = Database.getInstance()
         activity!!.apply {
             fab.apply {
@@ -70,14 +73,22 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
             }
         }
         if (FirebaseUtils.isUserSignedIn) {
+            /*val groupID = sharedPreferences.getString(getString(R.string.pref_main_screen), null)
+            if (groupID != null) {
+                val action = GroupsFragmentDirections.toExpenseList(groupID)
+                activity!!.host_nav_fragment.findNavController().navigate(action)
+            } else {
+                initFirebaseDb()
+            }*/
             initFirebaseDb()
         }
     }
 
+    var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
         Log.d(_tag, "initFirebaseDb: Started")
         activity!!.progress.visibility = View.VISIBLE
-        groupsAdapter = ExpenseAdapter(this)
+        groupsAdapter = ExpenseAdapterDelegate(this)
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
@@ -86,22 +97,25 @@ class GroupsFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
 
         val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
         groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<QuerySnapshot> { snapshot ->
-            groupsAdapter!!.setSnapshot(snapshot, Expense.TYPE_GROUP)
             list.adapter = groupsAdapter
+            mSnapshot = snapshot
+            groupsAdapter!!.add(snapshot.toObjects(Group::class.java) as List<Group>)
             activity?.apply {
-                progress?.visibility = View.GONE
+                progress?.visible(false)
                 fab.show()
             }
         })
         Log.d(_tag, "initFirebaseDb: Ended")
     }
 
-    override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int, view: View?) {
+    override fun onClick(position: Int, view: View?) {
+        val docId = mSnapshot!!.documents[position].id
         val action = GroupsFragmentDirections.toExpenseList(docId)
         activity!!.host_nav_fragment.findNavController().navigate(action)
     }
 
-    override fun onListItemLongClick(item: QuerySnapshot?, docId: String, position: Int) {
+    override fun onLongClick(position: Int) {
+        val docId = mSnapshot!!.documents[position].id
         val bottomSheetDialog = BottomSheetDialog(activity!!)
         val categoryReference = db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.CATEGORIES)
         val expensesReference = db.collection(DBConstants.GROUPS)

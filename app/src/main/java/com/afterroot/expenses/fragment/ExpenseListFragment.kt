@@ -32,10 +32,9 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.Explode
 import com.afterroot.expenses.R
-import com.afterroot.expenses.adapter.ExpenseAdapter
-import com.afterroot.expenses.model.Expense.Companion.TYPE_EXPENSE
+import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
+import com.afterroot.expenses.adapter.ItemSelectedCallback
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.ExpensesViewModel
 import com.afterroot.expenses.utils.*
@@ -47,15 +46,14 @@ import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_expense_list.*
 import kotlinx.android.synthetic.main.list_item_expense.view.*
 
-class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
-    private var adapter: ExpenseAdapter? = null
+class ExpenseListFragment : Fragment(), ItemSelectedCallback {
+    private var adapter: ExpenseAdapterDelegate? = null
     lateinit var groupDocID: String
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        enterTransition = Explode()
         return inflater.inflate(R.layout.fragment_expense_list, container, false)
     }
 
@@ -75,10 +73,11 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
         }
     }
 
+    var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
         Log.d(_tag, "initFirebaseDb: groupId: $groupDocID")
 
-        adapter = ExpenseAdapter(this)
+        adapter = ExpenseAdapterDelegate(this)
 
         list.apply {
             val lm = LinearLayoutManager(this.context)
@@ -88,15 +87,17 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
 
         val expensesViewModel = ViewModelProviders.of(this).get(ExpensesViewModel::class.java)
         expensesViewModel.getSnapshot(groupDocID).observe(this, Observer<QuerySnapshot> { snapshot ->
-            adapter!!.setSnapshot(snapshot, TYPE_EXPENSE)
             list.adapter = adapter
+            mSnapshot = snapshot
+            adapter!!.add(snapshot.toObjects(ExpenseItem::class.java) as List<ExpenseItem>)
             activity!!.progress.visible(false)
         })
     }
 
-    override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int, view: View?) {
+    override fun onClick(position: Int, view: View?) {
+        val expenseItem = mSnapshot!!.documents[position].toObject(ExpenseItem::class.java) as ExpenseItem
         val bundle = Bundle().apply {
-            putSerializable(Constants.KEY_EXPENSE_SERIALIZE, adapter!!.mList[position] as ExpenseItem)
+            putSerializable(Constants.KEY_EXPENSE_SERIALIZE, expenseItem)
             putString("ANIM_AMOUNT", ViewCompat.getTransitionName(view!!.item_amount))
             putString("ANIM_CATEGORY", ViewCompat.getTransitionName(view.item_category))
             putString("ANIM_NOTE", ViewCompat.getTransitionName(view.item_note))
@@ -111,13 +112,14 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
 
     }
 
-    override fun onListItemLongClick(item: QuerySnapshot?, docId: String, position: Int) {
+    override fun onLongClick(position: Int) {
+        val docId = mSnapshot!!.documents[position].id
         val bottomSheetDialog = BottomSheetDialog(context!!)
         with(bottomSheetDialog) {
             setContentView(R.layout.context_group)
             show()
             item_edit.setOnClickListener {
-                val expenseItem = item!!.documents[position].toObject(ExpenseItem::class.java)
+                val expenseItem = mSnapshot!!.documents[position].toObject(ExpenseItem::class.java)
                 val action = ExpenseListFragmentDirections.toAddExpense(groupDocID, docId)
                 with(Bundle()) {
                     putAll(action.arguments)
@@ -137,7 +139,7 @@ class ExpenseListFragment : Fragment(), ListClickCallbacks<QuerySnapshot> {
                             val reference = Database.getInstance().collection(DBConstants.GROUPS).document(groupDocID).collection(DBConstants.EXPENSES)
                             Database.delete(reference.document(docId), object : DeleteListener {
                                 override fun onDeleteSuccess() {
-                                    adapter?.notifyItemRemoved(position)
+                                    adapter?.remove(position)
                                 }
 
                                 override fun onDeleteFailed() {
