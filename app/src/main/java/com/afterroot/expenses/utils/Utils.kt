@@ -16,15 +16,12 @@
 
 package com.afterroot.expenses.utils
 
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.util.Log
-import android.view.View
 import androidx.core.content.ContextCompat
 import com.afterroot.expenses.BuildConfig
+import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -92,29 +89,6 @@ object Utils {
         val number = phoneUtil.parse(phone, "IN")
         val test = number.nationalNumber.toString()
         return test.replace("[\\D]", "")
-    }
-}
-
-fun Activity.getDrawableExt(id: Int, tint: Int? = null): Drawable {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        val drawable = resources.getDrawable(id, theme)
-        if (tint != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                drawable.setTint(resources.getColor(tint, theme))
-            } else {
-                drawable.setTint(resources.getColor(tint))
-            }
-        }
-        return drawable
-    }
-    return resources.getDrawable(id)
-}
-
-fun View.visible(value: Boolean) {
-    visibility = if (value) {
-        View.VISIBLE
-    } else {
-        View.INVISIBLE
     }
 }
 
@@ -212,6 +186,23 @@ object Database {
         }.addOnFailureListener { exception ->
             Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
             callbacks.onFailed(exception.message!!)
+        }
+    }
+
+    fun getGroupMembers(groupId: String, callbacks: Callbacks<List<User>>) {
+        getInstance().collection(DBConstants.GROUPS).document(groupId).get().addOnSuccessListener { groupSnapshot ->
+            val group = groupSnapshot.toObject(Group::class.java)
+            val user: ArrayList<User>? = null
+            var i = group!!.members!!.size
+            group.members?.forEach {
+                getInstance().collection(DBConstants.USERS).document(it.key!!).get().addOnSuccessListener { userSnapshot ->
+                    i--
+                    user!!.add(userSnapshot.toObject(User::class.java)!!)
+                }
+                if (i == 0) {
+                    callbacks.onSuccess(user!!)
+                }
+            }
         }
     }
 
