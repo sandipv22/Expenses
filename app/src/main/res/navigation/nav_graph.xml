@@ -41,11 +41,11 @@
         <action
             android:id="@+id/toExpenseList"
             app:destination="@+id/expenseListFragment"
-            app:popUpTo="@+id/groupsFragment">
-            <argument
-                android:name="groupDocId"
-                android:defaultValue="null" />
-        </action>
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@+id/groupsFragment" />
         <action
             android:id="@+id/toEditProfile"
             app:destination="@+id/editProfileFragment"
@@ -67,7 +67,9 @@
             app:destination="@id/expenseDetailFragment" />
         <argument
             android:name="groupDocId"
-            app:argType="string" />
+            android:defaultValue="null"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/toAddExpense"
             app:destination="@id/addExpenseFragment"
