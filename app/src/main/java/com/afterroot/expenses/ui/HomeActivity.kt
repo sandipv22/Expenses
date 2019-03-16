@@ -53,7 +53,7 @@ import org.jetbrains.anko.design.snackbar
 class HomeActivity : AppCompatActivity() {
 
     private val _tag = "HomeActivity"
-    private val homeFragmentId = R.id.groupsFragment
+    private var homeFragmentId = R.id.groupsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
@@ -76,6 +76,11 @@ class HomeActivity : AppCompatActivity() {
         val drawerArrowDrawable = DrawerArrowDrawable(this)
         bottom_appbar.navigationIcon = drawerArrowDrawable
         mFab = fab
+        /*val pref = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_main_screen), null)
+        homeFragmentId = if (pref != null) {
+            R.id.expenseListFragment
+        } else
+            R.id.groupsFragment*/
 
         handler.postDelayed({
             host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
@@ -150,7 +155,7 @@ class HomeActivity : AppCompatActivity() {
                 override fun onClick(item: MenuItem) {
                     when (item.itemId) {
                         R.id.action_settings -> {
-                            Toast.makeText(this@HomeActivity, "Clicked", Toast.LENGTH_SHORT).show()
+                            host_nav_fragment.findNavController().navigate(R.id.toSettings)
                         }
                         R.id.sign_out -> {
                             signOutDialog().show()
@@ -206,7 +211,6 @@ class HomeActivity : AppCompatActivity() {
                     root_layout.snackbar(getString(R.string.msg_grant_permission_request), getString(R.string.text_action_grant)) {
                         checkPermissions(permissions)
                     }
-                    //TODO MainInfoFragment
                 }
             }
         }
