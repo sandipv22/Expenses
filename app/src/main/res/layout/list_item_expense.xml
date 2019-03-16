@@ -24,13 +24,25 @@
     tools:targetApi="lollipop">
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_paid_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Sandip Vaghela" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/list_item_spacing"
-        android:layout_marginTop="12dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/item_date"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/item_paid_by"
+        app:layout_constraintTop_toTopOf="@+id/item_paid_by"
         tools:text="Text Category" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -38,9 +50,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:singleLine="true"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/item_date"
+        app:layout_constraintEnd_toStartOf="@+id/item_date"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_category"
         tools:text="Description" />
@@ -49,12 +63,24 @@
         android:id="@+id/item_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/list_item_spacing"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
         android:singleLine="true"
         android:textSize="22sp"
         app:fontFamily="sans-serif-light"
-        app:layout_constraintBaseline_toBaselineOf="@+id/item_category"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_paid_by"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="50" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="11/03/2019 05:03 PM" />
 </androidx.constraintlayout.widget.ConstraintLayout>

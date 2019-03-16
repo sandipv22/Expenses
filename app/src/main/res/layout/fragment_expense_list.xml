@@ -33,11 +33,12 @@
         tools:listitem="@layout/list_item_expense"
         tools:targetApi="lollipop" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_no_expenses"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
         android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:text="@string/no_expenses"

@@ -19,39 +19,26 @@ package com.afterroot.expenses.utils
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 
 fun Activity.getDrawableExt(id: Int, tint: Int? = null): Drawable {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        val drawable = resources.getDrawable(id, theme)
-        if (tint != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                drawable.setTint(resources.getColor(tint, theme))
-            } else {
-                drawable.setTint(resources.getColor(tint))
-            }
-        }
-        return drawable
+    val drawable = ContextCompat.getDrawable(this, id)
+    if (tint != null) {
+        DrawableCompat.setTint(drawable!!, tint)
     }
-    return resources.getDrawable(id)
+    return drawable!!
 }
 
 fun Context.getDrawableExt(id: Int, tint: Int? = null): Drawable {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        val drawable = resources.getDrawable(id, theme)
-        if (tint != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                drawable.setTint(resources.getColor(tint, theme))
-            } else {
-                drawable.setTint(resources.getColor(tint))
-            }
-        }
-        return drawable
+    val drawable = ContextCompat.getDrawable(this, id)
+    if (tint != null) {
+        DrawableCompat.setTint(drawable!!, tint)
     }
-    return resources.getDrawable(id)
+    return drawable!!
 }
 
 fun View.visible(value: Boolean) {

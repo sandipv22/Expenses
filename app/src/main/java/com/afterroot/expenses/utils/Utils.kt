@@ -163,13 +163,11 @@ object Database {
                 .get()
                 .addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
-                        Log.d("FirebaseUser", "DocumentSnapshot data: " + documentSnapshot.data)
                         callbacks.onSuccess(documentSnapshot.toObject(User::class.java)!!)
                     } else {
                         callbacks.onFailed("User Not Exists")
                     }
                 }.addOnFailureListener { exception ->
-                    Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
                     callbacks.onFailed(exception.message!!)
                 }
     }
@@ -177,27 +175,25 @@ object Database {
     inline fun <reified T> getByID(ref: DocumentReference, callbacks: Callbacks<T>) {
         ref.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
-                Log.d("FirebaseUser", "DocumentSnapshot data: " + documentSnapshot.data)
                 callbacks.onSuccess(documentSnapshot.toObject(T::class.java)!!)
                 callbacks.onSnapshot(documentSnapshot)
             } else {
                 callbacks.onFailed("User Not Exists")
             }
         }.addOnFailureListener { exception ->
-            Log.d("FirebaseUser", "getUserByID: Error :${exception.message}")
             callbacks.onFailed(exception.message!!)
         }
     }
 
-    fun getGroupMembers(groupId: String, callbacks: Callbacks<List<User>>) {
+    fun getGroupMembers(groupId: String, callbacks: Callbacks<HashMap<String, User>>) {
         getInstance().collection(DBConstants.GROUPS).document(groupId).get().addOnSuccessListener { groupSnapshot ->
             val group = groupSnapshot.toObject(Group::class.java)
-            val user: ArrayList<User>? = null
+            val user: HashMap<String, User>? = null
             var i = group!!.members!!.size
             group.members?.forEach {
                 getInstance().collection(DBConstants.USERS).document(it.key!!).get().addOnSuccessListener { userSnapshot ->
                     i--
-                    user!!.add(userSnapshot.toObject(User::class.java)!!)
+                    user!!.put(it.key!!, userSnapshot.toObject(User::class.java)!!)
                 }
                 if (i == 0) {
                     callbacks.onSuccess(user!!)

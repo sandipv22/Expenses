@@ -34,19 +34,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_add_category"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="8dp"
         android:tint="@color/secondaryColor"
+        app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@+id/list_category"
-        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintDimensionRatio=""
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_add" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_category"
@@ -60,4 +59,22 @@
         app:layout_constraintTop_toBottomOf="@+id/appCompatTextView"
         app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/list_item_category" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_no_categories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:text="No Categories. Why not crate one!"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/list_category" />
 </androidx.constraintlayout.widget.ConstraintLayout>

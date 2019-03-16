@@ -66,5 +66,43 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <HorizontalScrollView
+        android:id="@+id/chipGroup2HorizontalView"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:scrollbars="none"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ti_layout_group_members">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/text_members"
+        android:minWidth="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/chipGroup2HorizontalView"
+        app:layout_constraintTop_toBottomOf="@+id/ti_layout_group_members"
+        app:layout_constraintWidth_min="32dp">
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

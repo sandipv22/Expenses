@@ -65,6 +65,26 @@ class GroupsViewModel : ViewModel() {
         }
         return groups
     }
+
+    var groupMembers: MutableLiveData<HashMap<String, User>> = MutableLiveData()
+    fun getGroupMembers(groupId: String): LiveData<HashMap<String, User>> {
+        Database.getInstance().collection(DBConstants.GROUPS).document(groupId).get().addOnSuccessListener { groupSnapshot ->
+            val group = groupSnapshot.toObject(Group::class.java)
+            val user: HashMap<String, User>? = null
+            var i = group!!.members!!.size
+            group.members?.forEach {
+                Database.getInstance().collection(DBConstants.USERS).document(it.key!!).get().addOnSuccessListener { userSnapshot ->
+                    i--
+                    user!![it.key!!] = userSnapshot.toObject(User::class.java)!!
+                }
+                if (i == 0) {
+                    groupMembers.value = user
+                }
+            }
+        }
+        return groupMembers
+    }
+
 }
 
 class ExpensesViewModel : ViewModel() {
