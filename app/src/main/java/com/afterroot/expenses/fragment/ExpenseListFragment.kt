@@ -18,7 +18,6 @@ package com.afterroot.expenses.fragment
 
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +29,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.R
@@ -48,7 +48,7 @@ import kotlinx.android.synthetic.main.list_item_expense.view.*
 
 class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     private var adapter: ExpenseAdapterDelegate? = null
-    lateinit var groupDocID: String
+    private lateinit var groupDocID: String
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
 
@@ -66,7 +66,6 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
 
         activity!!.fab.apply {
             setOnClickListener {
-                Log.d(_tag, "onViewCreated: FAB Clicked")
                 val action = ExpenseListFragmentDirections.toAddExpense(groupDocID, null)
                 view.findNavController().navigate(action)
             }
@@ -75,8 +74,6 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
 
     var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
-        Log.d(_tag, "initFirebaseDb: groupId: $groupDocID")
-
         adapter = ExpenseAdapterDelegate(this)
 
         list.apply {
@@ -90,7 +87,10 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
             list.adapter = adapter
             mSnapshot = snapshot
             adapter!!.add(snapshot.toObjects(ExpenseItem::class.java) as List<ExpenseItem>)
-            activity!!.progress.visible(false)
+            activity!!.apply {
+                progress.visible(false)
+                text_no_expenses.visible(mSnapshot!!.documents.size == 0)
+            }
         })
     }
 
@@ -101,15 +101,18 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
             putString("ANIM_AMOUNT", ViewCompat.getTransitionName(view!!.item_amount))
             putString("ANIM_CATEGORY", ViewCompat.getTransitionName(view.item_category))
             putString("ANIM_NOTE", ViewCompat.getTransitionName(view.item_note))
+            putString("ANIM_DATE", ViewCompat.getTransitionName(view.item_date))
+            putString("ANIM_PAID_BY", ViewCompat.getTransitionName(view.item_paid_by))
         }
-        Log.d(_tag, "onListItemClick: ${bundle.getSerializable(Constants.KEY_EXPENSE_SERIALIZE)}")
         with(view!!) {
-            val extras = FragmentNavigatorExtras(this.item_amount to ViewCompat.getTransitionName(this.item_amount)!!,
+            val extras = FragmentNavigatorExtras(
+                    this.item_amount to ViewCompat.getTransitionName(this.item_amount)!!,
                     this.item_category to ViewCompat.getTransitionName(this.item_category)!!,
-                    this.item_note to ViewCompat.getTransitionName(this.item_note)!!)
+                    this.item_note to ViewCompat.getTransitionName(this.item_note)!!,
+                    this.item_date to ViewCompat.getTransitionName(this.item_date)!!,
+                    this.item_paid_by to ViewCompat.getTransitionName(this.item_paid_by)!!)
             this@ExpenseListFragment.view!!.findNavController().navigate(R.id.toExpenseDetail, bundle, null, extras)
         }
-
     }
 
     override fun onLongClick(position: Int) {
@@ -124,7 +127,6 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
                 with(Bundle()) {
                     putAll(action.arguments)
                     putSerializable(Constants.KEY_EXPENSE_SERIALIZE, expenseItem)
-                    Log.d(_tag, "onListItemLongClick: $this")
                     view!!.findNavController().navigate(action.actionId, this)
                 }
 

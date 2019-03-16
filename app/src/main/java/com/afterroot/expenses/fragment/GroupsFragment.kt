@@ -73,18 +73,11 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
             }
         }
         if (FirebaseUtils.isUserSignedIn) {
-            /*val groupID = sharedPreferences.getString(getString(R.string.pref_main_screen), null)
-            if (groupID != null) {
-                val action = GroupsFragmentDirections.toExpenseList(groupID)
-                activity!!.host_nav_fragment.findNavController().navigate(action)
-            } else {
-                initFirebaseDb()
-            }*/
             initFirebaseDb()
         }
     }
 
-    var mSnapshot: QuerySnapshot? = null
+    private var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
         Log.d(_tag, "initFirebaseDb: Started")
         activity!!.progress.visibility = View.VISIBLE
@@ -103,6 +96,7 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
             activity?.apply {
                 progress?.visible(false)
                 fab.show()
+                text_no_groups.visible(mSnapshot!!.documents.size == 0)
             }
         })
         Log.d(_tag, "initFirebaseDb: Ended")

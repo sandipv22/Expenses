@@ -27,15 +27,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Category
-import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.Database
-import com.afterroot.expenses.utils.ListClickCallbacks
+import com.afterroot.expenses.utils.*
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.android.synthetic.main.fragment_categories.*
+import kotlinx.android.synthetic.main.fragment_categories.view.*
 import kotlinx.android.synthetic.main.list_item_category.view.*
 
 class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
@@ -103,6 +102,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
             }
 
             override fun onDataChanged() {
+                this@CategoryItemListDialogFragment.view!!.text_no_categories.visible(snapshots.size <= 0)
             }
 
             override fun onError(e: FirebaseFirestoreException) {
@@ -118,6 +118,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
         }
 
         button_add_category.apply {
+            setImageDrawable(context!!.getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
             setOnClickListener {
                 MaterialDialog.Builder(activity!!)
                         .title("New Category")
