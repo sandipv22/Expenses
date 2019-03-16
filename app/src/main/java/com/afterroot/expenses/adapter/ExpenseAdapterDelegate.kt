@@ -31,7 +31,7 @@ class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
     init {
         with(delegateAdapters) {
             put(Expense.TYPE_GROUP, GroupDelegateAdapter(callbacks))
-            put(Expense.TYPE_EXPENSE, ExpenseDelegateAdapter(callbacks))
+            put(Expense.TYPE_EXPENSE, ExpenseListDelegateAdapter(callbacks))
             put(Expense.TYPE_GROUP_ALT, GroupAltDelegateAdapter(callbacks))
         }
     }
@@ -54,9 +54,9 @@ class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
     }
 
     fun add(value: List<Expense>) {
+        mList.clear()
         mList.addAll(value)
         notifyItemRangeInserted(0, mList.size)
-        notifyDataSetChanged()
     }
 
     fun remove(position: Int) {
