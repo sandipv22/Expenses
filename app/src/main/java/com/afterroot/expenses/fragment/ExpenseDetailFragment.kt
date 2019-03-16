@@ -63,6 +63,8 @@ class ExpenseDetailFragment : Fragment() {
             ViewCompat.setTransitionName(fragmentView!!.detail_amount, it.getString("ANIM_AMOUNT"))
             ViewCompat.setTransitionName(fragmentView!!.detail_category, it.getString("ANIM_CATEGORY"))
             ViewCompat.setTransitionName(fragmentView!!.detail_note, it.getString("ANIM_NOTE"))
+            ViewCompat.setTransitionName(fragmentView!!.detail_date, it.getString("ANIM_DATE"))
+            ViewCompat.setTransitionName(fragmentView!!.detail_paid_by, it.getString("ANIM_PAID_BY"))
         }
         return fragmentView
     }
