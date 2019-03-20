@@ -21,9 +21,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.afterroot.expenses.Callbacks
 import com.afterroot.expenses.R
+import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.firebase.FirebaseUtils
 import com.afterroot.expenses.model.User
-import com.afterroot.expenses.utils.*
+import com.afterroot.expenses.utils.Utils
+import com.afterroot.expenses.visible
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentSnapshot

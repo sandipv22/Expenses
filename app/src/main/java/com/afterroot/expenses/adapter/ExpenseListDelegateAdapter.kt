@@ -20,14 +20,14 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.afterroot.expenses.Callbacks
 import com.afterroot.expenses.R
+import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.inflate
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.User
-import com.afterroot.expenses.utils.Callbacks
-import com.afterroot.expenses.utils.Database
 import com.afterroot.expenses.utils.Utils
-import com.afterroot.expenses.utils.inflate
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.list_item_expense.view.*
 import java.text.SimpleDateFormat
@@ -54,7 +54,7 @@ class ExpenseListDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDele
             noteText.text = String.format("%s, with %s", item.note, Utils.formatNames(item.with!!))
             categoryText.text = item.category
             time.text = SimpleDateFormat(itemView.context.getString(R.string.date_time_format), Locale.US).format(item.date)
-            Database.getUserByID(item.paidBy, object : Callbacks<User> {
+            Database.getUserByID(item.paidBy!!, object : Callbacks<User> {
                 override fun onSuccess(value: User) {
                     paidBy.text = value.name
                 }

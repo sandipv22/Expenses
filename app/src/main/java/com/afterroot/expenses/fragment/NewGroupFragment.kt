@@ -16,19 +16,31 @@
 
 package com.afterroot.expenses.fragment
 
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CursorAdapter
 import android.widget.MultiAutoCompleteTextView
+import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.CursorLoader
+import androidx.loader.content.Loader
 import androidx.navigation.fragment.findNavController
 import com.afterroot.expenses.R
+import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.firebase.FirebaseUtils
+import com.afterroot.expenses.getDrawableExt
 import com.afterroot.expenses.model.Group
-import com.afterroot.expenses.utils.*
+import com.afterroot.expenses.utils.Utils
+import com.afterroot.expenses.visible
 import com.android.ex.chips.BaseRecipientAdapter
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*

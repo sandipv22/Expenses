@@ -20,9 +20,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.expenses.R
+import com.afterroot.expenses.inflate
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.Group
-import com.afterroot.expenses.utils.inflate
 
 class GroupAltDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = GroupAltVH(parent)

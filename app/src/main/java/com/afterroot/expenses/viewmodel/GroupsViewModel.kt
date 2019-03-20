@@ -14,30 +14,17 @@
  * limitations under the License.
  */
 
-package com.afterroot.expenses.model
+package com.afterroot.expenses.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.afterroot.expenses.utils.DBConstants
-import com.afterroot.expenses.utils.Database
-import com.google.firebase.firestore.Query
+import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.model.Group
+import com.afterroot.expenses.model.User
 import com.google.firebase.firestore.QuerySnapshot
-
-
-class UserViewModel : ViewModel() {
-    private var userId: String? = null
-    private val user: LiveData<User>? = null
-
-    fun init(userId: String) {
-        this.userId = userId
-    }
-
-    fun getUser(): LiveData<User>? {
-        return user
-    }
-}
 
 class GroupsViewModel : ViewModel() {
     var groupSnapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
@@ -85,33 +72,4 @@ class GroupsViewModel : ViewModel() {
         return groupMembers
     }
 
-}
-
-class ExpensesViewModel : ViewModel() {
-    var snapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
-    var expenses: MutableLiveData<List<ExpenseItem>> = MutableLiveData()
-
-    fun getSnapshot(groupId: String): LiveData<QuerySnapshot> {
-        if (snapshot.value == null) {
-            Log.d("ExpensesViewModel", "getGroupSnapshot: ")
-            Database.getInstance()
-                    .collection(DBConstants.GROUPS)
-                    .document(groupId)
-                    .collection(DBConstants.EXPENSES)
-                    .orderBy("date", Query.Direction.DESCENDING)
-                    .addSnapshotListener { querySnapshot, _ ->
-                        if (querySnapshot != null) {
-                            snapshot.value = querySnapshot
-                        }
-                    }
-        }
-        return snapshot
-    }
-
-    fun getExpenses(groupId: String): LiveData<List<ExpenseItem>> {
-        if (expenses.value == null) {
-            expenses.value = getSnapshot(groupId).value?.toObjects(ExpenseItem::class.java)
-        }
-        return expenses
-    }
 }

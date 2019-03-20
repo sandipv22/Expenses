@@ -30,13 +30,14 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.expenses.R
+import com.afterroot.expenses.*
+import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.database.Database.getByID
 import com.afterroot.expenses.model.Category
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
-import com.afterroot.expenses.utils.*
-import com.afterroot.expenses.utils.Database.getByID
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
@@ -115,7 +116,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
         fragmentView!!.apply {
             if (item != null) {
                 activity!!.progress.visible(true)
-                Database.getUserByID(item!!.paidBy, object : Callbacks<User> {
+                Database.getUserByID(item!!.paidBy!!, object : Callbacks<User> {
                     override fun onSuccess(value: User) {
                         text_input_amount.setText(item!!.amount.toString())
 
@@ -128,7 +129,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
 
                         text_input_note.setText(item!!.note)
 
-                        paidByID = item!!.paidBy
+                        paidByID = item!!.paidBy!!
                         text_paid_by.text = value.name
 
                         withUserMap.values.forEach {
@@ -274,7 +275,15 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 view.text_input_note.text.toString(), paidByID,
                                 map
                         )
-                        reference.add(item!!).addOnSuccessListener {
+                        val documentsData = hashMapOf<String, Any?>(
+                                "amount" to view.text_input_amount.text.toString().toLong(),
+                                "category" to category,
+                                "date" to Date(millis),
+                                "note" to view.text_input_note.text.toString(),
+                                "paidBy" to paidByID,
+                                "with" to map
+                        )
+                        reference.add(documentsData).addOnSuccessListener {
                             this@AddExpenseFragment.view!!.findNavController().popBackStack()
                         }
                     }

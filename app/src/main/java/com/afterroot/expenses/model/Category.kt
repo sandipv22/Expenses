@@ -16,11 +16,13 @@
 
 package com.afterroot.expenses.model
 
-import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.module.AppGlideModule
+import com.google.firebase.firestore.ServerTimestamp
+import java.io.Serializable
+import java.util.*
 
-/**
- * Created by Sandip on 14-12-2017.
- */
-@GlideModule
-class MyGlide : AppGlideModule()
+data class Category(
+        var name: String,
+        @ServerTimestamp var createdAt: Date? = null
+) : Serializable {
+    constructor() : this("", null)
+}

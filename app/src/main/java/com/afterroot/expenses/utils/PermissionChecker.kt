@@ -16,26 +16,17 @@
 
 package com.afterroot.expenses.utils
 
-import android.view.MenuItem
-import android.view.View
-import com.google.firebase.firestore.DocumentSnapshot
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 
-interface ListClickCallbacks<in T> {
-    fun onListItemClick(item: T?, docId: String, position: Int, view: View? = null)
-    fun onListItemLongClick(item: T?, docId: String, position: Int)
-}
+class PermissionChecker(private val mContext: Context) {
 
-interface NavigationItemClickCallback {
-    fun onClick(item: MenuItem)
-}
+    fun isPermissionsNeeded(vararg permissions: String): Boolean {
+        return permissions.any { checkPermission(it) }
+    }
 
-interface Callbacks<in T> {
-    fun onSuccess(value: T)
-    fun onFailed(message: String)
-    fun onSnapshot(snapshot: DocumentSnapshot)
-}
-
-interface DeleteListener {
-    fun onDeleteSuccess()
-    fun onDeleteFailed()
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(mContext, permission) == PackageManager.PERMISSION_DENIED
+    }
 }

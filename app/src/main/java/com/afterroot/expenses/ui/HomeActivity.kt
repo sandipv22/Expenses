@@ -34,10 +34,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afterroot.expenses.Constants
+import com.afterroot.expenses.NavigationItemClickCallback
 import com.afterroot.expenses.R
+import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.firebase.FirebaseUtils
 import com.afterroot.expenses.fragment.BottomNavigationDrawerFragment
+import com.afterroot.expenses.getDrawableExt
 import com.afterroot.expenses.model.User
-import com.afterroot.expenses.utils.*
+import com.afterroot.expenses.utils.PermissionChecker
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse

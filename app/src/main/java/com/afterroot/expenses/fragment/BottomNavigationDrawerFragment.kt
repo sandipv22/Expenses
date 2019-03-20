@@ -20,8 +20,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.afterroot.expenses.NavigationItemClickCallback
 import com.afterroot.expenses.R
-import com.afterroot.expenses.utils.NavigationItemClickCallback
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_bottomsheet_nav.*
 

@@ -31,13 +31,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afterroot.expenses.DeleteListener
 import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
 import com.afterroot.expenses.adapter.ItemSelectedCallback
+import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.firebase.FirebaseUtils
 import com.afterroot.expenses.model.Group
-import com.afterroot.expenses.model.GroupsViewModel
-import com.afterroot.expenses.utils.*
+import com.afterroot.expenses.viewmodel.GroupsViewModel
+import com.afterroot.expenses.visible
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -46,6 +51,7 @@ import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_groups.*
 import org.jetbrains.anko.design.snackbar
+import java.util.*
 
 class GroupsFragment : Fragment(), ItemSelectedCallback {
     private var groupsAdapter: ExpenseAdapterDelegate? = null

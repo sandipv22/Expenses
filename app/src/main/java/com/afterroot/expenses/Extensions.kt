@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.expenses.utils
+package com.afterroot.expenses
 
 import android.app.Activity
 import android.content.Context

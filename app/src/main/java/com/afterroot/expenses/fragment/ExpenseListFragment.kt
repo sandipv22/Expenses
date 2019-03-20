@@ -32,19 +32,25 @@ import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afterroot.expenses.Constants
+import com.afterroot.expenses.DeleteListener
 import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
 import com.afterroot.expenses.adapter.ItemSelectedCallback
+import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.model.ExpenseItem
-import com.afterroot.expenses.model.ExpensesViewModel
-import com.afterroot.expenses.utils.*
+import com.afterroot.expenses.viewmodel.ExpensesViewModel
+import com.afterroot.expenses.visible
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_expense_list.*
 import kotlinx.android.synthetic.main.list_item_expense.view.*
+import java.util.*
 
 class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     private var adapter: ExpenseAdapterDelegate? = null
@@ -145,17 +151,11 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
                                 }
 
                                 override fun onDeleteFailed() {
-
                                 }
-
                             })
                         }.setNegativeButton(getString(R.string.text_cancel)) { _, _ ->
-
                         }.show()
-
             }
-
         }
-
     }
 }
