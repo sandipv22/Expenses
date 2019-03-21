@@ -34,6 +34,7 @@ import com.afterroot.expenses.*
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.database.Database.getByID
+import com.afterroot.expenses.firebase.FirebaseUtils
 import com.afterroot.expenses.model.Category
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
@@ -216,7 +217,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                         withUserMap[user!!.name] = user
                                     }
                                     return@itemsCallbackMultiChoice true
-                                }.positiveText("OK").onPositive { dialog, which ->
+                                }.positiveText("OK").onPositive { _, _ ->
                                 }.show()
                     } else {
                         val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
@@ -263,7 +264,8 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 category,
                                 Date(millis),
                                 view.text_input_note.text.toString(), paidByID,
-                                map
+                                map,
+                                hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!)
                         )
                         reference.document(expenseDocNo!!).set(item!!).addOnSuccessListener {
                             this@AddExpenseFragment.view!!.findNavController().popBackStack()
@@ -273,17 +275,10 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 category,
                                 Date(millis),
                                 view.text_input_note.text.toString(), paidByID,
-                                map
+                                map,
+                                hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!)
                         )
-                        val documentsData = hashMapOf<String, Any?>(
-                                "amount" to view.text_input_amount.text.toString().toLong(),
-                                "category" to category,
-                                "date" to Date(millis),
-                                "note" to view.text_input_note.text.toString(),
-                                "paidBy" to paidByID,
-                                "with" to map
-                        )
-                        reference.add(documentsData).addOnSuccessListener {
+                        reference.add(item!!).addOnSuccessListener {
                             this@AddExpenseFragment.view!!.findNavController().popBackStack()
                         }
                     }

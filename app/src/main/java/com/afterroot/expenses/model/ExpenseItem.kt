@@ -26,11 +26,20 @@ data class ExpenseItem(
         @ServerTimestamp var date: Date?,
         var note: String?,
         var paidBy: String?,
-        var with: HashMap<String, String>?
+        var with: HashMap<String, String>?,
+        var addedBy: HashMap<String, String>?
 ) : Serializable, Expense {
     override fun getType(): Int {
         return Expense.TYPE_EXPENSE
     }
 
-    constructor() : this(0, "", null, "", "", null)
+    constructor() : this(
+            0,
+            "",
+            null,
+            "",
+            "",
+            null,
+            null
+    )
 }
