@@ -16,7 +16,6 @@
 
 package com.afterroot.expenses.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,16 +23,15 @@ import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.model.ExpenseItem
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
 
 
 class ExpensesViewModel : ViewModel() {
-    var snapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
+    var snapshot: MutableLiveData<ViewModelState> = MutableLiveData()
     var expenses: MutableLiveData<List<ExpenseItem>> = MutableLiveData()
 
-    fun getSnapshot(groupId: String): LiveData<QuerySnapshot> {
+    fun getSnapshot(groupId: String): LiveData<ViewModelState> {
         if (snapshot.value == null) {
-            Log.d("ExpensesViewModel", "getGroupSnapshot: ")
+            snapshot.postValue(ViewModelState.Loading)
             Database.getInstance()
                     .collection(DBConstants.GROUPS)
                     .document(groupId)
@@ -41,17 +39,10 @@ class ExpensesViewModel : ViewModel() {
                     .orderBy("date", Query.Direction.DESCENDING)
                     .addSnapshotListener { querySnapshot, _ ->
                         if (querySnapshot != null) {
-                            snapshot.value = querySnapshot
+                            snapshot.postValue(ViewModelState.Loaded(querySnapshot))
                         }
                     }
         }
         return snapshot
-    }
-
-    fun getExpenses(groupId: String): LiveData<List<ExpenseItem>> {
-        if (expenses.value == null) {
-            expenses.value = getSnapshot(groupId).value?.toObjects(ExpenseItem::class.java)
-        }
-        return expenses
     }
 }

@@ -16,7 +16,6 @@
 
 package com.afterroot.expenses.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,33 +23,24 @@ import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
-import com.google.firebase.firestore.QuerySnapshot
 
 class GroupsViewModel : ViewModel() {
-    var groupSnapshot: MutableLiveData<QuerySnapshot> = MutableLiveData()
+    var groupSnapshot: MutableLiveData<ViewModelState> = MutableLiveData()
     var groups: MutableLiveData<List<Group>> = MutableLiveData()
 
-
-    fun getGroupSnapshot(userId: String): LiveData<QuerySnapshot> {
+    fun getGroupSnapshot(userId: String): LiveData<ViewModelState> {
         if (groupSnapshot.value == null) {
-            Log.d("GroupViewModel", "getGroupSnapshot: Getting Snapshots")
+            groupSnapshot.postValue(ViewModelState.Loading)
             Database.getInstance().collection(DBConstants.GROUPS).whereGreaterThanOrEqualTo(
                     "${DBConstants.FIELD_GROUP_MEMBERS}.$userId",
                     DBConstants.TYPE_MEMBER
             ).addSnapshotListener { querySnapshot, _ ->
                 if (querySnapshot != null) {
-                    groupSnapshot.value = querySnapshot
+                    groupSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
                 }
             }
         }
         return groupSnapshot
-    }
-
-    fun getGroups(userId: String): LiveData<List<Group>> {
-        if (groups.value == null) {
-            groups.value = getGroupSnapshot(userId).value?.toObjects(Group::class.java)
-        }
-        return groups
     }
 
     var groupMembers: MutableLiveData<HashMap<String, User>> = MutableLiveData()

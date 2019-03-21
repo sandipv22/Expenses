@@ -19,7 +19,6 @@ package com.afterroot.expenses.fragment
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,9 +39,9 @@ import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.firebase.FirebaseUtils
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.viewmodel.GroupsViewModel
+import com.afterroot.expenses.viewmodel.ViewModelState
 import com.afterroot.expenses.visible
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -51,7 +50,6 @@ import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_groups.*
 import org.jetbrains.anko.design.snackbar
-import java.util.*
 
 class GroupsFragment : Fragment(), ItemSelectedCallback {
     private var groupsAdapter: ExpenseAdapterDelegate? = null
@@ -85,27 +83,33 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
 
     private var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
-        Log.d(_tag, "initFirebaseDb: Started")
         activity!!.progress.visibility = View.VISIBLE
         groupsAdapter = ExpenseAdapterDelegate(this)
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
+            this.adapter = groupsAdapter
         }
 
         val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
-        groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<QuerySnapshot> { snapshot ->
-            list.adapter = groupsAdapter
-            mSnapshot = snapshot
-            groupsAdapter!!.add(snapshot.toObjects(Group::class.java) as List<Group>)
-            activity?.apply {
-                progress?.visible(false)
-                fab.show()
-                text_no_groups.visible(mSnapshot!!.documents.size == 0)
+        groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<ViewModelState> { state ->
+            when (state) {
+                is ViewModelState.Loading -> {
+                    activity!!.progress.visible(true)
+                }
+
+                is ViewModelState.Loaded<*> -> {
+                    mSnapshot = state.data as QuerySnapshot
+                    groupsAdapter!!.add(mSnapshot!!.toObjects(Group::class.java) as List<Group>)
+                    activity?.apply {
+                        progress?.visible(false)
+                        fab.show()
+                        text_no_groups.visible(mSnapshot!!.documents.size == 0)
+                    }
+                }
             }
         })
-        Log.d(_tag, "initFirebaseDb: Ended")
     }
 
     override fun onClick(position: Int, view: View?) {

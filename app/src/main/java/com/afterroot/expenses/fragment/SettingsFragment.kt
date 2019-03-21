@@ -29,6 +29,7 @@ import com.afterroot.expenses.ListClickCallbacks
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.viewmodel.GroupsViewModel
+import com.afterroot.expenses.viewmodel.ViewModelState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.QuerySnapshot
 
@@ -49,8 +50,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
         editor = sharedPref.edit()
 
         val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
-        groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<QuerySnapshot> { snapshot ->
-            querySnapshot = snapshot
+        groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<ViewModelState> { state ->
+            when (state) {
+                is ViewModelState.Loading -> {
+                }
+
+                is ViewModelState.Loaded<*> -> {
+                    querySnapshot = state.data as QuerySnapshot
+                }
+            }
         })
     }
 

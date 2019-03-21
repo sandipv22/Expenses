@@ -41,19 +41,18 @@ import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.viewmodel.ExpensesViewModel
+import com.afterroot.expenses.viewmodel.ViewModelState
 import com.afterroot.expenses.visible
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_expense_list.*
 import kotlinx.android.synthetic.main.list_item_expense.view.*
-import java.util.*
 
 class ExpenseListFragment : Fragment(), ItemSelectedCallback {
-    private var adapter: ExpenseAdapterDelegate? = null
+    private var expenseAdapter: ExpenseAdapterDelegate? = null
     private lateinit var groupDocID: String
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
@@ -68,7 +67,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
         activity!!.progress.visible(true)
         Handler().postDelayed({
             initFirebaseDb()
-        }, 200)
+        }, 50)
 
         activity!!.fab.apply {
             setOnClickListener {
@@ -80,22 +79,30 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
 
     var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
-        adapter = ExpenseAdapterDelegate(this)
+        expenseAdapter = ExpenseAdapterDelegate(this)
 
         list.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
+            this.adapter = expenseAdapter
         }
 
         val expensesViewModel = ViewModelProviders.of(this).get(ExpensesViewModel::class.java)
-        expensesViewModel.getSnapshot(groupDocID).observe(this, Observer<QuerySnapshot> { snapshot ->
-            list.adapter = adapter
-            mSnapshot = snapshot
-            adapter!!.add(snapshot.toObjects(ExpenseItem::class.java) as List<ExpenseItem>)
-            activity!!.apply {
-                progress.visible(false)
-                text_no_expenses.visible(mSnapshot!!.documents.size == 0)
+        expensesViewModel.getSnapshot(groupDocID).observe(this, Observer<ViewModelState> { state ->
+            when (state) {
+                is ViewModelState.Loading -> {
+                    activity!!.progress.visible(true)
+                }
+
+                is ViewModelState.Loaded<*> -> {
+                    mSnapshot = state.data as QuerySnapshot
+                    expenseAdapter!!.add(mSnapshot!!.toObjects(ExpenseItem::class.java) as List<ExpenseItem>)
+                    activity?.apply {
+                        progress?.visible(false)
+                        text_no_expenses.visible(mSnapshot!!.documents.size == 0)
+                    }
+                }
             }
         })
     }
@@ -147,7 +154,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
                             val reference = Database.getInstance().collection(DBConstants.GROUPS).document(groupDocID).collection(DBConstants.EXPENSES)
                             Database.delete(reference.document(docId), object : DeleteListener {
                                 override fun onDeleteSuccess() {
-                                    adapter?.remove(position)
+                                    expenseAdapter?.remove(position)
                                 }
 
                                 override fun onDeleteFailed() {
