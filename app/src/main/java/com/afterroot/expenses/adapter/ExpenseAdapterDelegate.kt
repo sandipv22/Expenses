@@ -36,15 +36,13 @@ class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return delegateAdapters.get(viewType)!!.onCreateViewHolder(parent)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+            delegateAdapters.get(viewType)!!.onCreateViewHolder(parent)
 
     override fun getItemCount(): Int = mList.size
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        delegateAdapters.get(getItemViewType(position))!!.onBindViewHolder(holder, mList[position])
-    }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+            delegateAdapters.get(getItemViewType(position))!!.onBindViewHolder(holder, mList[position])
 
     override fun getItemViewType(position: Int): Int = mList[position].getType()
 
@@ -60,8 +58,8 @@ class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
     }
 
     fun remove(position: Int) {
-        mList.removeAt(position)
         notifyItemRemoved(position)
+        mList.removeAt(position)
     }
 }
 
