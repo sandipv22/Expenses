@@ -42,7 +42,6 @@ android {
         versionCode genVersionCode()
         versionName genVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs "en"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
     }
@@ -58,6 +57,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    flavorDimensions "ar"
+    productFlavors {
+        dev {
+            resConfigs "en"
+        }
     }
 }
 
