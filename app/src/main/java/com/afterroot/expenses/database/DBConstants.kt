@@ -31,6 +31,9 @@ object DBConstants {
     const val FIELD_GROUP_NAME = "group_name"
     const val FIELD_GROUP_MEMBERS = "members"
 
+    const val CREATED_AT = "createdAt"
+    const val USED_AT = "usedAt"
+
     const val TYPE_MEMBER = 0
     const val TYPE_ADMIN = 1
 }

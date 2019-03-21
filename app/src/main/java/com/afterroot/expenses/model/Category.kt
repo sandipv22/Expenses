@@ -16,13 +16,15 @@
 
 package com.afterroot.expenses.model
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import java.io.Serializable
 import java.util.*
 
 data class Category(
         var name: String,
-        @ServerTimestamp var createdAt: Date? = null
+        @ServerTimestamp var createdAt: Date? = Timestamp.now().toDate(),
+        @ServerTimestamp var usedAt: Date? = Timestamp.now().toDate()
 ) : Serializable {
-    constructor() : this("", null)
+    constructor() : this("", null, null)
 }

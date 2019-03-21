@@ -28,6 +28,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.ListClickCallbacks
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.database.DBConstants.USED_AT
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.getDrawableExt
 import com.afterroot.expenses.model.Category
@@ -35,8 +36,10 @@ import com.afterroot.expenses.visible
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.fragment_categories.*
 import kotlinx.android.synthetic.main.fragment_categories.view.*
 import kotlinx.android.synthetic.main.list_item_category.view.*
@@ -58,6 +61,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
         val query = db.collection(DBConstants.GROUPS)
                 .document(arguments!!.getString("groupId")!!)
                 .collection(DBConstants.CATEGORIES)
+                .orderBy(USED_AT, Query.Direction.DESCENDING)
 
         val options = FirestoreRecyclerOptions.Builder<Category>()
                 .setQuery(query, Category::class.java)
@@ -75,19 +79,19 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                     text = model.name
                     setOnClickListener {
                         mCallbacks?.onListItemClick(model, snapshots.getSnapshot(holder.adapterPosition).id, position)
+                        db.collection(DBConstants.GROUPS)
+                                .document(arguments!!.getString("groupId")!!)
+                                .collection(DBConstants.CATEGORIES)
+                                .document(snapshots.getSnapshot(holder.adapterPosition).id)
+                                .update(USED_AT, Timestamp.now().toDate())
                         dismiss()
                     }
                     setOnLongClickListener {
                         mCallbacks?.onListItemLongClick(model, snapshots.getSnapshot(holder.adapterPosition).id, position)
-                        var docId: String? = null
+                        val docId: String? = snapshots.getSnapshot(holder.adapterPosition).id
                         val ref = db.collection(DBConstants.GROUPS)
                                 .document(arguments!!.getString("groupId")!!)
                                 .collection(DBConstants.CATEGORIES)
-                        ref.whereEqualTo(DBConstants.FIELD_NAME, model.name).get()
-                                .addOnCompleteListener { task ->
-                                    docId = task.result!!.documents[0].id
-                                }
-
                         MaterialDialog.Builder(activity!!)
                                 .title("Edit Category")
                                 .input("new name", model.name, false) { _, input ->
@@ -135,7 +139,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                                         if (task.result!!.documents.size > 0) {
                                             Toast.makeText(it.context, "Category already exists.", Toast.LENGTH_SHORT).show()
                                         } else {
-                                            ref.add(Category(input.toString()))
+                                            ref.add(Category(input.toString(), Timestamp.now().toDate()))
                                                     .addOnSuccessListener {
                                                         Toast.makeText(this.context, "Category added", Toast.LENGTH_SHORT).show()
                                                     }
