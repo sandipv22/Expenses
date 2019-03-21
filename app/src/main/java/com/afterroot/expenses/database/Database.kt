@@ -23,7 +23,6 @@ import com.afterroot.expenses.model.User
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import java.util.*
 
 object Database {
 
@@ -51,7 +50,7 @@ object Database {
                 queryCallback.onSuccess(documentSnapshot.toObject(T::class.java)!!)
                 queryCallback.onSnapshot(documentSnapshot)
             } else {
-                queryCallback.onFailed("User Not Exists")
+                queryCallback.onFailed("Document Not Exists")
             }
         }.addOnFailureListener { exception ->
             queryCallback.onFailed(exception.message!!)
@@ -61,15 +60,15 @@ object Database {
     fun getGroupMembers(groupId: String, queryCallback: QueryCallback<HashMap<String, User>>) {
         getInstance().collection(DBConstants.GROUPS).document(groupId).get().addOnSuccessListener { groupSnapshot ->
             val group = groupSnapshot.toObject(Group::class.java)
-            val user: HashMap<String, User>? = null
+            val user = HashMap<String, User>()
             var i = group!!.members!!.size
             group.members?.forEach {
                 getInstance().collection(DBConstants.USERS).document(it.key!!).get().addOnSuccessListener { userSnapshot ->
                     i--
-                    user!!.put(it.key!!, userSnapshot.toObject(User::class.java)!!)
-                }
-                if (i == 0) {
-                    queryCallback.onSuccess(user!!)
+                    user[it.key!!] = userSnapshot.toObject(User::class.java)!!
+                    if (i == 0) {
+                        queryCallback.onSuccess(user)
+                    }
                 }
             }
         }
