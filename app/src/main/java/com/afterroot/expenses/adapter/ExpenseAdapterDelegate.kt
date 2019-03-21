@@ -25,7 +25,7 @@ import com.afterroot.expenses.model.Group
 import java.util.*
 
 class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var mList: ArrayList<Expense> = ArrayList()
+    private var mList = ArrayList<Expense>()
     private var delegateAdapters = SparseArrayCompat<TypeDelegateAdapter>()
 
     init {
