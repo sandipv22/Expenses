@@ -16,8 +16,8 @@
 
 package com.afterroot.expenses.database
 
-import com.afterroot.expenses.Callbacks
-import com.afterroot.expenses.DeleteListener
+import com.afterroot.expenses.firebase.DeleteListener
+import com.afterroot.expenses.firebase.QueryCallback
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
 import com.google.firebase.firestore.DocumentReference
@@ -31,34 +31,34 @@ object Database {
         firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(true).build()
     }
 
-    fun getUserByID(uid: String, callbacks: Callbacks<User>) {
+    fun getUserByID(uid: String, queryCallback: QueryCallback<User>) {
         getInstance().collection(DBConstants.USERS).document(uid)
                 .get()
                 .addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
-                        callbacks.onSuccess(documentSnapshot.toObject(User::class.java)!!)
+                        queryCallback.onSuccess(documentSnapshot.toObject(User::class.java)!!)
                     } else {
-                        callbacks.onFailed("User Not Exists")
+                        queryCallback.onFailed("User Not Exists")
                     }
                 }.addOnFailureListener { exception ->
-                    callbacks.onFailed(exception.message!!)
+                    queryCallback.onFailed(exception.message!!)
                 }
     }
 
-    inline fun <reified T> getByID(ref: DocumentReference, callbacks: Callbacks<T>) {
+    inline fun <reified T> getByID(ref: DocumentReference, queryCallback: QueryCallback<T>) {
         ref.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
-                callbacks.onSuccess(documentSnapshot.toObject(T::class.java)!!)
-                callbacks.onSnapshot(documentSnapshot)
+                queryCallback.onSuccess(documentSnapshot.toObject(T::class.java)!!)
+                queryCallback.onSnapshot(documentSnapshot)
             } else {
-                callbacks.onFailed("User Not Exists")
+                queryCallback.onFailed("User Not Exists")
             }
         }.addOnFailureListener { exception ->
-            callbacks.onFailed(exception.message!!)
+            queryCallback.onFailed(exception.message!!)
         }
     }
 
-    fun getGroupMembers(groupId: String, callbacks: Callbacks<HashMap<String, User>>) {
+    fun getGroupMembers(groupId: String, queryCallback: QueryCallback<HashMap<String, User>>) {
         getInstance().collection(DBConstants.GROUPS).document(groupId).get().addOnSuccessListener { groupSnapshot ->
             val group = groupSnapshot.toObject(Group::class.java)
             val user: HashMap<String, User>? = null
@@ -69,7 +69,7 @@ object Database {
                     user!!.put(it.key!!, userSnapshot.toObject(User::class.java)!!)
                 }
                 if (i == 0) {
-                    callbacks.onSuccess(user!!)
+                    queryCallback.onSuccess(user!!)
                 }
             }
         }

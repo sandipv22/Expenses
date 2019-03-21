@@ -21,11 +21,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.afterroot.expenses.Callbacks
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.firebase.FirebaseUtils
+import com.afterroot.expenses.firebase.QueryCallback
 import com.afterroot.expenses.model.User
 import com.afterroot.expenses.utils.Utils
 import com.afterroot.expenses.visible
@@ -56,7 +56,7 @@ class EditProfileFragment : Fragment() {
         if (FirebaseUtils.isUserSignedIn) {
             firebaseUser = FirebaseUtils.auth?.currentUser!!
             activity!!.progress.visible(true)
-            Database.getUserByID(firebaseUser.uid, object : Callbacks<User> {
+            Database.getUserByID(firebaseUser.uid, object : QueryCallback<User> {
                 override fun onSuccess(value: User) {
                     input_phone?.setText(value.phone)
                     input_profile_name.setText(firebaseUser.displayName)

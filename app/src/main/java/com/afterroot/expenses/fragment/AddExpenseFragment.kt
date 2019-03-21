@@ -30,15 +30,20 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.expenses.*
+import com.afterroot.expenses.Constants
+import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.database.Database.getByID
 import com.afterroot.expenses.firebase.FirebaseUtils
+import com.afterroot.expenses.firebase.QueryCallback
+import com.afterroot.expenses.getDrawableExt
 import com.afterroot.expenses.model.Category
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.User
+import com.afterroot.expenses.ui.ListClickCallbacks
+import com.afterroot.expenses.visible
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
@@ -117,7 +122,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
         fragmentView!!.apply {
             if (item != null) {
                 activity!!.progress.visible(true)
-                Database.getUserByID(item!!.paidBy!!, object : Callbacks<User> {
+                Database.getUserByID(item!!.paidBy!!, object : QueryCallback<User> {
                     override fun onSuccess(value: User) {
                         text_input_amount.setText(item!!.amount.toString())
 
@@ -174,7 +179,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                         }.show()
                     } else {
                         val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
-                        getGroupUsers(object : Callbacks<HashMap<String, User>> {
+                        getGroupUsers(object : QueryCallback<HashMap<String, User>> {
                             override fun onSnapshot(snapshot: DocumentSnapshot) {
 
                             }
@@ -221,7 +226,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 }.show()
                     } else {
                         val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
-                        getGroupUsers(object : Callbacks<HashMap<String, User>> {
+                        getGroupUsers(object : QueryCallback<HashMap<String, User>> {
                             override fun onSnapshot(snapshot: DocumentSnapshot) {
 
                             }
@@ -292,9 +297,9 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
     var isAllUsersAdded: Boolean = false
     val referenceMap: HashMap<String, User> = HashMap()
 
-    private fun getGroupUsers(callbacks: Callbacks<HashMap<String, User>>?) {
+    private fun getGroupUsers(queryCallback: QueryCallback<HashMap<String, User>>?) {
         val ref = db.collection(DBConstants.GROUPS).document(groupID)
-        getByID(ref, object : Callbacks<Group> {
+        getByID(ref, object : QueryCallback<Group> {
             override fun onSnapshot(snapshot: DocumentSnapshot) {
 
             }
@@ -302,7 +307,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
             override fun onSuccess(value: Group) {
                 var i = value.members!!.size
                 for (user in value.members!!) {
-                    getByID(db.collection(DBConstants.USERS).document(user.key!!), object : Callbacks<User> {
+                    getByID(db.collection(DBConstants.USERS).document(user.key!!), object : QueryCallback<User> {
                         override fun onSnapshot(snapshot: DocumentSnapshot) {
 
                         }
@@ -313,7 +318,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                             if (!referenceMap.containsKey(value.name)) referenceMap[value.name] = value
                             if (i == 0) {
                                 isAllUsersAdded = true
-                                callbacks?.onSuccess(usersMap)
+                                queryCallback?.onSuccess(usersMap)
                             }
                         }
 

@@ -14,26 +14,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.expenses
-
-import android.view.MenuItem
-import android.view.View
-import com.google.firebase.firestore.DocumentSnapshot
-
-interface ListClickCallbacks<in T> {
-    fun onListItemClick(item: T?, docId: String, position: Int, view: View? = null)
-    fun onListItemLongClick(item: T?, docId: String, position: Int)
-}
-
-interface NavigationItemClickCallback {
-    fun onClick(item: MenuItem)
-}
-
-interface Callbacks<in T> {
-    fun onSuccess(value: T)
-    fun onFailed(message: String)
-    fun onSnapshot(snapshot: DocumentSnapshot)
-}
+package com.afterroot.expenses.firebase
 
 interface DeleteListener {
     fun onDeleteSuccess()

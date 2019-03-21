@@ -23,12 +23,12 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.afterroot.expenses.ListClickCallbacks
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.model.GroupAlt
+import com.afterroot.expenses.ui.ListClickCallbacks
 import com.afterroot.expenses.utils.Utils
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.list_item_expense.view.*

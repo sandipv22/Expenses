@@ -35,7 +35,6 @@ import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.Constants
-import com.afterroot.expenses.NavigationItemClickCallback
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.firebase.FirebaseUtils

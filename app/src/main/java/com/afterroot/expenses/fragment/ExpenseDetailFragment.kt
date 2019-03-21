@@ -27,10 +27,10 @@ import androidx.transition.ChangeBounds
 import androidx.transition.ChangeTransform
 import androidx.transition.Fade
 import androidx.transition.TransitionSet
-import com.afterroot.expenses.Callbacks
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.firebase.QueryCallback
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.User
 import com.google.firebase.firestore.DocumentSnapshot
@@ -76,7 +76,7 @@ class ExpenseDetailFragment : Fragment() {
         val formatter = SimpleDateFormat(getString(R.string.date_time_format), Locale.US)
         detail_date.text = formatter.format(Date(item!!.date!!.time))
         detail_note.text = item!!.note
-        Database.getUserByID(item!!.paidBy!!, object : Callbacks<User> {
+        Database.getUserByID(item!!.paidBy!!, object : QueryCallback<User> {
             override fun onSnapshot(snapshot: DocumentSnapshot) {
 
             }

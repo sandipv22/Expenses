@@ -25,9 +25,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.afterroot.expenses.ListClickCallbacks
 import com.afterroot.expenses.R
 import com.afterroot.expenses.model.Expense
+import com.afterroot.expenses.ui.ListClickCallbacks
 import com.afterroot.expenses.viewmodel.GroupsViewModel
 import com.afterroot.expenses.viewmodel.ViewModelState
 import com.google.firebase.auth.FirebaseAuth

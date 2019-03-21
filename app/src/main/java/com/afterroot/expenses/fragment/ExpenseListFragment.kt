@@ -33,12 +33,12 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.Constants
-import com.afterroot.expenses.DeleteListener
 import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
 import com.afterroot.expenses.adapter.ItemSelectedCallback
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.firebase.DeleteListener
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.viewmodel.ExpensesViewModel
 import com.afterroot.expenses.viewmodel.ViewModelState

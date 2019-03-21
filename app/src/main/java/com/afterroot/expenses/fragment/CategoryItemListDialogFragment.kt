@@ -25,13 +25,13 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afterroot.expenses.ListClickCallbacks
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.DBConstants.USED_AT
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.getDrawableExt
 import com.afterroot.expenses.model.Category
+import com.afterroot.expenses.ui.ListClickCallbacks
 import com.afterroot.expenses.visible
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
