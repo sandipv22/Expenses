@@ -16,5 +16,5 @@
 
 <resources>
     <bool name="translucent_navigation">false</bool>
-    <bool name="translucent_status">true</bool>
+    <bool name="translucent_status">false</bool>
 </resources>
