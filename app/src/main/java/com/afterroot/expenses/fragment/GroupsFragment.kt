@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
-import com.afterroot.expenses.adapter.ItemSelectedCallback
+import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.firebase.DeleteListener

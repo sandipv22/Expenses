@@ -16,10 +16,10 @@
 
 package com.afterroot.expenses.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.collection.SparseArrayCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.Group
 import java.util.*
@@ -61,15 +61,5 @@ class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
         notifyItemRemoved(position)
         mList.removeAt(position)
     }
-}
-
-interface TypeDelegateAdapter {
-    fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder
-    fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: Expense)
-}
-
-interface ItemSelectedCallback {
-    fun onClick(position: Int, view: View? = null)
-    fun onLongClick(position: Int)
 }
 
