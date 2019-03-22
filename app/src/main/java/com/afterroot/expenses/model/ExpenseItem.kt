@@ -27,7 +27,8 @@ data class ExpenseItem(
         var note: String?,
         var paidBy: String?,
         var with: HashMap<String, String>?,
-        var addedBy: HashMap<String, String>?
+        var addedBy: HashMap<String, String>?,
+        var paidBy2: HashMap<String, String>?
 ) : Serializable, Expense {
     override fun getType(): Int {
         return Expense.TYPE_EXPENSE
@@ -39,6 +40,7 @@ data class ExpenseItem(
             null,
             "",
             "",
+            null,
             null,
             null
     )
