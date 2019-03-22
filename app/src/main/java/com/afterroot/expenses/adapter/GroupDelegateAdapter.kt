@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.expenses.R
+import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.inflate
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.Group
