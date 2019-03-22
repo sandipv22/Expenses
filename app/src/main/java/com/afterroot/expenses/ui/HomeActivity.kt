@@ -33,6 +33,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
@@ -45,7 +46,6 @@ import com.afterroot.expenses.utils.PermissionChecker
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -64,7 +64,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        setSupportActionBar(bottom_appbar)
+        setSupportActionBar(toolbar)
 
         checkPermissions(permissions)
     }
@@ -78,7 +78,7 @@ class HomeActivity : AppCompatActivity() {
     lateinit var mFab: FloatingActionButton
     private fun setUpNavigation() {
         val drawerArrowDrawable = DrawerArrowDrawable(this)
-        bottom_appbar.navigationIcon = drawerArrowDrawable
+        toolbar.navigationIcon = drawerArrowDrawable
         mFab = fab
         /*val pref = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_main_screen), null)
         homeFragmentId = if (pref != null) {
@@ -89,18 +89,16 @@ class HomeActivity : AppCompatActivity() {
         handler.postDelayed({
             host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
                 Log.d(_tag, "onDestinationChange: ${destination.label}")
-                action_title.text = destination.label
+                NavigationUI.setupActionBarWithNavController(this, controller)
                 with(mFab) {
                     hide()
                     setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
                 }
                 when (destination.id) {
                     R.id.groupsFragment -> {
-                        bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
                         mFab.show()
                     }
                     R.id.expenseListFragment -> {
-                        bottom_appbar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_CENTER
                         mFab.show()
                     }
                     R.id.newGroupFragment -> {
@@ -130,7 +128,7 @@ class HomeActivity : AppCompatActivity() {
                 }
                 val anim: ValueAnimator = when {
                     destination.id != homeFragmentId -> {
-                        bottom_appbar.setNavigationOnClickListener { controller.navigateUp() }
+                        toolbar.setNavigationOnClickListener { controller.navigateUp() }
                         ValueAnimator.ofFloat(0F, 1F) //Set as Arrow
                     }
                     else -> {
@@ -154,7 +152,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setUpBottomNavDrawer() {
-        bottom_appbar.setNavigationOnClickListener {
+        toolbar.setNavigationOnClickListener {
             val fragment = BottomNavigationDrawerFragment.with(object : NavigationItemClickCallback {
                 override fun onClick(item: MenuItem) {
                     when (item.itemId) {

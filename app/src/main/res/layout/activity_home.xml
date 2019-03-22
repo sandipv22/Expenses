@@ -23,24 +23,28 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.HomeActivity">
 
-    <include layout="@layout/content_home" />
-
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/bottom_appbar"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:backgroundTint="@color/primaryColor"
-        app:fabAlignmentMode="center"
-        app:hideOnScroll="true"
-        app:fabCradleRoundedCornerRadius="24dp"
-        app:layout_scrollFlags="scroll|enterAlways" />
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primaryColor"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <include layout="@layout/content_home" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_anchor="@id/bottom_appbar"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
