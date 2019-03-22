@@ -33,7 +33,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
@@ -89,7 +88,6 @@ class HomeActivity : AppCompatActivity() {
         handler.postDelayed({
             host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
                 Log.d(_tag, "onDestinationChange: ${destination.label}")
-                NavigationUI.setupActionBarWithNavController(this, controller)
                 with(mFab) {
                     hide()
                     setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))

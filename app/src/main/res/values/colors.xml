@@ -25,5 +25,5 @@
     <color name="secondaryTextColor">#000000</color>
 
     <color name="icon_fill">#000000</color>
-    <color name="icon_fill_light">#efefef</color>
+    <color name="icon_fill_light">#ffffff</color>
 </resources>

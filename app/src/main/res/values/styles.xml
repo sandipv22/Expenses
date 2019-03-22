@@ -22,7 +22,7 @@
         <item name="colorAccent">@color/secondaryColor</item>
         <item name="android:windowTranslucentStatus">@bool/translucent_status</item>
         <item name="android:windowTranslucentNavigation">@bool/translucent_navigation</item>
-        <item name="android:fitsSystemWindows">true</item>
+        <item name="drawerArrowStyle">@style/AppTheme.DrawerArrow</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -39,5 +39,9 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" />
+
+    <style name="AppTheme.DrawerArrow" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/icon_fill_light</item>
+    </style>
 
 </resources>
