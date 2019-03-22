@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModel
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.model.Group
-import com.afterroot.expenses.model.User
 
 class GroupsViewModel : ViewModel() {
     var groupSnapshot: MutableLiveData<ViewModelState> = MutableLiveData()
@@ -42,24 +41,4 @@ class GroupsViewModel : ViewModel() {
         }
         return groupSnapshot
     }
-
-    var groupMembers: MutableLiveData<HashMap<String, User>> = MutableLiveData()
-    fun getGroupMembers(groupId: String): LiveData<HashMap<String, User>> {
-        Database.getInstance().collection(DBConstants.GROUPS).document(groupId).get().addOnSuccessListener { groupSnapshot ->
-            val group = groupSnapshot.toObject(Group::class.java)
-            val user: HashMap<String, User>? = null
-            var i = group!!.members!!.size
-            group.members?.forEach {
-                Database.getInstance().collection(DBConstants.USERS).document(it.key!!).get().addOnSuccessListener { userSnapshot ->
-                    i--
-                    user!![it.key!!] = userSnapshot.toObject(User::class.java)!!
-                }
-                if (i == 0) {
-                    groupMembers.value = user
-                }
-            }
-        }
-        return groupMembers
-    }
-
 }
