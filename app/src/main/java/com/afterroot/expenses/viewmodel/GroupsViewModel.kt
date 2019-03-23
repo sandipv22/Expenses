@@ -21,11 +21,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
-import com.afterroot.expenses.model.Group
 
 class GroupsViewModel : ViewModel() {
     var groupSnapshot: MutableLiveData<ViewModelState> = MutableLiveData()
-    var groups: MutableLiveData<List<Group>> = MutableLiveData()
 
     fun getGroupSnapshot(userId: String): LiveData<ViewModelState> {
         if (groupSnapshot.value == null) {
