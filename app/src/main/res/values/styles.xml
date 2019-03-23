@@ -23,6 +23,7 @@
         <item name="android:windowTranslucentStatus">@bool/translucent_status</item>
         <item name="android:windowTranslucentNavigation">@bool/translucent_navigation</item>
         <item name="drawerArrowStyle">@style/AppTheme.DrawerArrow</item>
+        <item name="chipStyle">@style/FilterChip</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -42,6 +43,13 @@
 
     <style name="AppTheme.DrawerArrow" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="color">@color/icon_fill_light</item>
+    </style>
+
+    <style name="FilterChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="checkedIconVisible">true</item>
+        <item name="checkedIcon">@drawable/ic_done</item>
+        <item name="rippleColor">?attr/colorAccent</item>
+        <item name="chipBackgroundColor">@color/chip_background</item>
     </style>
 
 </resources>

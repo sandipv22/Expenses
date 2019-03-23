@@ -21,7 +21,6 @@ import android.app.TimePickerDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -130,17 +129,12 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                 chip.apply {
                     this.text = it.name
                     tag = it.uid
-                    isCheckable = true
-                    isCheckedIconVisible = true
-                    checkedIcon = context.getDrawableExt(R.drawable.ic_done)
                     this.setOnCheckedChangeListener { buttonView, isChecked ->
-                        Log.d(_tag, "init: Removed chip with id: ${buttonView.tag}")
                         if (isChecked) {
                             withUserMap[buttonView.tag.toString()] = usersMap[buttonView.tag]!!
                         } else {
                             withUserMap.remove(buttonView.tag)
                         }
-                        Log.d(_tag, "mapUserValues: $withUserMap")
                     }
                 }
                 view!!.spenders_chip_group.addView(chip)

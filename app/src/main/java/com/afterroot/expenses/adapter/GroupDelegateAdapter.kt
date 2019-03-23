@@ -48,7 +48,7 @@ class GroupDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAd
             with(super.itemView) {
                 tag = item
                 setOnClickListener {
-                    callbacks.onClick(adapterPosition)
+                    callbacks.onClick(adapterPosition, itemView)
                 }
                 setOnLongClickListener {
                     callbacks.onLongClick(adapterPosition)

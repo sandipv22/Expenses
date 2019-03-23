@@ -26,4 +26,6 @@
 
     <color name="icon_fill">#000000</color>
     <color name="icon_fill_light">#ffffff</color>
+
+    <color name="chip_onSurface">#1F232F34</color>
 </resources>

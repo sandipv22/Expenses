@@ -85,67 +85,66 @@ class HomeActivity : AppCompatActivity() {
         } else
             R.id.groupsFragment*/
 
-        handler.postDelayed({
-            host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
-                Log.d(_tag, "onDestinationChange: ${destination.label}")
-                with(mFab) {
-                    hide()
-                    setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
-                }
-                when (destination.id) {
-                    R.id.groupsFragment -> {
-                        mFab.show()
-                    }
-                    R.id.expenseListFragment -> {
-                        mFab.show()
-                    }
-                    R.id.newGroupFragment -> {
-                        handler.postDelayed({
-                            with(mFab) {
-                                show()
-                                setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
-                            }
-                        }, 150)
-                    }
-                    R.id.addExpenseFragment -> {
-                        with(mFab) {
-                            setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.icon_fill))
-                            show()
-                        }
-                    }
-                    R.id.expenseDetailFragment -> {
-                    }
-                    R.id.editProfileFragment -> {
-                        handler.postDelayed({
-                            with(mFab) {
-                                show()
-                                setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
-                            }
-                        }, 150)
-                    }
-                }
-                val anim: ValueAnimator = when {
-                    destination.id != homeFragmentId -> {
-                        toolbar.setNavigationOnClickListener { controller.navigateUp() }
-                        ValueAnimator.ofFloat(0F, 1F) //Set as Arrow
-                    }
-                    else -> {
-                        setUpBottomNavDrawer()
-                        ValueAnimator.ofFloat(1F, 0F) //Set as Hamburger
-                    }
-                }
-                handler.postDelayed({
-                    anim.apply {
-                        addUpdateListener {
-                            drawerArrowDrawable.progress = it.animatedValue as Float
-                        }
-                        interpolator = DecelerateInterpolator()
-                        duration = 200
-                        start()
-                    }
-                }, 100)
+        host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
+            Log.d(_tag, "onDestinationChange: ${destination.label}")
+            with(mFab) {
+                hide()
+                setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
             }
-        }, 100)
+            when (destination.id) {
+                R.id.groupsFragment -> {
+                    mFab.show()
+                }
+                R.id.expenseListFragment -> {
+                    mFab.show()
+                }
+                R.id.newGroupFragment -> {
+                    handler.postDelayed({
+                        with(mFab) {
+                            show()
+                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                        }
+                    }, 150)
+                }
+                R.id.addExpenseFragment -> {
+                    with(mFab) {
+                        setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.icon_fill))
+                        show()
+                    }
+                }
+                R.id.expenseDetailFragment -> {
+                }
+                R.id.editProfileFragment -> {
+                    handler.postDelayed({
+                        with(mFab) {
+                            show()
+                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                        }
+                    }, 150)
+                }
+            }
+            val anim: ValueAnimator = when {
+                destination.id != homeFragmentId -> {
+                    toolbar.setNavigationOnClickListener { controller.navigateUp() }
+                    ValueAnimator.ofFloat(0F, 1F) //Set as Arrow
+                }
+                else -> {
+                    setUpBottomNavDrawer()
+                    ValueAnimator.ofFloat(1F, 0F) //Set as Hamburger
+                }
+            }
+            handler.postDelayed({
+                anim.apply {
+                    addUpdateListener {
+                        drawerArrowDrawable.progress = it.animatedValue as Float
+                    }
+                    interpolator = DecelerateInterpolator()
+                    duration = 200
+                    start()
+                }
+            }, 100)
+        }
+
 
     }
 
