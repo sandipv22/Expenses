@@ -27,8 +27,13 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.transition.ChangeTransform
+import androidx.transition.Fade
+import androidx.transition.Slide
+import androidx.transition.TransitionSet
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
@@ -100,6 +105,11 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
             }
 
         })
+        val transitionSet = TransitionSet().addTransition(Slide()).addTransition(Fade()).addTransition(ChangeTransform())
+        transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
+        transitionSet.duration = 100
+        transitionSet.interpolator = LinearOutSlowInInterpolator()
+        enterTransition = transitionSet
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

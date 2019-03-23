@@ -20,9 +20,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.ChangeBounds
 import androidx.transition.ChangeTransform
 import androidx.transition.Fade
@@ -51,8 +51,8 @@ class ExpenseDetailFragment : Fragment() {
         }
         val transitionSet = TransitionSet().addTransition(ChangeBounds()).addTransition(Fade()).addTransition(ChangeTransform())
         transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
-        //transitionSet.duration = 100
-        transitionSet.interpolator = AccelerateDecelerateInterpolator()
+        transitionSet.duration = 200
+        transitionSet.interpolator = FastOutSlowInInterpolator()
         sharedElementEnterTransition = transitionSet
     }
 
