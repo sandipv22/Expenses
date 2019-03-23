@@ -52,6 +52,7 @@ android {
         }
         debug {
             versionNameSuffix '-debug'
+            ext.alwaysUpdateBuildId = false
         }
     }
     compileOptions {
