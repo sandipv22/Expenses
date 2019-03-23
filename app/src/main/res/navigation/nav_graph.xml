@@ -74,11 +74,7 @@
             app:nullable="true" />
         <action
             android:id="@+id/toAddExpense"
-            app:destination="@id/addExpenseFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+            app:destination="@id/addExpenseFragment" />
     </fragment>
     <fragment
         android:id="@+id/expenseDetailFragment"

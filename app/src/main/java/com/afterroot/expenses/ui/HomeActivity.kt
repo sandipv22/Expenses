@@ -27,11 +27,11 @@ import android.os.Handler
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.MenuItem
-import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.Constants
@@ -73,7 +73,7 @@ class HomeActivity : AppCompatActivity() {
         checkPermissions(permissions)
     }
 
-    private val handler = Handler()
+    private val handler by lazy { Handler() }
     lateinit var mFab: FloatingActionButton
     private fun setUpNavigation() {
         val drawerArrowDrawable = DrawerArrowDrawable(this)
@@ -138,7 +138,7 @@ class HomeActivity : AppCompatActivity() {
                     addUpdateListener {
                         drawerArrowDrawable.progress = it.animatedValue as Float
                     }
-                    interpolator = DecelerateInterpolator()
+                    interpolator = FastOutSlowInInterpolator()
                     duration = 200
                     start()
                 }
