@@ -44,7 +44,7 @@ fun Context.getDrawableExt(id: Int, tint: Int? = null): Drawable {
 fun View.visible(value: Boolean) {
     visibility = when {
         value -> View.VISIBLE
-        else -> View.INVISIBLE
+        else -> View.GONE
     }
 }
 
