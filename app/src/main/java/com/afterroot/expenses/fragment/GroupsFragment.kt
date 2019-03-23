@@ -58,6 +58,9 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
     private lateinit var _context: Context
     private lateinit var createdView: View
     private lateinit var sharedPreferences: SharedPreferences
+    private val groupsViewModel: GroupsViewModel by lazy {
+        ViewModelProviders.of(this).get(GroupsViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_groups, container, false)
@@ -92,7 +95,6 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
             this.adapter = groupsAdapter
         }
 
-        val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
         groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<ViewModelState> { state ->
             when (state) {
                 is ViewModelState.Loading -> {

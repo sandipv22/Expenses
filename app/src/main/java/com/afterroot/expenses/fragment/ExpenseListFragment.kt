@@ -29,7 +29,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.navArgs
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.Constants
@@ -56,6 +55,9 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     private lateinit var groupDocID: String
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
+    private val expensesViewModel: ExpensesViewModel by lazy {
+        ViewModelProviders.of(this).get(ExpensesViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -63,7 +65,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        groupDocID = args.groupDocId
+        groupDocID = args.groupDocId!!
         activity!!.progress.visible(true)
         Handler().postDelayed({
             initFirebaseDb()
@@ -88,7 +90,6 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
             this.adapter = expenseAdapter
         }
 
-        val expensesViewModel = ViewModelProviders.of(this).get(ExpensesViewModel::class.java)
         expensesViewModel.getSnapshot(groupDocID).observe(this, Observer<ViewModelState> { state ->
             when (state) {
                 is ViewModelState.Loading -> {
