@@ -21,13 +21,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
-import com.afterroot.expenses.model.ExpenseItem
 import com.google.firebase.firestore.Query
 
 
 class ExpensesViewModel : ViewModel() {
     var snapshot: MutableLiveData<ViewModelState> = MutableLiveData()
-    var expenses: MutableLiveData<List<ExpenseItem>> = MutableLiveData()
 
     fun getSnapshot(groupId: String): LiveData<ViewModelState> {
         if (snapshot.value == null) {
