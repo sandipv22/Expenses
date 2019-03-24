@@ -86,8 +86,12 @@ class ExpenseDetailFragment : Fragment() {
             }
 
             override fun onSuccess(value: User) {
-                detail_paid_by?.text = value.name
-                activity!!.toolbar.subtitle = "Paid by ${value.name}"
+                try {
+                    detail_paid_by?.text = value.name
+                    activity!!.toolbar.subtitle = "Paid by ${value.name}"
+                } catch (ignored: Exception) {
+                }
+
             }
 
             override fun onFailed(message: String) {
