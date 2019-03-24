@@ -101,6 +101,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                                                 Toast.makeText(view.context, "Name Changed", Toast.LENGTH_SHORT).show()
                                             }
                                 }
+                                .inputRange(0, 10)
                                 .positiveText(getString(R.string.text_save))
                                 .neutralText(getString(R.string.text_delete))
                                 .onNeutral { _, _ -> ref.document(docId!!).delete() }
@@ -152,7 +153,9 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                                     }.addOnFailureListener {
 
                                     }
-                        }.positiveText("ADD")
+                        }
+                        .inputRange(0, 10)
+                        .positiveText("ADD")
                         .show()
             }
         }
