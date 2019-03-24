@@ -43,6 +43,7 @@
                 android:drawableStart="@drawable/ic_money"
                 android:drawablePadding="@dimen/text_drawable_padding"
                 android:inputType="number"
+                android:maxLength="10"
                 android:selectAllOnFocus="true"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -96,6 +97,7 @@
                 android:drawableStart="@drawable/ic_short_text"
                 android:drawablePadding="@dimen/text_drawable_padding"
                 android:inputType="text|textCapWords"
+                android:maxLength="50"
                 android:selectAllOnFocus="true" />
         </com.google.android.material.textfield.TextInputLayout>
 

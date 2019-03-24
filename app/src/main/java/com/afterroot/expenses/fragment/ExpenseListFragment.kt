@@ -16,6 +16,7 @@
 
 package com.afterroot.expenses.fragment
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -62,7 +63,6 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        activity!!.toolbar.title = "Groups"
         return inflater.inflate(R.layout.fragment_expense_list, container, false)
     }
 
@@ -78,6 +78,15 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
                 val action = ExpenseListFragmentDirections.toAddExpense(groupDocID, null)
                 view.findNavController().navigate(action)
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity!!.toolbar.apply {
+            title = arguments!!.getString("GROUP_NAME")
+            subtitle = null
+            this.layoutTransition = LayoutTransition()
         }
     }
 

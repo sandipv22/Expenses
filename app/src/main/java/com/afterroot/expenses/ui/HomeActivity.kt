@@ -86,7 +86,6 @@ class HomeActivity : AppCompatActivity() {
             R.id.groupsFragment*/
 
         host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
-            Log.d(_tag, "onDestinationChange: ${destination.label}")
             with(mFab) {
                 hide()
                 setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
@@ -99,6 +98,7 @@ class HomeActivity : AppCompatActivity() {
                     mFab.show()
                 }
                 R.id.newGroupFragment -> {
+                    toolbar.title = destination.label
                     handler.postDelayed({
                         with(mFab) {
                             show()
@@ -107,6 +107,7 @@ class HomeActivity : AppCompatActivity() {
                     }, 150)
                 }
                 R.id.addExpenseFragment -> {
+                    toolbar.title = destination.label
                     with(mFab) {
                         setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.icon_fill))
                         show()
@@ -115,12 +116,16 @@ class HomeActivity : AppCompatActivity() {
                 R.id.expenseDetailFragment -> {
                 }
                 R.id.editProfileFragment -> {
+                    toolbar.title = destination.label
                     handler.postDelayed({
                         with(mFab) {
                             show()
                             setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
                         }
                     }, 150)
+                }
+                R.id.settingsFragment -> {
+                    toolbar.title = destination.label
                 }
             }
             val anim: ValueAnimator = when {

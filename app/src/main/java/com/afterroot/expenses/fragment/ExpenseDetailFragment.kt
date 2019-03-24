@@ -34,6 +34,7 @@ import com.afterroot.expenses.firebase.QueryCallback
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.User
 import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_expense_detail.*
 import kotlinx.android.synthetic.main.fragment_expense_detail.view.*
 import java.text.SimpleDateFormat
@@ -77,6 +78,8 @@ class ExpenseDetailFragment : Fragment() {
         val formatter = SimpleDateFormat(getString(R.string.date_time_format), Locale.US)
         detail_date.text = formatter.format(Date(item!!.date!!.time))
         detail_note.text = item!!.note
+        activity!!.toolbar.title = item!!.note
+
         Database.getUserByID(item!!.paidBy!!, object : QueryCallback<User> {
             override fun onSnapshot(snapshot: DocumentSnapshot) {
 
@@ -84,6 +87,7 @@ class ExpenseDetailFragment : Fragment() {
 
             override fun onSuccess(value: User) {
                 detail_paid_by?.text = value.name
+                activity!!.toolbar.subtitle = "Paid by ${value.name}"
             }
 
             override fun onFailed(message: String) {
