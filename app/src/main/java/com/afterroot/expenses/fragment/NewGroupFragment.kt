@@ -95,7 +95,12 @@ class NewGroupFragment : Fragment() {
                                             userMAp[FirebaseUtils.firebaseUser!!.uid] = DBConstants.TYPE_ADMIN
                                             activity!!.progress.visibility = View.VISIBLE
                                             Log.d(_tag, "onCreateOptionsMenu: Creating Group")
-                                            val group = Group(view.edit_text_group_name.text.toString(), Date(), userMAp)
+                                            val group = Group(
+                                                    view.edit_text_group_name.text.toString(),
+                                                    Date(),
+                                                    userMAp,
+                                                    null,
+                                                    null)
                                             db.collection(DBConstants.GROUPS).add(group).addOnSuccessListener {
                                                 activity!!.apply {
                                                     root_layout.snackbar("Group Created")

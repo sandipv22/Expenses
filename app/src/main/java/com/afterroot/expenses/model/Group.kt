@@ -23,11 +23,13 @@ import java.util.*
 data class Group(
         var group_name: String,
         @ServerTimestamp var date: Date?,
-        var members: HashMap<String?, Int>?
+        var members: HashMap<String?, Int>?,
+        @ServerTimestamp var lastEntry: Date? = Date(),
+        var lastEntryText: String?
 ) : Serializable, Expense {
     override fun getType(): Int {
         return Expense.TYPE_GROUP
     }
 
-    constructor() : this("", null, null)
+    constructor() : this("", null, null, null, "")
 }

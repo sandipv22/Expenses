@@ -43,7 +43,10 @@ class GroupDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAd
 
         fun bind(item: Group) {
             itemName.text = item.group_name
-            itemDate.text = Utils.getDateDiff(item.date!!, Calendar.getInstance().time)
+            if (item.lastEntry != null) {
+                itemDate.text = Utils.getDateDiff(item.lastEntry!!, Calendar.getInstance().time)
+            }
+            itemEmail.text = item.lastEntryText
 
             with(super.itemView) {
                 tag = item

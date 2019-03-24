@@ -241,7 +241,8 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                         finalMap!![user.uid] = user.name
                     }
 
-                    val reference = db.collection(DBConstants.GROUPS).document(groupID).collection(DBConstants.EXPENSES)
+                    val groupRef = db.collection(DBConstants.GROUPS).document(groupID)
+                    val reference = groupRef.collection(DBConstants.EXPENSES)
                     if (item != null) {
                         item = ExpenseItem(view!!.text_input_amount.text.toString().toLong(),
                                 category,
@@ -252,6 +253,12 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 hashMapOf(paidByID to usersMap[paidByID]!!.name)
                         )
                         reference.document(expenseDocNo!!).set(item!!).addOnSuccessListener {
+                            val batch = Database.getInstance().batch()
+                            val map = hashMapOf("lastEntry" to Date(millis),
+                                    "lastEntryText" to "Edited: ${usersMap[paidByID]!!.name} : ${view!!.text_input_note.text.toString()}"
+                            )
+                            batch.update(groupRef, map)
+                            batch.commit()
                             this@AddExpenseFragment.view!!.findNavController().popBackStack()
                         }
                     } else {
@@ -264,6 +271,12 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 hashMapOf(paidByID to referenceMap[paidByID]!!.name)
                         )
                         reference.add(item!!).addOnSuccessListener {
+                            val batch = Database.getInstance().batch()
+                            val map = hashMapOf("lastEntry" to Date(millis),
+                                    "lastEntryText" to "${usersMap[paidByID]!!.name} : ${view!!.text_input_note.text.toString()}"
+                            )
+                            batch.update(groupRef, map)
+                            batch.commit()
                             this@AddExpenseFragment.view!!.findNavController().popBackStack()
                         }
                     }
