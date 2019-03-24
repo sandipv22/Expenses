@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceFragmentCompat
@@ -36,7 +37,9 @@ import com.google.firebase.firestore.QuerySnapshot
 class SettingsFragment : PreferenceFragmentCompat() {
     private var querySnapshot: QuerySnapshot? = null
     private lateinit var sharedPref: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
+    private val groupsViewModel by lazy {
+        ViewModelProviders.of(this).get(GroupsViewModel::class.java)
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, rootKey)
@@ -47,9 +50,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onCreate(savedInstanceState)
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-        editor = sharedPref.edit()
 
-        val groupsViewModel = ViewModelProviders.of(this).get(GroupsViewModel::class.java)
         groupsViewModel.getGroupSnapshot(FirebaseAuth.getInstance().uid!!).observe(this, Observer<ViewModelState> { state ->
             when (state) {
                 is ViewModelState.Loading -> {
@@ -73,7 +74,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             object : ListClickCallbacks<QuerySnapshot> {
                                 override fun onListItemClick(item: QuerySnapshot?, docId: String, position: Int, view: View?) {
                                     it.dismiss()
-                                    editor.putString(getString(R.string.pref_main_screen), docId).apply()
+                                    sharedPref.edit(true) {
+                                        putString(getString(R.string.pref_main_screen), docId)
+                                    }
                                     Toast.makeText(this@SettingsFragment.activity, "Clicked with id: $docId", Toast.LENGTH_SHORT).show()
                                 }
 

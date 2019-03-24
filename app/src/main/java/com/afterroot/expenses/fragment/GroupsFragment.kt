@@ -64,6 +64,7 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        activity!!.toolbar.title = "Groups"
         return inflater.inflate(R.layout.fragment_groups, container, false)
     }
 

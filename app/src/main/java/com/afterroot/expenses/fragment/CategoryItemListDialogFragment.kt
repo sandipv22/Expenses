@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
@@ -170,9 +171,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
         private var mCallbacks: ListClickCallbacks<Category>? = null
         fun with(groupId: String, callback: ListClickCallbacks<Category>): CategoryItemListDialogFragment =
                 CategoryItemListDialogFragment().apply {
-                    arguments = Bundle().apply {
-                        putString("groupId", groupId)
-                    }
+                    arguments = bundleOf("groupId" to groupId)
                     mCallbacks = callback
                 }
     }

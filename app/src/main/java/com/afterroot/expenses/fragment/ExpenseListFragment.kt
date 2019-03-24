@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -61,6 +62,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        activity!!.toolbar.title = "Groups"
         return inflater.inflate(R.layout.fragment_expense_list, container, false)
     }
 
@@ -110,15 +112,15 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
 
     override fun onClick(position: Int, view: View?) {
         val expenseItem = mSnapshot!!.documents[position].toObject(ExpenseItem::class.java) as ExpenseItem
-        val bundle = Bundle().apply {
-            putSerializable(Constants.KEY_EXPENSE_SERIALIZE, expenseItem)
-            putString("ANIM_AMOUNT", ViewCompat.getTransitionName(view!!.item_amount))
-            putString("ANIM_CATEGORY", ViewCompat.getTransitionName(view.item_category))
-            putString("ANIM_NOTE", ViewCompat.getTransitionName(view.item_note))
-            putString("ANIM_DATE", ViewCompat.getTransitionName(view.item_date))
-            putString("ANIM_PAID_BY", ViewCompat.getTransitionName(view.item_paid_by))
-        }
-        with(view!!) {
+        val bundle = bundleOf(
+                Constants.KEY_EXPENSE_SERIALIZE to expenseItem,
+                "ANIM_AMOUNT" to ViewCompat.getTransitionName(view!!.item_amount),
+                "ANIM_CATEGORY" to ViewCompat.getTransitionName(view.item_category),
+                "ANIM_NOTE" to ViewCompat.getTransitionName(view.item_note),
+                "ANIM_DATE" to ViewCompat.getTransitionName(view.item_date),
+                "ANIM_PAID_BY" to ViewCompat.getTransitionName(view.item_paid_by)
+        )
+        with(view) {
             val extras = FragmentNavigatorExtras(
                     this.item_amount to ViewCompat.getTransitionName(this.item_amount)!!,
                     this.item_category to ViewCompat.getTransitionName(this.item_category)!!,

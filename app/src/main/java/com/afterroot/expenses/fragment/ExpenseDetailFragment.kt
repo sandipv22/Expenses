@@ -49,11 +49,12 @@ class ExpenseDetailFragment : Fragment() {
         arguments?.let {
             item = it.getSerializable(Constants.KEY_EXPENSE_SERIALIZE) as ExpenseItem?
         }
-        val transitionSet = TransitionSet().addTransition(ChangeBounds()).addTransition(Fade()).addTransition(ChangeTransform())
-        transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
-        transitionSet.duration = 200
-        transitionSet.interpolator = FastOutSlowInInterpolator()
-        sharedElementEnterTransition = transitionSet
+        TransitionSet().addTransition(ChangeBounds()).addTransition(Fade()).addTransition(ChangeTransform()).apply {
+            ordering = TransitionSet.ORDERING_TOGETHER
+            duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+            interpolator = FastOutSlowInInterpolator()
+            sharedElementEnterTransition = this
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
