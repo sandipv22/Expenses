@@ -238,7 +238,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
 
         activity!!.fab.apply {
             if (item != null) {
-                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save, R.color.onSecondary))
             }
             setOnClickListener {
                 if (verifyData()) {

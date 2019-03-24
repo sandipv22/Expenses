@@ -74,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val handler by lazy { Handler() }
-    lateinit var mFab: FloatingActionButton
+    private lateinit var mFab: FloatingActionButton
     private fun setUpNavigation() {
         val drawerArrowDrawable = DrawerArrowDrawable(this)
         toolbar.navigationIcon = drawerArrowDrawable
@@ -88,7 +88,7 @@ class HomeActivity : AppCompatActivity() {
         host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
             with(mFab) {
                 hide()
-                setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
+                setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.onSecondary))
             }
             when (destination.id) {
                 R.id.groupsFragment -> {
@@ -102,14 +102,14 @@ class HomeActivity : AppCompatActivity() {
                     handler.postDelayed({
                         with(mFab) {
                             show()
-                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.onSecondary))
                         }
                     }, 150)
                 }
                 R.id.addExpenseFragment -> {
                     toolbar.title = destination.label
                     with(mFab) {
-                        setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.icon_fill))
+                        setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.onSecondary))
                         show()
                     }
                 }
@@ -120,7 +120,7 @@ class HomeActivity : AppCompatActivity() {
                     handler.postDelayed({
                         with(mFab) {
                             show()
-                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.icon_fill))
+                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.onSecondary))
                         }
                     }, 150)
                 }
@@ -199,7 +199,7 @@ class HomeActivity : AppCompatActivity() {
             Constants.RC_PERMISSIONS -> {
                 if (grantResults.isNotEmpty() && !grantResults.contains(PackageManager.PERMISSION_DENIED)) {
                     Log.d(_tag, "onRequestPermissionsResult: Permission Granted")
-                    Handler().postDelayed({
+                    handler.postDelayed({
                         when {
                             PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.PREF_KEY_FIRST_START, true)
                                     or !FirebaseUtils.isUserSignedIn -> signInDialog().show()

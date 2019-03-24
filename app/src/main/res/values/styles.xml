@@ -42,7 +42,8 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" />
 
     <style name="AppTheme.DrawerArrow" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/icon_fill_light</item>
+        <item name="color">@color/onPrimary</item>
+        <item name="barLength">12dp</item>
     </style>
 
     <style name="FilterChip" parent="Widget.MaterialComponents.Chip.Filter">

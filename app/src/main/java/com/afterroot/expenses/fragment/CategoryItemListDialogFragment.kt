@@ -128,7 +128,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
         }
 
         button_add_category.apply {
-            setImageDrawable(context!!.getDrawableExt(R.drawable.ic_add, R.color.icon_fill))
+            setImageDrawable(context!!.getDrawableExt(R.drawable.ic_add, R.color.onSecondary))
             setOnClickListener {
                 MaterialDialog.Builder(activity!!)
                         .title("New Category")

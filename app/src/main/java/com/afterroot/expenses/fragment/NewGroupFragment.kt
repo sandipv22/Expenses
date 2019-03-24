@@ -69,7 +69,7 @@ class NewGroupFragment : Fragment() {
         edit_text_group_members.setAdapter(recAdapter)
 
         activity!!.fab.apply {
-            val icon = activity!!.getDrawableExt(R.drawable.ic_save, R.color.icon_fill)
+            val icon = activity!!.getDrawableExt(R.drawable.ic_save, R.color.onSecondary)
             setImageDrawable(icon)
             setOnClickListener {
                 if (verifyData()) {
