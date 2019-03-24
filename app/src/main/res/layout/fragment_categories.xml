@@ -19,13 +19,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bs_background">
+    android:paddingTop="@dimen/list_item_spacing">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/appCompatTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-condensed"
         android:text="@string/text_select_category"
@@ -70,7 +70,7 @@
         android:layout_marginBottom="32dp"
         android:fontFamily="sans-serif-light"
         android:gravity="center"
-        android:text="No Categories. Why not crate one!"
+        android:text="@string/text_no_categories"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"

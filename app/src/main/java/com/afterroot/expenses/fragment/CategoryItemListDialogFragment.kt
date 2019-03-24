@@ -49,6 +49,10 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
     private var fireCategoryAdapter: FirestoreRecyclerAdapter<Category, CategoryViewHolder>? = null
     private var db: FirebaseFirestore = Database.getInstance()
 
+    override fun getTheme(): Int {
+        return R.style.BottomSheetDialogTheme
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_categories, container, false)
