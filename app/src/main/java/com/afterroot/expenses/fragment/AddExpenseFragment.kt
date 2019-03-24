@@ -54,6 +54,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_add_expense.*
 import kotlinx.android.synthetic.main.fragment_add_expense.view.*
+import org.jetbrains.anko.design.snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -65,6 +66,7 @@ import kotlin.collections.set
  */
 class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
+    private lateinit var cal: Calendar
     private lateinit var category: String
     private lateinit var groupID: String
     private lateinit var paidByID: String
@@ -92,7 +94,11 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
         category = getString(R.string.text_uncategorized)
         expenseDocNo = args.expenseDocNo
         groupID = args.groupDocId
+        paidByID = ""
         item = arguments?.getSerializable(Constants.KEY_EXPENSE_SERIALIZE) as ExpenseItem?
+        if (item != null) {
+            activity!!.toolbar.title = "Edit Expense"
+        }
         Database.getGroupMembers(groupID, object : QueryCallback<HashMap<String, User>> {
             override fun onSuccess(value: HashMap<String, User>) {
                 mapUserValues(value)
@@ -107,7 +113,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
         })
         val transitionSet = TransitionSet().addTransition(Slide()).addTransition(Fade()).addTransition(ChangeTransform())
         transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
-        transitionSet.duration = 100
+        transitionSet.duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
         transitionSet.interpolator = LinearOutSlowInInterpolator()
         enterTransition = transitionSet
     }
@@ -246,7 +252,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                     if (item != null) {
                         item = ExpenseItem(view!!.text_input_amount.text.toString().toLong(),
                                 category,
-                                Date(millis),
+                                item!!.date,
                                 view!!.text_input_note.text.toString(), paidByID,
                                 finalMap,
                                 hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!),
@@ -281,14 +287,12 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                         }
                     }
                 }
-
             }
         }
-
     }
 
     private fun verifyData(): Boolean {
-        return when {
+        when {
             text_input_amount.text!!.isEmpty() -> {
                 text_input_amount.addTextChangedListener(object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
@@ -303,14 +307,42 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
 
                 })
                 text_input_layout_amount.error = "Please enter amount"
-                false
+                return false
             }
-            else -> true
+            text_input_note.text!!.isEmpty() -> {
+                text_input_note.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+
+                    }
+
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        text_input_layout_note.isErrorEnabled = false
+                    }
+
+                })
+                text_input_layout_note.error = "Please enter note"
+                return false
+            }
+            paidByID.isBlank() -> {
+                activity!!.root_layout.snackbar("Please select Paid by")
+                return false
+            }
+            millis == 0L -> {
+                activity!!.root_layout.snackbar("Please select Date")
+                return false
+            }
+            else -> return true
         }
     }
 
     private fun showDatePicker() {
-        val cal = Calendar.getInstance()
+        cal = Calendar.getInstance()
+        if (item != null) {
+            cal.timeInMillis = item!!.date!!.time
+        }
         day = cal.get(Calendar.DAY_OF_MONTH)
         hourOfDay = cal.get(Calendar.HOUR_OF_DAY)
         minute = cal.get(Calendar.MINUTE)
