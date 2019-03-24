@@ -21,7 +21,6 @@ import androidx.collection.SparseArrayCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.model.Expense
-import com.afterroot.expenses.model.Group
 import java.util.*
 
 class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -46,20 +45,16 @@ class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
 
     override fun getItemViewType(position: Int): Int = mList[position].getType()
 
-    fun addGroups(groups: List<Group>) {
-        mList.addAll(groups)
-        notifyItemRangeInserted(0, mList.size)
-    }
-
     fun add(value: List<Expense>) {
-        mList.clear()
+        removeAll()
         mList.addAll(value)
         notifyItemRangeInserted(0, mList.size)
     }
 
-    fun remove(position: Int) {
-        notifyItemRemoved(position)
-        mList.removeAt(position)
+    private fun removeAll() {
+        val size = mList.size
+        mList.clear()
+        notifyItemRangeRemoved(0, size)
     }
 }
 

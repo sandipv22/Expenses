@@ -49,6 +49,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.context_group.*
 import kotlinx.android.synthetic.main.fragment_groups.*
+import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 
 class GroupsFragment : Fragment(), ItemSelectedCallback {
@@ -123,9 +124,9 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
     override fun onLongClick(position: Int) {
         val docId = mSnapshot!!.documents[position].id
         val bottomSheetDialog = BottomSheetDialog(activity!!)
-        val categoryReference = db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.CATEGORIES)
-        val expensesReference = db.collection(DBConstants.GROUPS)
-                .document(docId).collection(DBConstants.EXPENSES)
+        val groupReference = db.collection(DBConstants.GROUPS).document(docId)
+        val categoryReference = groupReference.collection(DBConstants.CATEGORIES)
+        val expensesReference = groupReference.collection(DBConstants.EXPENSES)
         with(bottomSheetDialog) {
             setContentView(R.layout.context_group)
             show()
@@ -134,21 +135,25 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
             }
             item_delete.setOnClickListener {
                 dismiss()
-                activity!!.progress.visible(true)
+                activity!!.apply {
+                    progress.visible(true)
+                    root_layout.longSnackbar("Deleting Group...")
+                }
                 categoryReference.get().addOnSuccessListener { categories ->
                     if (categories.documents.isNotEmpty()) { //check group has categories
                         categories.documents.forEach { category ->
-                            Database.delete(category.reference, object : DeleteListener {
+                            Database.delete(category.reference, object : DeleteListener { //delete categories
                                 override fun onDeleteSuccess() {
                                     expensesReference.get().addOnSuccessListener { expenses ->
                                         if (expenses.documents.isNotEmpty()) {
                                             expenses.documents.forEach { expense ->
-                                                Database.delete(expense.reference, object : DeleteListener {
-                                                    override fun onDeleteSuccess() {
-                                                        db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                                                Database.delete(expense.reference, object : DeleteListener { //delete expenses
+                                                    override fun onDeleteSuccess() { // finally delete group
+                                                        groupReference.delete().addOnSuccessListener {
                                                             activity!!.apply {
                                                                 root_layout.snackbar("Group Deleted.")
                                                                 progress.visible(false)
+                                                                groupsAdapter!!.notifyItemRemoved(position)
                                                             }
                                                         }
                                                     }
@@ -156,50 +161,50 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
                                                     override fun onDeleteFailed() {
                                                         activity!!.progress.visible(false)
                                                     }
-
                                                 })
                                             }
-                                        } else {
-                                            db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                                        } else { //no expenses direct delete group
+                                            groupReference.delete().addOnSuccessListener {
                                                 activity!!.root_layout.snackbar("Group Deleted.")
                                                 activity!!.progress.visible(true)
+                                                groupsAdapter!!.notifyItemRemoved(position)
                                             }
                                         }
-
                                     }
                                 }
 
                                 override fun onDeleteFailed() {
                                     activity!!.progress.visible(false)
                                 }
-
                             })
                         }
                     } else { //no categories, direct delete expenses
-                        db.collection(DBConstants.GROUPS).document(docId).collection(DBConstants.EXPENSES).get().addOnSuccessListener {
+                        expensesReference.get().addOnSuccessListener {
                             if (it.documents.isNotEmpty()) {
                                 it.documents.forEach { documentSnapshot ->
                                     documentSnapshot.reference.delete().addOnSuccessListener {
-                                        db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
+                                        //delete expenses
+                                        groupReference.delete().addOnSuccessListener {
+                                            //finally delete group
                                             activity!!.apply {
                                                 root_layout.snackbar("Group Deleted.")
                                                 progress.visible(false)
+                                                groupsAdapter!!.notifyItemRemoved(position)
                                             }
                                         }
                                     }
                                 }
-                            } else {
+                            } else { //no expenses , direct delete group
                                 db.collection(DBConstants.GROUPS).document(docId).delete().addOnSuccessListener {
                                     activity!!.apply {
                                         root_layout.snackbar("Group Deleted.")
                                         progress.visible(false)
+                                        groupsAdapter!!.notifyItemRemoved(position)
                                     }
                                 }
                             }
-
                         }
                     }
-
                 }
             }
         }

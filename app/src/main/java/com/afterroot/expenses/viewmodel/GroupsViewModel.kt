@@ -28,14 +28,13 @@ class GroupsViewModel : ViewModel() {
     fun getGroupSnapshot(userId: String): LiveData<ViewModelState> {
         if (groupSnapshot.value == null) {
             groupSnapshot.postValue(ViewModelState.Loading)
-            Database.getInstance().collection(DBConstants.GROUPS).whereGreaterThanOrEqualTo(
-                    "${DBConstants.FIELD_GROUP_MEMBERS}.$userId",
-                    DBConstants.TYPE_MEMBER
-            ).addSnapshotListener { querySnapshot, _ ->
-                if (querySnapshot != null) {
-                    groupSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
-                }
-            }
+            Database.getInstance().collection(DBConstants.GROUPS)
+                    .whereGreaterThanOrEqualTo("${DBConstants.FIELD_GROUP_MEMBERS}.$userId", DBConstants.TYPE_MEMBER)
+                    .addSnapshotListener { querySnapshot, _ ->
+                        if (querySnapshot != null) {
+                            groupSnapshot.postValue(ViewModelState.Loaded(querySnapshot))
+                        }
+                    }
         }
         return groupSnapshot
     }

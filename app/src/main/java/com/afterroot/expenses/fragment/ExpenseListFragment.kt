@@ -155,7 +155,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
                             val reference = Database.getInstance().collection(DBConstants.GROUPS).document(groupDocID).collection(DBConstants.EXPENSES)
                             Database.delete(reference.document(docId), object : DeleteListener {
                                 override fun onDeleteSuccess() {
-                                    expenseAdapter?.remove(position)
+                                    expenseAdapter!!.notifyItemRemoved(position)
                                 }
 
                                 override fun onDeleteFailed() {
