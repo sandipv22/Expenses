@@ -43,4 +43,17 @@ class ExpensesViewModel : ViewModel() {
         }
         return snapshot
     }
+
+    var myQuerySnapshot: MutableLiveData<ViewModelState> = MutableLiveData()
+    fun getSnapshot(query: Query): LiveData<ViewModelState> {
+        if (myQuerySnapshot.value == null) {
+            myQuerySnapshot
+            query.addSnapshotListener { querySnapshot, _ ->
+                if (querySnapshot != null) {
+                    myQuerySnapshot.postValue(ViewModelState.Loaded(querySnapshot))
+                }
+            }
+        }
+        return myQuerySnapshot
+    }
 }

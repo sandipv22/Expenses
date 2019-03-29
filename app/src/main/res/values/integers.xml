@@ -16,4 +16,5 @@
 
 <resources>
     <integer name="fragment_anim_time">200</integer>
+    <integer name="max_char_category">20</integer>
 </resources>
