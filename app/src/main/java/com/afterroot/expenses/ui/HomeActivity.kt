@@ -31,9 +31,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
+import androidx.core.content.edit
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.fragment.findNavController
-import com.afollestad.materialdialogs.MaterialDialog
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
@@ -178,12 +178,10 @@ class HomeActivity : AppCompatActivity() {
     private val permissions = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private fun checkPermissions(permissions: Array<out String>) {
         if (PermissionChecker(this).isPermissionsNeeded(*permissions)) {
-            Log.d(_tag, "checkPermissions: Requesting Permissions")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(permissions, Constants.RC_PERMISSIONS)
             }
         } else {
-            Log.d(_tag, "checkPermissions: Permissions Granted. Now initializing")
             if (FirebaseUtils.isUserSignedIn) {
                 addUserInfoInDB()
                 setUpNavigation()
@@ -198,7 +196,6 @@ class HomeActivity : AppCompatActivity() {
         when (requestCode) {
             Constants.RC_PERMISSIONS -> {
                 if (grantResults.isNotEmpty() && !grantResults.contains(PackageManager.PERMISSION_DENIED)) {
-                    Log.d(_tag, "onRequestPermissionsResult: Permission Granted")
                     handler.postDelayed({
                         when {
                             PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.PREF_KEY_FIRST_START, true)
@@ -211,7 +208,6 @@ class HomeActivity : AppCompatActivity() {
                         }
                     }, 1000)
                 } else {
-                    Log.d(_tag, "onRequestPermissionsResult: Permissions not granted")
                     root_layout.snackbar(getString(R.string.msg_grant_permission_request), getString(R.string.text_action_grant)) {
                         checkPermissions(permissions)
                     }
@@ -261,15 +257,10 @@ class HomeActivity : AppCompatActivity() {
             return
         }*/
         val userRef = FirebaseFirestore.getInstance().collection(DBConstants.USERS).document(curUser!!.uid)
-        Log.d(_tag, "addUserInfoInDB: Started")
         userRef.get().addOnCompleteListener { getUserTask ->
             when {
                 getUserTask.isSuccessful -> if (!getUserTask.result!!.exists()) {
-                    val dialog = MaterialDialog.Builder(this)
-                            .progress(true, 1)
-                            .content("Creating User...")
-                            .show()
-                    Log.d(_tag, "User not available. Creating User..")
+                    root_layout.snackbar("User not available. Creating User..")
                     val phone = curUser.phoneNumber
                     val user = User(curUser.displayName!!,
                             curUser.email!!,
@@ -279,12 +270,9 @@ class HomeActivity : AppCompatActivity() {
                     userRef.set(user).addOnCompleteListener { setUserTask ->
                         when {
                             setUserTask.isSuccessful -> {
-                                Log.d(_tag, "User Created")
-                                Log.d(_tag, "DocumentSnapshot data: " + setUserTask.result)
                             }
                             else -> Log.e(_tag, "Can't create firebaseUser", setUserTask.exception)
                         }
-                        dialog.dismiss()
                     }
                 }
                 else -> Log.e(_tag, "Unknown Error", getUserTask.exception)
@@ -297,19 +285,16 @@ class HomeActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             Constants.RC_SIGN_IN -> {
-                Log.d(_tag, "onActivityResult: Request Code Received")
                 val response = IdpResponse.fromResultIntent(data)
                 when (resultCode) {
                     Activity.RESULT_OK -> {
-                        Log.d(_tag, "onActivityResult: Result was ok")
                         val user = FirebaseAuth.getInstance().currentUser
                         when {
                             user != null -> {
-                                PreferenceManager.getDefaultSharedPreferences(this).edit()
-                                        .putBoolean(Constants.PREF_KEY_FIRST_START, false)
-                                        .apply()
+                                PreferenceManager.getDefaultSharedPreferences(this).edit(true) {
+                                    putBoolean(Constants.PREF_KEY_FIRST_START, false)
+                                }
                                 checkPermissions(permissions)
-                                Log.d(_tag, "onActivityResult: Everything is Ok. Navigating to Groups")
                             }
                         }
                     }

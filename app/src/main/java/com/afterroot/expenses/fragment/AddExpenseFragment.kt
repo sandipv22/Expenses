@@ -35,6 +35,7 @@ import androidx.transition.Fade
 import androidx.transition.Slide
 import androidx.transition.TransitionSet
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
@@ -209,20 +210,25 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
         }
         view!!.text_paid_by.setOnClickListener {
             if (isAllUsersAdded) {
-                MaterialDialog.Builder(activity!!).title(getString(R.string.paid_by)).items(names).itemsCallback { _, _, position, _ ->
-                    paidByID = users[position].uid
-                    view!!.text_paid_by.text = users[position].name
-                }.show()
+                MaterialDialog(activity!!).show {
+                    title(R.string.paid_by)
+                    listItems(items = names) { _, position, _ ->
+                        paidByID = users[position].uid
+                        view!!.text_paid_by.text = users[position].name
+                    }
+                }
             } else {
-                val progress = MaterialDialog.Builder(activity!!).progress(true, 1).content("Loading...").show()
+                activity!!.root_layout.snackbar("Loading...")
                 Database.getGroupMembers(groupID, object : QueryCallback<HashMap<String, User>> {
                     override fun onSuccess(value: HashMap<String, User>) {
                         mapUserValues(value)
-                        progress.dismiss()
-                        MaterialDialog.Builder(activity!!).title(getString(R.string.paid_by)).items(names).itemsCallback { _, _, position, text ->
-                            paidByID = users[position].uid
-                            view!!.text_paid_by.text = users[position].name
-                        }.show()
+                        MaterialDialog(activity!!).show {
+                            title(R.string.paid_by)
+                            listItems(items = names) { _, position, _ ->
+                                paidByID = users[position].uid
+                                view!!.text_paid_by.text = users[position].name
+                            }
+                        }
                     }
 
                     override fun onFailed(message: String) {

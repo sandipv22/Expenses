@@ -26,11 +26,11 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.DBConstants.USED_AT
 import com.afterroot.expenses.database.Database
-import com.afterroot.expenses.getDrawableExt
 import com.afterroot.expenses.model.Category
 import com.afterroot.expenses.ui.ListClickCallbacks
 import com.afterroot.expenses.visible
@@ -97,19 +97,20 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                         val ref = db.collection(DBConstants.GROUPS)
                                 .document(arguments!!.getString("groupId")!!)
                                 .collection(DBConstants.CATEGORIES)
-                        MaterialDialog.Builder(activity!!)
-                                .title("Edit Category")
-                                .input("new name", model.name, false) { _, input ->
-                                    ref.document(docId!!).set(Category(input.toString()))
-                                            .addOnSuccessListener {
-                                                Toast.makeText(view.context, "Name Changed", Toast.LENGTH_SHORT).show()
-                                            }
-                                }
-                                .inputRange(0, 10)
-                                .positiveText(getString(R.string.text_save))
-                                .neutralText(getString(R.string.text_delete))
-                                .onNeutral { _, _ -> ref.document(docId!!).delete() }
-                                .show()
+                        MaterialDialog(activity!!).show {
+                            title(text = "Edit Category")
+                            input(hint = "new category name", prefill = model.name, allowEmpty = false,
+                                    maxLength = resources.getInteger(R.integer.max_char_category)) { _, input ->
+                                ref.document(docId!!).set(Category(input.toString()))
+                                        .addOnSuccessListener {
+                                            Toast.makeText(view.context, "Category Name Changed", Toast.LENGTH_SHORT).show()
+                                        }
+                            }
+                            positiveButton(R.string.text_save)
+                            negativeButton(R.string.text_delete) {
+                                ref.document(docId!!).delete()
+                            }
+                        }
                         return@setOnLongClickListener true
                     }
                 }
@@ -132,35 +133,33 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
         }
 
         button_add_category.apply {
-            setImageDrawable(context!!.getDrawableExt(R.drawable.ic_add, R.color.onSecondary))
             setOnClickListener {
-                MaterialDialog.Builder(activity!!)
-                        .title("New Category")
-                        .input("Category name", null, false) { _, input ->
-                            val ref = db.collection(DBConstants.GROUPS)
-                                    .document(arguments!!.getString("groupId")!!)
-                                    .collection(DBConstants.CATEGORIES)
-                            ref.whereEqualTo(DBConstants.FIELD_NAME, input.toString()).get()
-                                    .addOnCompleteListener { task ->
-                                        if (task.result!!.documents.size > 0) {
-                                            Toast.makeText(it.context, "Category already exists.", Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            ref.add(Category(input.toString(), Timestamp.now().toDate()))
-                                                    .addOnSuccessListener {
-                                                        Toast.makeText(this.context, "Category added", Toast.LENGTH_SHORT).show()
-                                                    }
-                                                    .addOnFailureListener {
-                                                        Toast.makeText(this.context, "Failed to add category.", Toast.LENGTH_SHORT).show()
+                MaterialDialog(activity!!).show {
+                    title(text = "New Category")
+                    input(hint = "Category Name", maxLength = resources.getInteger(R.integer.max_char_category)) { _, input ->
+                        val ref = db.collection(DBConstants.GROUPS)
+                                .document(arguments!!.getString("groupId")!!)
+                                .collection(DBConstants.CATEGORIES)
+                        ref.whereEqualTo(DBConstants.FIELD_NAME, input.toString()).get()
+                                .addOnCompleteListener { task ->
+                                    if (task.result!!.documents.size > 0) {
+                                        Toast.makeText(it.context, "Category already exists.", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        ref.add(Category(input.trim().toString(), Timestamp.now().toDate()))
+                                                .addOnSuccessListener {
+                                                    Toast.makeText(this.context, "Category added", Toast.LENGTH_SHORT).show()
+                                                }
+                                                .addOnFailureListener {
+                                                    Toast.makeText(this.context, "Failed to add category.", Toast.LENGTH_SHORT).show()
 
-                                                    }
-                                        }
-                                    }.addOnFailureListener {
-
+                                                }
                                     }
-                        }
-                        .inputRange(0, 10)
-                        .positiveText("ADD")
-                        .show()
+                                }.addOnFailureListener {
+
+                                }
+                    }
+                    positiveButton(text = "ADD")
+                }
             }
         }
     }
