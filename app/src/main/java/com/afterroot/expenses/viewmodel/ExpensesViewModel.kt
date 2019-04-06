@@ -34,7 +34,7 @@ class ExpensesViewModel : ViewModel() {
                     .collection(DBConstants.GROUPS)
                     .document(groupId)
                     .collection(DBConstants.EXPENSES)
-                    .orderBy("date", Query.Direction.DESCENDING)
+                    .orderBy(DBConstants.FIELD_DATE, Query.Direction.DESCENDING)
                     .addSnapshotListener { querySnapshot, _ ->
                         if (querySnapshot != null) {
                             snapshot.postValue(ViewModelState.Loaded(querySnapshot))

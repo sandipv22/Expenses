@@ -84,7 +84,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     override fun onResume() {
         super.onResume()
         activity!!.toolbar.apply {
-            title = arguments!!.getString("GROUP_NAME")
+            title = arguments!!.getString(Constants.ARG_GROUP_NAME)
             subtitle = null
             this.layoutTransition = LayoutTransition()
         }

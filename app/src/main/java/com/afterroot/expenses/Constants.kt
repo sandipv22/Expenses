@@ -22,4 +22,6 @@ object Constants {
     const val RC_CONTACTS_PICKER = 461
     const val PREF_KEY_FIRST_START = "${BuildConfig.APPLICATION_ID}.PREF_KEY_FIRST_START"
     const val KEY_EXPENSE_SERIALIZE = "EXPENSE_ITEM_SERIALIZE"
+    const val ARG_GROUP_ID = "groupId"
+    const val ARG_GROUP_NAME = "GROUP_NAME"
 }

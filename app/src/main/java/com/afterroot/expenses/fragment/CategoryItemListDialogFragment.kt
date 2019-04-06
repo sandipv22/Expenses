@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
+import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.DBConstants.USED_AT
@@ -64,7 +65,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
 
     private fun initCategories(view: View) {
         val query = db.collection(DBConstants.GROUPS)
-                .document(arguments!!.getString("groupId")!!)
+                .document(arguments!!.getString(Constants.ARG_GROUP_ID)!!)
                 .collection(DBConstants.CATEGORIES)
                 .orderBy(USED_AT, Query.Direction.DESCENDING)
 
@@ -85,7 +86,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                     setOnClickListener {
                         mCallbacks?.onListItemClick(model, snapshots.getSnapshot(holder.adapterPosition).id, position)
                         db.collection(DBConstants.GROUPS)
-                                .document(arguments!!.getString("groupId")!!)
+                                .document(arguments!!.getString(Constants.ARG_GROUP_ID)!!)
                                 .collection(DBConstants.CATEGORIES)
                                 .document(snapshots.getSnapshot(holder.adapterPosition).id)
                                 .update(USED_AT, Timestamp.now().toDate())
@@ -95,7 +96,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                         mCallbacks?.onListItemLongClick(model, snapshots.getSnapshot(holder.adapterPosition).id, position)
                         val docId: String? = snapshots.getSnapshot(holder.adapterPosition).id
                         val ref = db.collection(DBConstants.GROUPS)
-                                .document(arguments!!.getString("groupId")!!)
+                                .document(arguments!!.getString(Constants.ARG_GROUP_ID)!!)
                                 .collection(DBConstants.CATEGORIES)
                         MaterialDialog(activity!!).show {
                             title(text = "Edit Category")
@@ -138,7 +139,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
                     title(text = "New Category")
                     input(hint = "Category Name", maxLength = resources.getInteger(R.integer.max_char_category)) { _, input ->
                         val ref = db.collection(DBConstants.GROUPS)
-                                .document(arguments!!.getString("groupId")!!)
+                                .document(arguments!!.getString(Constants.ARG_GROUP_ID)!!)
                                 .collection(DBConstants.CATEGORIES)
                         ref.whereEqualTo(DBConstants.FIELD_NAME, input.toString()).get()
                                 .addOnCompleteListener { task ->
@@ -177,7 +178,7 @@ class CategoryItemListDialogFragment : BottomSheetDialogFragment() {
         private var mCallbacks: ListClickCallbacks<Category>? = null
         fun with(groupId: String, callback: ListClickCallbacks<Category>): CategoryItemListDialogFragment =
                 CategoryItemListDialogFragment().apply {
-                    arguments = bundleOf("groupId" to groupId)
+                    arguments = bundleOf(Constants.ARG_GROUP_ID to groupId)
                     mCallbacks = callback
                 }
     }

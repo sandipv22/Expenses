@@ -17,23 +17,28 @@
 package com.afterroot.expenses.database
 
 object DBConstants {
-    const val USERS = "users"
+    //Collections
+    const val CATEGORIES = "categories"
     const val EXPENSES = "expenses"
     const val GROUPS = "groups"
-    const val CATEGORIES = "categories"
-
-    const val FIELD_NAME = "name"
-    const val FIELD_EMAIL = "email"
-    const val FIELD_UID = "uid"
-    const val FIELD_PHONE = "phone"
-
-    const val FIELD_ADMIN_ID = "admin_id"
-    const val FIELD_GROUP_NAME = "group_name"
-    const val FIELD_GROUP_MEMBERS = "members"
 
     const val CREATED_AT = "createdAt"
-    const val USED_AT = "usedAt"
 
-    const val TYPE_MEMBER = 0
+    //Fields
+    const val FIELD_ADMIN_ID = "admin_id"
+    const val FIELD_DATE = "date"
+    const val FIELD_EMAIL = "email"
+    const val FIELD_GROUP_MEMBERS = "members"
+    const val FIELD_GROUP_NAME = "group_name"
+    const val FIELD_NAME = "name"
+    const val FIELD_PAID_BY = "paidBy"
+    const val FIELD_PHONE = "phone"
+    const val FIELD_UID = "uid"
+
+    //Member Type
     const val TYPE_ADMIN = 1
+    const val TYPE_MEMBER = 0
+
+    const val USED_AT = "usedAt"
+    const val USERS = "users"
 }

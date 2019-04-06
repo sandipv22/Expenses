@@ -31,6 +31,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
 import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
 import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
@@ -120,8 +121,11 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
     override fun onClick(position: Int, view: View?) {
         val docId = mSnapshot!!.documents[position].id
         val action = GroupsFragmentDirections.toExpenseList(docId)
+        val list = mSnapshot!!.toObjects(Group::class.java) as List<Group>
+        val members = list[position].members
         val bundle = bundleOf(
-                "GROUP_NAME" to mSnapshot!!.documents[position].data!!["group_name"].toString()
+                Constants.ARG_GROUP_NAME to mSnapshot!!.documents[position].data!![DBConstants.FIELD_GROUP_NAME].toString(),
+                "MEMBERS" to members
         )
         bundle.putAll(action.arguments)
         activity!!.host_nav_fragment.findNavController().navigate(action.actionId, bundle)
