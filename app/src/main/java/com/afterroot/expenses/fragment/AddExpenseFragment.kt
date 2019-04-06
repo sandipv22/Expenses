@@ -282,7 +282,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                                 hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!),
                                 hashMapOf(paidByID to referenceMap[paidByID]!!.name)
                         )
-                        reference.add(item!!).addOnSuccessListener {
+                        reference.add(item!!).addOnCompleteListener {
                             val batch = Database.getInstance().batch()
                             val map = hashMapOf("lastEntry" to Date(millis),
                                     "lastEntryText" to "${usersMap[paidByID]!!.name} : ${view!!.text_input_note.text.toString()}"
