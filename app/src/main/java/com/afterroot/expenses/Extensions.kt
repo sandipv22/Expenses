@@ -24,6 +24,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
 
 fun Activity.getDrawableExt(id: Int, tint: Int? = null): Drawable {
     val drawable = ContextCompat.getDrawable(this, id)
@@ -41,7 +43,10 @@ fun Context.getDrawableExt(id: Int, tint: Int? = null): Drawable {
     return drawable!!
 }
 
-fun View.visible(value: Boolean) {
+fun View.visible(value: Boolean, transition: Transition? = null, view: ViewGroup = parent as ViewGroup) {
+    if (transition != null) {
+        TransitionManager.beginDelayedTransition(view, transition)
+    }
     visibility = when {
         value -> View.VISIBLE
         else -> View.GONE
