@@ -55,7 +55,10 @@ import org.jetbrains.anko.design.snackbar
 
 class HomeActivity : AppCompatActivity() {
 
+    private lateinit var mFab: FloatingActionButton
     private val _tag = "HomeActivity"
+    private val handler by lazy { Handler() }
+    private val permissions = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private var homeFragmentId = R.id.groupsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,8 +76,6 @@ class HomeActivity : AppCompatActivity() {
         checkPermissions(permissions)
     }
 
-    private val handler by lazy { Handler() }
-    private lateinit var mFab: FloatingActionButton
     private fun setUpNavigation() {
         val drawerArrowDrawable = DrawerArrowDrawable(this)
         toolbar.navigationIcon = drawerArrowDrawable
@@ -149,8 +150,6 @@ class HomeActivity : AppCompatActivity() {
                 }
             }, 100)
         }
-
-
     }
 
     private fun setUpBottomNavDrawer() {
@@ -169,13 +168,11 @@ class HomeActivity : AppCompatActivity() {
                         }
                     }
                 }
-
             })
             fragment.show(this.supportFragmentManager, fragment.tag)
         }
     }
 
-    private val permissions = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     private fun checkPermissions(permissions: Array<out String>) {
         if (PermissionChecker(this).isPermissionsNeeded(*permissions)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -186,6 +183,8 @@ class HomeActivity : AppCompatActivity() {
                 addUserInfoInDB()
                 setUpNavigation()
                 setUpBottomNavDrawer()
+            } else {
+                signInDialog().show()
             }
         }
     }
