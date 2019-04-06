@@ -21,6 +21,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
+import com.afterroot.expenses.firebase.QueryCallback
+import com.afterroot.expenses.model.Group
+import com.afterroot.expenses.model.User
 import com.google.firebase.firestore.Query
 
 
@@ -46,14 +49,29 @@ class ExpensesViewModel : ViewModel() {
 
     var myQuerySnapshot: MutableLiveData<ViewModelState> = MutableLiveData()
     fun getSnapshot(query: Query): LiveData<ViewModelState> {
-        if (myQuerySnapshot.value == null) {
-            myQuerySnapshot
-            query.addSnapshotListener { querySnapshot, _ ->
-                if (querySnapshot != null) {
-                    myQuerySnapshot.postValue(ViewModelState.Loaded(querySnapshot))
-                }
+        myQuerySnapshot.postValue(ViewModelState.Loading)
+        query.addSnapshotListener { querySnapshot, _ ->
+            if (querySnapshot != null) {
+                myQuerySnapshot.postValue(ViewModelState.Loaded(querySnapshot))
             }
         }
         return myQuerySnapshot
+    }
+
+    fun getGroupMembers(groupId: String, queryCallback: QueryCallback<HashMap<String, User>>) {
+        Database.getInstance().collection(DBConstants.GROUPS).document(groupId).get().addOnSuccessListener { groupSnapshot ->
+            val group = groupSnapshot.toObject(Group::class.java)
+            val user = HashMap<String, User>()
+            var i = group!!.members!!.size
+            group.members?.forEach {
+                Database.getInstance().collection(DBConstants.USERS).document(it.key!!).get().addOnSuccessListener { userSnapshot ->
+                    i--
+                    user[it.key!!] = userSnapshot.toObject(User::class.java)!!
+                    if (i == 0) {
+                        queryCallback.onSuccess(user)
+                    }
+                }
+            }
+        }
     }
 }
