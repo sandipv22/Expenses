@@ -58,4 +58,5 @@
     <string name="date_time_format">dd-MMM-yyyy hh:mm a</string>
     <string name="pref_main_screen">pref_main_screen</string>
     <string name="text_no_categories">No Categories. Why not crate one!</string>
+    <string name="text_click_to_summary">Click to View Summary</string>
 </resources>
