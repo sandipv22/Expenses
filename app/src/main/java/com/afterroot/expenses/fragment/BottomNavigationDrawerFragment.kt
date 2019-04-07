@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.afterroot.expenses.R
+import com.afterroot.expenses.firebase.FirebaseUtils
 import com.afterroot.expenses.ui.NavigationItemClickCallback
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_bottomsheet_nav.*
@@ -42,6 +43,7 @@ class BottomNavigationDrawerFragment : BottomSheetDialogFragment() {
             dismissAllowingStateLoss()
             true
         }
+        text_user_name.text = FirebaseUtils.firebaseUser!!.displayName
     }
 
     companion object {
