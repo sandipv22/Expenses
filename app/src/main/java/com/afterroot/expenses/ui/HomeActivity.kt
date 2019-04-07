@@ -26,12 +26,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.core.content.edit
+import androidx.core.view.size
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.fragment.findNavController
 import com.afterroot.expenses.Constants
@@ -55,6 +57,7 @@ import org.jetbrains.anko.design.snackbar
 
 class HomeActivity : AppCompatActivity() {
 
+    private var mActionMenu: Menu? = null
     private lateinit var mFab: FloatingActionButton
     private val _tag = "HomeActivity"
     private val handler by lazy { Handler() }
@@ -76,6 +79,11 @@ class HomeActivity : AppCompatActivity() {
         checkPermissions(permissions)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        mActionMenu = menu!!
+        return super.onCreateOptionsMenu(menu)
+    }
+
     private fun setUpNavigation() {
         val drawerArrowDrawable = DrawerArrowDrawable(this)
         toolbar.navigationIcon = drawerArrowDrawable
@@ -90,6 +98,9 @@ class HomeActivity : AppCompatActivity() {
             with(mFab) {
                 hide()
                 setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.onSecondary))
+            }
+            if (mActionMenu != null && mActionMenu?.size!! > 0) {
+                mActionMenu?.removeItem(R.id.action_view_summary)
             }
             when (destination.id) {
                 R.id.groupsFragment -> {
