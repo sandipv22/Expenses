@@ -28,6 +28,7 @@ object DBConstants {
     const val FIELD_ADMIN_ID = "admin_id"
     const val FIELD_DATE = "date"
     const val FIELD_EMAIL = "email"
+    const val FIELD_FCM_ID = "fcm_id"
     const val FIELD_GROUP_MEMBERS = "members"
     const val FIELD_GROUP_NAME = "group_name"
     const val FIELD_NAME = "name"

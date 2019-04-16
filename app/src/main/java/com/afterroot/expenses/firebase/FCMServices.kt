@@ -23,18 +23,25 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import com.afterroot.expenses.R
+import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.ui.HomeActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-class FireMessagingService : FirebaseMessagingService() {
+class FCMServices : FirebaseMessagingService() {
 
-    private val _tag = "FireMessagingService"
+    private val _tag = "FCMServices"
 
     override fun onNewToken(token: String?) {
         super.onNewToken(token)
         Log.d(_tag, "NEW_TOKEN $token")
+        PreferenceManager.getDefaultSharedPreferences(applicationContext).edit(true) {
+            putString(DBConstants.FIELD_FCM_ID, token)
+            putBoolean("isFCMIdUpdated", false)
+        }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
