@@ -21,37 +21,44 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'io.fabric'
 
-ext.major = 1
-ext.minor = 0
-ext.patch = 1
-
-private String genVersionName() {
-    return "${ext.major}.${ext.minor}.${ext.patch}"
-}
-
-private Integer genVersionCode() {
-    return ext.major * 10000 + ext.minor * 1000 + ext.patch * 100
+ext {
+    major = 1
+    minor = 0
+    patch = 2
+    minimumSdkVersion = 16
 }
 
 android {
-    compileSdkVersion 28
+    signingConfigs {
+        release {
+            storeFile file("config/release.jks")
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+            storePassword RELEASE_STORE_PASSWORD
+        }
+    }
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.afterroot.expenses"
-        minSdkVersion 19
-        targetSdkVersion 28
-        versionCode genVersionCode()
-        versionName genVersionName()
+        minSdkVersion project.ext.minimumSdkVersion
+        targetSdkVersion 29
+        versionCode project.ext.minimumSdkVersion * 10000000 + project.ext.major * 10000 + project.ext.minor * 100 + project.ext.patch
+        versionName "${project.ext.major}.${project.ext.minor}.${project.ext.patch}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
     }
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            splits.abi.enable = false
+            splits.density.enable = false
+            aaptOptions.cruncherEnabled = false
             versionNameSuffix '-debug'
             ext.alwaysUpdateBuildId = false
         }
@@ -60,17 +67,31 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+    dexOptions {
+        javaMaxHeapSize "4g"
+        preDexLibraries = false
+    }
     flavorDimensions "ar"
     productFlavors {
         dev {
-            resConfigs "en"
+            dimension = 'ar'
+            minSdkVersion 22
+            targetSdkVersion 29
+            resConfigs('en', 'xhdpi')
+            signingConfig signingConfigs.release
+        }
+        prod {
+            signingConfig signingConfigs.release
         }
     }
 }
 
 configurations.all {
     resolutionStrategy {
-        force 'com.squareup.okio:okio:1.15.0'
+//        force 'com.squareup.okio:okio:1.15.0'
     }
 }
 
@@ -82,44 +103,44 @@ dependencies {
     implementation "android.arch.navigation:navigation-fragment:$nav_version"
     implementation "android.arch.navigation:navigation-ui:$nav_version"
 
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
-    implementation 'androidx.core:core-ktx:1.1.0-alpha05'
-    implementation 'androidx.fragment:fragment-ktx:1.1.0-alpha06'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
+    implementation 'androidx.core:core-ktx:1.2.0-alpha04'
+    implementation 'androidx.fragment:fragment-ktx:1.2.0-alpha04'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:2.1.0-alpha04'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha04'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0-alpha04'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0-alpha05'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-alpha05'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-alpha05'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.preference:preference:1.1.0-alpha04'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha04'
-    implementation 'androidx.vectordrawable:vectordrawable:1.1.0-alpha01'
+    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'
+    implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
 
-    implementation 'com.afollestad.material-dialogs:input:2.6.0'
-    implementation 'com.afollestad.material-dialogs:core:2.6.0'
+    implementation 'com.afollestad.material-dialogs:input:3.1.0'
+    implementation 'com.afollestad.material-dialogs:core:3.1.0'
 
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
-    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
-    implementation 'com.firebaseui:firebase-ui-firestore:4.3.1'
+    implementation 'com.firebaseui:firebase-ui-auth:4.3.2'
+    implementation 'com.firebaseui:firebase-ui-firestore:5.0.0'
 
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
 
-    implementation 'com.google.android.gms:play-services-auth:16.0.1'
-    implementation 'com.google.android.material:material:1.1.0-alpha05'
-    implementation 'com.google.firebase:firebase-auth:16.2.1'
-    implementation 'com.google.firebase:firebase-core:16.0.8'
-    implementation 'com.google.firebase:firebase-firestore:18.2.0'
-    implementation 'com.google.firebase:firebase-functions:16.3.0'
-    implementation 'com.google.firebase:firebase-messaging:17.6.0'
-    implementation 'com.google.firebase:firebase-storage:16.1.0'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
+    implementation 'com.google.firebase:firebase-auth:19.0.0'
+    implementation 'com.google.firebase:firebase-core:17.2.0'
+    implementation 'com.google.firebase:firebase-firestore:21.1.1'
+    implementation 'com.google.firebase:firebase-functions:19.0.1'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+    implementation 'com.google.firebase:firebase-storage:19.0.1'
 
-    implementation 'com.hannesdorfmann:adapterdelegates4:4.0.0'
+    implementation 'com.hannesdorfmann:adapterdelegates4:4.2.0'
     implementation 'com.klinkerapps:android-chips:1.3.2@aar'
     implementation 'io.michaelrocks:libphonenumber-android:8.8.5'
-    kapt 'com.github.bumptech.glide:compiler:4.9.0'
+    kapt 'com.github.bumptech.glide:compiler:4.10.0'
 }
 apply plugin: 'com.google.gms.google-services'
