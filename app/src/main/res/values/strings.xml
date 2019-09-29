@@ -62,4 +62,6 @@
     <string name="about">About</string>
     <string name="url_privacy_policy">http://afterroot.co/privacy-policy.html</string>
     <string name="view_summary">View Summary</string>
+    <string name="fcm_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="fcm_channel_default">Updates</string>
 </resources>
