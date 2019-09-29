@@ -25,8 +25,8 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.navArgs
@@ -52,13 +52,12 @@ import kotlinx.android.synthetic.main.fragment_expense_list.*
 import kotlinx.android.synthetic.main.list_item_expense.view.*
 
 class ExpenseListFragment : Fragment(), ItemSelectedCallback {
-    private var expenseAdapter: ExpenseAdapterDelegate? = null
     private lateinit var groupDocID: String
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
-    private val expensesViewModel: ExpensesViewModel by lazy {
-        ViewModelProviders.of(this).get(ExpensesViewModel::class.java)
-    }
+    private val expensesViewModel: ExpensesViewModel by viewModels()
+    private var expenseAdapter: ExpenseAdapterDelegate? = null
+    private var mSnapshot: QuerySnapshot? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -93,24 +92,23 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.menu_expenses_list, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_expenses_list, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item!!.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
             R.id.action_view_summary -> {
                 val fragment = ExpenseSummaryDialogFragment()
                 val bundle = bundleOf(Constants.ARG_GROUP_ID to groupDocID)
                 fragment.arguments = bundle
-                fragment.show(this.fragmentManager, "summary")
+                fragment.show(parentFragmentManager, "summary")
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
         expenseAdapter = ExpenseAdapterDelegate(this)
 

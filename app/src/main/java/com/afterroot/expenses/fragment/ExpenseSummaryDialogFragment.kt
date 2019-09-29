@@ -18,20 +18,28 @@ package com.afterroot.expenses.fragment
 
 import android.os.Bundle
 import android.util.Log
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.util.set
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.AutoTransition
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
+import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
+import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.firebase.QueryCallback
+import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.ExpenseItem
+import com.afterroot.expenses.model.ExpensesSummary
 import com.afterroot.expenses.model.User
 import com.afterroot.expenses.viewmodel.ExpensesViewModel
 import com.afterroot.expenses.viewmodel.ViewModelState
@@ -41,13 +49,17 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.fragment_expense_summary.*
 
-class ExpenseSummaryDialogFragment : BottomSheetDialogFragment() {
-    private val expensesViewModel: ExpensesViewModel by lazy {
-        ViewModelProviders.of(this).get(ExpensesViewModel::class.java)
-    }
+class ExpenseSummaryDialogFragment : BottomSheetDialogFragment(), ItemSelectedCallback,
+    AdapterView.OnItemSelectedListener {
     private val _tag = "ExpenseSummaryDialog"
+    private val expensesViewModel: ExpensesViewModel by viewModels()
+    private val names = ArrayList<String>()
+    private val uidMap = SparseArray<User>()
+    private var rawUserMap = HashMap<String, User>()
+    private var myAdapter: ExpenseAdapterDelegate? = null
     private var mGroupId: String? = null
     private var mSnapshot: QuerySnapshot? = null
+    private var mList = ArrayList<Expense>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mGroupId = arguments!!.getString(Constants.ARG_GROUP_ID)
@@ -68,62 +80,23 @@ class ExpenseSummaryDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun loadContent() {
-        users_spinner.visible(true, AutoTransition())
-        total_spend.visible(true, AutoTransition())
+        loaded(false)
         expensesViewModel.getGroupMembers(mGroupId!!, object : QueryCallback<HashMap<String, User>> {
             override fun onSuccess(value: HashMap<String, User>) {
+                loaded(true)
+                rawUserMap = value
                 try {
-                    val array = ArrayList<String>()
-                    val uidMap = HashMap<Int, User>()
                     var i = 0
                     value.forEach {
-                        array.add(it.value.name)
+                        names.add(it.value.name)
                         uidMap[i] = it.value
                         i++
                     }
-                    val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_item, array)
+                    val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_item, names)
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     users_spinner.apply {
                         this.adapter = adapter
-                        onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                            }
-
-                            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                                try {
-                                    val uid: String? = uidMap[position]!!.uid
-                                    Log.d(_tag, "onItemSelected: $uid")
-                                    if (uid != null) {
-                                        val paidByQuery = Database.getInstance()
-                                                .collection(DBConstants.GROUPS)
-                                                .document(mGroupId!!)
-                                                .collection(DBConstants.EXPENSES)
-                                                .whereEqualTo(DBConstants.FIELD_PAID_BY, uid)
-                                        expensesViewModel.getSnapshot(paidByQuery).observe(this@ExpenseSummaryDialogFragment, Observer {
-                                            when (it) {
-                                                is ViewModelState.Loaded<*> -> {
-                                                    val snapshot = it.data as QuerySnapshot
-                                                    val expenses = snapshot.toObjects(ExpenseItem::class.java) as List<ExpenseItem>
-                                                    //expenseAdapter!!.add(expenses) to apply filter to whole list
-                                                    var total: Long = 0
-                                                    expenses.forEach { item ->
-                                                        total += item.amount
-                                                    }
-                                                    this@ExpenseSummaryDialogFragment.total_spend.text = String.format("%s%d", context.resources.getString(R.string.rs_symbol), total)
-                                                }
-                                                is ViewModelState.Loading -> {
-                                                }
-                                            }
-                                        })
-                                    }
-                                } catch (e: Exception) {
-
-                                }
-
-                            }
-
-                        }
+                        onItemSelectedListener = this@ExpenseSummaryDialogFragment
                     }
                 } catch (e: Exception) {
 
@@ -138,6 +111,98 @@ class ExpenseSummaryDialogFragment : BottomSheetDialogFragment() {
 
         })
 
+    }
 
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+    }
+
+    //On Spinner Item Selected
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val selectedUid: String? = uidMap[position]!!.uid
+        val paidByQuery = Database.getInstance()
+            .collection(DBConstants.GROUPS)
+            .document(mGroupId!!)
+            .collection(DBConstants.EXPENSES)
+        try {
+            expensesViewModel.getSnapshot(paidByQuery).observe(this@ExpenseSummaryDialogFragment, Observer {
+                when (it) {
+                    is ViewModelState.Loaded<*> -> {
+                        try {
+                            val expenses =
+                                (it.data as QuerySnapshot).toObjects(ExpenseItem::class.java) as List<ExpenseItem>
+                            val map = HashMap<String, ExpensesSummary>()
+                            val list = ArrayList<ExpensesSummary>()
+                            expenses.forEach { item ->
+                                val count = item.with!!.size + 1
+                                val divided = item.amount / count
+                                if (item.with!!.contains(selectedUid)) {
+                                    map[item.paidBy!!] = ExpensesSummary(
+                                        rawUserMap[item.paidBy!!]!!.name,
+                                        map[item.paidBy!!]?.payable ?: 0 + divided,
+                                        map[item.paidBy!!]?.receivable ?: 0
+                                    )
+                                    Log.d(_tag, "Divided: $divided Payable ${map[item.paidBy!!]}")
+                                }
+                                if (item.paidBy.equals(selectedUid!!.trim())) {
+                                    item.with!!.forEach { withId ->
+                                        map[withId.key] = ExpensesSummary(
+                                            rawUserMap[withId.key]!!.name,
+                                            map[withId.key]?.payable ?: 0,
+                                            map[withId.key]?.receivable ?: 0 + divided
+                                        )
+                                        Log.d(_tag, "Divided: $divided Receivable ${map[withId.key]}")
+                                    }
+                                }
+                                map[item.paidBy!!] = ExpensesSummary(
+                                    rawUserMap[item.paidBy!!]!!.name,
+                                    map[item.paidBy!!]?.payable ?: 0,
+                                    map[item.paidBy!!]?.receivable ?: 0
+                                )
+                                Log.d(_tag, "Final ${map[item.paidBy!!]}")
+                            }
+                            map.remove(selectedUid)
+                            map.forEach { mapItem ->
+                                list.add(mapItem.value)
+                            }
+                            loaded(true)
+                            loadToAdapter(list)
+
+                        } catch (e: Exception) {
+
+                        }
+                    }
+                    is ViewModelState.Loading -> {
+                        loaded(false)
+                    }
+                }
+            })
+        } catch (e: Exception) {
+
+        }
+    }
+
+    private fun loadToAdapter(list: ArrayList<ExpensesSummary>) {
+        myAdapter = ExpenseAdapterDelegate(this)
+
+        expense_summary_members_list.apply {
+            val lm = LinearLayoutManager(context)
+            layoutManager = lm
+            addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
+            adapter = myAdapter
+        }
+
+        myAdapter!!.add(list)
+    }
+
+    override fun onClick(position: Int, view: View?) {
+    }
+
+    override fun onLongClick(position: Int) {
+    }
+
+    private fun loaded(loaded: Boolean) {
+        content.visible(loaded, AutoTransition())
+        progress.visible(!loaded, AutoTransition())
     }
 }
