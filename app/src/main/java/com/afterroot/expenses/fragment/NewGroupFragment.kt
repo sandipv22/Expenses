@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CursorAdapter
 import android.widget.MultiAutoCompleteTextView
+import androidx.core.os.bundleOf
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.loader.app.LoaderManager
@@ -50,7 +51,88 @@ import kotlinx.android.synthetic.main.fragment_new_group.view.*
 import org.jetbrains.anko.design.snackbar
 import java.util.*
 
-class NewGroupFragment : Fragment() {
+private val FROM_COLUMNS: Array<String> = arrayOf(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
+private val TO_IDS: IntArray = intArrayOf(android.R.id.text1)
+private val PROJECTION: Array<out String> = arrayOf(
+    ContactsContract.Contacts._ID,
+    ContactsContract.Contacts.LOOKUP_KEY,
+    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
+)
+private const val CONTACT_ID_INDEX: Int = 0
+private const val CONTACT_KEY_INDEX: Int = 1
+private const val SELECTION: String = "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} LIKE ?"
+
+class NewGroupFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
+
+    private var contactId: Long = 0
+    private var contactKey: String? = null
+    private var contactUri: Uri? = null
+    private var cursorAdapter: SimpleCursorAdapter? = null
+    private val searchString: String = ""
+    private val selectionArgs = arrayOf(searchString)
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        val loaderManager = LoaderManager.getInstance(this)
+        loaderManager.initLoader(id, null, this)
+        activity?.also {
+            cursorAdapter = SimpleCursorAdapter(
+                it,
+                android.R.layout.simple_list_item_1,
+                null,
+                FROM_COLUMNS, TO_IDS,
+                0
+            )
+        }
+        activity!!.autoCompleteTextView.apply {
+            setAdapter(cursorAdapter)
+            setOnItemClickListener { parent, view, position, id ->
+                val cursor = (parent.adapter as CursorAdapter).cursor.apply {
+                    moveToPosition(position)
+                    contactId = getLong(CONTACT_ID_INDEX)
+                    contactKey = getString(CONTACT_KEY_INDEX)
+                    contactUri = ContactsContract.Contacts.getLookupUri(contactId, contactKey)
+                }
+            }
+            addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                }
+
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    bundleOf("FILTER" to s.toString()).apply {
+                        loaderManager.restartLoader(id, this, this@NewGroupFragment)
+                    }
+                }
+
+            })
+        }
+    }
+
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+        selectionArgs[0] = "%${args?.getString("FILTER")}%"
+        return activity?.let {
+            return CursorLoader(
+                it,
+                ContactsContract.Contacts.CONTENT_URI,
+                PROJECTION,
+                SELECTION,
+                selectionArgs,
+                null
+            )
+        } ?: throw IllegalStateException()
+    }
+
+    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
+        cursorAdapter?.swapCursor(data)
+    }
+
+    override fun onLoaderReset(loader: Loader<Cursor>) {
+        cursorAdapter?.swapCursor(null)
+    }
 
     private val db = FirebaseFirestore.getInstance()
     private val _tag = "NewGroupFragment"

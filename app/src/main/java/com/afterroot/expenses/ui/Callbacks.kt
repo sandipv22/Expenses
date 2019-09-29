@@ -21,7 +21,7 @@ import android.view.View
 
 interface ListClickCallbacks<in T> {
     fun onListItemClick(item: T?, docId: String, position: Int, view: View? = null)
-    fun onListItemLongClick(item: T?, docId: String, position: Int)
+    fun onListItemLongClick(item: T?, docId: String, position: Int) {}
 }
 
 interface NavigationItemClickCallback {

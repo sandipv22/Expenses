@@ -20,5 +20,5 @@ import android.view.View
 
 interface ItemSelectedCallback {
     fun onClick(position: Int, view: View? = null)
-    fun onLongClick(position: Int)
+    fun onLongClick(position: Int) {}
 }

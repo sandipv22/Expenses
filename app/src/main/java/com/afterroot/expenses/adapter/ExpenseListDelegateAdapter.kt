@@ -29,7 +29,6 @@ import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.User
 import com.afterroot.expenses.utils.Utils
-import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.list_item_expense.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -54,18 +53,12 @@ class ExpenseListDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDele
                     amountText.context.resources.getString(R.string.rs_symbol), item.amount)
             noteText.text = String.format("%s, with %s", item.note, Utils.formatNames(item.with!!))
             categoryText.text = item.category
-            time.text = SimpleDateFormat(itemView.context.getString(R.string.date_time_format), Locale.US).format(item.date)
+            time.text =
+                SimpleDateFormat(itemView.context.getString(R.string.date_time_format), Locale.US).format(item.date!!)
             Database.getUserByID(item.paidBy!!, object : QueryCallback<User> {
                 override fun onSuccess(value: User) {
                     paidBy.text = value.name
                 }
-
-                override fun onFailed(message: String) {
-                }
-
-                override fun onSnapshot(snapshot: DocumentSnapshot) {
-                }
-
             })
 
             ViewCompat.setTransitionName(amountText, amountText.toString())

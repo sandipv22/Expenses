@@ -194,6 +194,19 @@ class HomeActivity : AppCompatActivity() {
                 addUserInfoInDB()
                 setUpNavigation()
                 setUpBottomNavDrawer()
+
+                val pref = PreferenceManager.getDefaultSharedPreferences(this)
+                if (pref.getBoolean("isFCMIdUpdated", false)) {
+                    FirebaseFirestore.getInstance()
+                        .collection(DBConstants.USERS)
+                        .document(FirebaseAuth.getInstance().currentUser!!.uid)
+                        .update(
+                            DBConstants.FIELD_FCM_ID, PreferenceManager.getDefaultSharedPreferences(this)
+                                .getString(DBConstants.FIELD_FCM_ID, null)
+                        ).addOnSuccessListener {
+                            pref.edit(true) { putBoolean("isFCMIdUpdated", true) }
+                        }
+                }
             } else {
                 signInDialog().show()
             }

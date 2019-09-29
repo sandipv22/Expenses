@@ -18,5 +18,5 @@ package com.afterroot.expenses.firebase
 
 interface DeleteListener {
     fun onDeleteSuccess()
-    fun onDeleteFailed()
+    fun onDeleteFailed() {}
 }

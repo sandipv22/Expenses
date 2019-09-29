@@ -31,7 +31,6 @@ import com.afterroot.expenses.utils.Utils
 import com.afterroot.expenses.visible
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
@@ -64,13 +63,6 @@ class EditProfileFragment : Fragment() {
                     input_email.isEnabled = false
                     activity!!.progress.visible(false)
                 }
-
-                override fun onFailed(message: String) {
-                }
-
-                override fun onSnapshot(snapshot: DocumentSnapshot) {
-                }
-
             })
             activity!!.fab.apply {
                 setOnClickListener {

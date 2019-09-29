@@ -45,7 +45,6 @@ import com.afterroot.expenses.viewmodel.ExpensesViewModel
 import com.afterroot.expenses.viewmodel.ViewModelState
 import com.afterroot.expenses.visible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.android.synthetic.main.fragment_expense_summary.*
 
@@ -102,13 +101,6 @@ class ExpenseSummaryDialogFragment : BottomSheetDialogFragment(), ItemSelectedCa
 
                 }
             }
-
-            override fun onFailed(message: String) {
-            }
-
-            override fun onSnapshot(snapshot: DocumentSnapshot) {
-            }
-
         })
 
     }
@@ -196,9 +188,6 @@ class ExpenseSummaryDialogFragment : BottomSheetDialogFragment(), ItemSelectedCa
     }
 
     override fun onClick(position: Int, view: View?) {
-    }
-
-    override fun onLongClick(position: Int) {
     }
 
     private fun loaded(loaded: Boolean) {

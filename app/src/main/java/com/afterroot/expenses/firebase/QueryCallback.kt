@@ -20,6 +20,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 
 interface QueryCallback<in T> {
     fun onSuccess(value: T)
-    fun onFailed(message: String)
-    fun onSnapshot(snapshot: DocumentSnapshot)
+    fun onFailed(message: String) {}
+    fun onSnapshot(snapshot: DocumentSnapshot) {}
 }

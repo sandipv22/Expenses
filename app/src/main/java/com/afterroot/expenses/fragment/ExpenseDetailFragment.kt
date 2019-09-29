@@ -33,7 +33,6 @@ import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.firebase.QueryCallback
 import com.afterroot.expenses.model.ExpenseItem
 import com.afterroot.expenses.model.User
-import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_expense_detail.*
 import kotlinx.android.synthetic.main.fragment_expense_detail.view.*
@@ -81,22 +80,13 @@ class ExpenseDetailFragment : Fragment() {
         activity!!.toolbar.title = item!!.note
 
         Database.getUserByID(item!!.paidBy!!, object : QueryCallback<User> {
-            override fun onSnapshot(snapshot: DocumentSnapshot) {
-
-            }
-
             override fun onSuccess(value: User) {
                 try {
                     detail_paid_by?.text = value.name
                     activity!!.toolbar.subtitle = "Paid by ${value.name}"
                 } catch (ignored: Exception) {
                 }
-
             }
-
-            override fun onFailed(message: String) {
-            }
-
         })
         val builder = StringBuilder()
         var i = 0

@@ -27,13 +27,8 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.fragment.app.Fragment
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.transition.ChangeTransform
-import androidx.transition.Fade
-import androidx.transition.Slide
-import androidx.transition.TransitionSet
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import com.afterroot.expenses.Constants
@@ -49,7 +44,6 @@ import com.afterroot.expenses.model.User
 import com.afterroot.expenses.ui.ListClickCallbacks
 import com.afterroot.expenses.visible
 import com.google.android.material.chip.Chip
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
@@ -104,19 +98,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
             override fun onSuccess(value: HashMap<String, User>) {
                 mapUserValues(value)
             }
-
-            override fun onFailed(message: String) {
-            }
-
-            override fun onSnapshot(snapshot: DocumentSnapshot) {
-            }
-
         })
-        val transitionSet = TransitionSet().addTransition(Slide()).addTransition(Fade()).addTransition(ChangeTransform())
-        transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
-        transitionSet.duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-        transitionSet.interpolator = LinearOutSlowInInterpolator()
-        enterTransition = transitionSet
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -175,19 +157,13 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                     view.apply {
                         text_input_amount.setText(item!!.amount.toString())
                         text_input_category.text = category
-                        text_input_date.text = SimpleDateFormat(getString(R.string.date_time_format), Locale.US).format(item!!.date)
+                        text_input_date.text =
+                            SimpleDateFormat(getString(R.string.date_time_format), Locale.US).format(item?.date!!)
                         text_input_note.setText(item!!.note)
                         text_paid_by.text = value.name
                     }
                     activity!!.progress.visible(false)
                 }
-
-                override fun onFailed(message: String) {
-                }
-
-                override fun onSnapshot(snapshot: DocumentSnapshot) {
-                }
-
             })
 
         }
@@ -201,11 +177,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                     category = item!!.name
                     text_input_category.text = item.name
                 }
-
-                override fun onListItemLongClick(item: Category?, docId: String, position: Int) {
-
-                }
-
             }).show(activity!!.supportFragmentManager, "category")
         }
         view!!.text_paid_by.setOnClickListener {
@@ -230,13 +201,6 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                             }
                         }
                     }
-
-                    override fun onFailed(message: String) {
-                    }
-
-                    override fun onSnapshot(snapshot: DocumentSnapshot) {
-                    }
-
                 })
             }
 
@@ -256,36 +220,40 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                     val groupRef = db.collection(DBConstants.GROUPS).document(groupID)
                     val reference = groupRef.collection(DBConstants.EXPENSES)
                     if (item != null) {
-                        item = ExpenseItem(view!!.text_input_amount.text.toString().toLong(),
-                                category,
-                                item!!.date,
-                                view!!.text_input_note.text.toString(), paidByID,
-                                finalMap,
-                                hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!),
-                                hashMapOf(paidByID to usersMap[paidByID]!!.name)
+                        item = ExpenseItem(
+                            view!!.text_input_amount.text.toString().toLong(),
+                            category,
+                            item!!.date,
+                            view!!.text_input_note.text.toString(), paidByID,
+                            finalMap,
+                            hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!),
+                            hashMapOf(paidByID to usersMap[paidByID]!!.name)
                         )
                         reference.document(expenseDocNo!!).set(item!!).addOnSuccessListener {
                             val batch = Database.getInstance().batch()
-                            val map = hashMapOf("lastEntry" to Date(millis),
-                                    "lastEntryText" to "Edited: ${usersMap[paidByID]!!.name} : ${view!!.text_input_note.text.toString()}"
+                            val map = hashMapOf(
+                                "lastEntry" to Date(millis),
+                                "lastEntryText" to "Edited: ${usersMap[paidByID]!!.name} : ${view!!.text_input_note.text.toString()}"
                             )
                             batch.update(groupRef, map)
                             batch.commit()
                             this@AddExpenseFragment.view!!.findNavController().popBackStack()
                         }
                     } else {
-                        item = ExpenseItem(view!!.text_input_amount.text.toString().toLong(),
-                                category,
-                                Date(millis),
-                                view!!.text_input_note.text.toString(), paidByID,
-                                finalMap,
-                                hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!),
-                                hashMapOf(paidByID to referenceMap[paidByID]!!.name)
+                        item = ExpenseItem(
+                            view!!.text_input_amount.text.toString().toLong(),
+                            category,
+                            Date(millis),
+                            view!!.text_input_note.text.toString(), paidByID,
+                            finalMap,
+                            hashMapOf(FirebaseUtils.auth!!.uid!! to FirebaseUtils.auth!!.currentUser!!.displayName!!),
+                            hashMapOf(paidByID to referenceMap[paidByID]!!.name)
                         )
                         reference.add(item!!).addOnCompleteListener {
                             val batch = Database.getInstance().batch()
-                            val map = hashMapOf("lastEntry" to Date(millis),
-                                    "lastEntryText" to "${usersMap[paidByID]!!.name} : ${view!!.text_input_note.text.toString()}"
+                            val map = hashMapOf(
+                                "lastEntry" to Date(millis),
+                                "lastEntryText" to "${usersMap[paidByID]!!.name} : ${view!!.text_input_note.text.toString()}"
                             )
                             batch.update(groupRef, map)
                             batch.commit()

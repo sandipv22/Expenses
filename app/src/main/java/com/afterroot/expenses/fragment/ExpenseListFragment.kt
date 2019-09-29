@@ -59,8 +59,10 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     private var expenseAdapter: ExpenseAdapterDelegate? = null
     private var mSnapshot: QuerySnapshot? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_expense_list, container, false)
     }
 
@@ -100,8 +102,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
         return when (item.itemId) {
             R.id.action_view_summary -> {
                 val fragment = ExpenseSummaryDialogFragment()
-                val bundle = bundleOf(Constants.ARG_GROUP_ID to groupDocID)
-                fragment.arguments = bundle
+                fragment.arguments = bundleOf(Constants.ARG_GROUP_ID to groupDocID)
                 fragment.show(parentFragmentManager, "summary")
                 true
             }
@@ -140,20 +141,21 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     override fun onClick(position: Int, view: View?) {
         val expenseItem = mSnapshot!!.documents[position].toObject(ExpenseItem::class.java) as ExpenseItem
         val bundle = bundleOf(
-                Constants.KEY_EXPENSE_SERIALIZE to expenseItem,
-                "ANIM_AMOUNT" to ViewCompat.getTransitionName(view!!.item_amount),
-                "ANIM_CATEGORY" to ViewCompat.getTransitionName(view.item_category),
-                "ANIM_NOTE" to ViewCompat.getTransitionName(view.item_note),
-                "ANIM_DATE" to ViewCompat.getTransitionName(view.item_date),
-                "ANIM_PAID_BY" to ViewCompat.getTransitionName(view.item_paid_by)
+            Constants.KEY_EXPENSE_SERIALIZE to expenseItem,
+            "ANIM_AMOUNT" to ViewCompat.getTransitionName(view!!.item_amount),
+            "ANIM_CATEGORY" to ViewCompat.getTransitionName(view.item_category),
+            "ANIM_NOTE" to ViewCompat.getTransitionName(view.item_note),
+            "ANIM_DATE" to ViewCompat.getTransitionName(view.item_date),
+            "ANIM_PAID_BY" to ViewCompat.getTransitionName(view.item_paid_by)
         )
         with(view) {
             val extras = FragmentNavigatorExtras(
-                    this.item_amount to ViewCompat.getTransitionName(this.item_amount)!!,
-                    this.item_category to ViewCompat.getTransitionName(this.item_category)!!,
-                    this.item_note to ViewCompat.getTransitionName(this.item_note)!!,
-                    this.item_date to ViewCompat.getTransitionName(this.item_date)!!,
-                    this.item_paid_by to ViewCompat.getTransitionName(this.item_paid_by)!!)
+                this.item_amount to ViewCompat.getTransitionName(this.item_amount)!!,
+                this.item_category to ViewCompat.getTransitionName(this.item_category)!!,
+                this.item_note to ViewCompat.getTransitionName(this.item_note)!!,
+                this.item_date to ViewCompat.getTransitionName(this.item_date)!!,
+                this.item_paid_by to ViewCompat.getTransitionName(this.item_paid_by)!!
+            )
             this@ExpenseListFragment.view!!.findNavController().navigate(R.id.toExpenseDetail, bundle, null, extras)
         }
     }
@@ -178,20 +180,18 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
             item_delete.setOnClickListener {
                 dismiss()
                 AlertDialog.Builder(view!!.context)
-                        .setTitle(getString(R.string.text_dialog_confirm))
-                        .setMessage(getString(R.string.msg_dialog_delete_expense))
-                        .setPositiveButton(getString(R.string.text_delete)) { _, _ ->
-                            val reference = Database.getInstance().collection(DBConstants.GROUPS).document(groupDocID).collection(DBConstants.EXPENSES)
-                            Database.delete(reference.document(docId), object : DeleteListener {
-                                override fun onDeleteSuccess() {
-                                    expenseAdapter!!.notifyItemRemoved(position)
-                                }
-
-                                override fun onDeleteFailed() {
-                                }
-                            })
-                        }.setNegativeButton(getString(R.string.text_cancel)) { _, _ ->
-                        }.show()
+                    .setTitle(getString(R.string.text_dialog_confirm))
+                    .setMessage(getString(R.string.msg_dialog_delete_expense))
+                    .setPositiveButton(getString(R.string.text_delete)) { _, _ ->
+                        val reference = Database.getInstance().collection(DBConstants.GROUPS).document(groupDocID)
+                            .collection(DBConstants.EXPENSES)
+                        Database.delete(reference.document(docId), object : DeleteListener {
+                            override fun onDeleteSuccess() {
+                                expenseAdapter!!.notifyItemRemoved(position)
+                            }
+                        })
+                    }.setNegativeButton(getString(R.string.text_cancel)) { _, _ ->
+                    }.show()
             }
         }
     }
