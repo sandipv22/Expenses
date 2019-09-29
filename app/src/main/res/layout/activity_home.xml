@@ -20,7 +20,9 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.HomeActivity">
+    android:fitsSystemWindows="false"
+    tools:context=".ui.HomeActivity"
+    tools:theme="@style/MyTheme.Main">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -31,10 +33,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:animateLayoutChanges="true"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            android:theme="@style/MyTheme.AppBarOverlay"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+            app:popupTheme="@style/MyTheme.PopupOverlay"
             app:title="@string/app_name" />
 
     </com.google.android.material.appbar.AppBarLayout>

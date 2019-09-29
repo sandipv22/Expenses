@@ -102,21 +102,6 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/text_paid_by"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:drawablePadding="@dimen/text_drawable_padding"
-            android:drawableStart="@drawable/ic_person"
-            android:layout_gravity="bottom"
-            android:padding="@dimen/text_item_padding"
-            android:text="@string/paid_by"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_input_layout_note" />
-
-        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_spenders"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -165,6 +150,22 @@
                 android:layout_marginTop="4dp"
                 app:singleLine="true" />
         </HorizontalScrollView>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/text_paid_by"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawablePadding="@dimen/text_drawable_padding"
+            android:drawableStart="@drawable/ic_person"
+            android:layout_gravity="bottom"
+            android:padding="@dimen/text_item_padding"
+            android:text="@string/paid_by"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:fontFamily="@font/ubuntu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_input_layout_note" />
 
         <Space
             android:layout_width="wrap_content"

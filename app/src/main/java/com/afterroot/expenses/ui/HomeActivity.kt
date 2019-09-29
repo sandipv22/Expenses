@@ -65,7 +65,7 @@ class HomeActivity : AppCompatActivity() {
     private var homeFragmentId = R.id.groupsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme_NoActionBar)
+        setTheme(R.style.MyTheme_Main)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
@@ -97,7 +97,7 @@ class HomeActivity : AppCompatActivity() {
         host_nav_fragment.findNavController().addOnDestinationChangedListener { controller, destination, _ ->
             with(mFab) {
                 hide()
-                setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.onSecondary))
+                setImageDrawable(getDrawableExt(R.drawable.ic_add, R.color.color_on_secondary))
             }
             if (mActionMenu != null && mActionMenu?.size!! > 0) {
                 mActionMenu?.removeItem(R.id.action_view_summary)
@@ -114,14 +114,14 @@ class HomeActivity : AppCompatActivity() {
                     handler.postDelayed({
                         with(mFab) {
                             show()
-                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.onSecondary))
+                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.color_on_secondary))
                         }
                     }, 150)
                 }
                 R.id.addExpenseFragment -> {
                     toolbar.title = destination.label
                     with(mFab) {
-                        setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.onSecondary))
+                        setImageDrawable(getDrawableExt(R.drawable.ic_done, R.color.color_on_secondary))
                         show()
                     }
                 }
@@ -132,7 +132,7 @@ class HomeActivity : AppCompatActivity() {
                     handler.postDelayed({
                         with(mFab) {
                             show()
-                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.onSecondary))
+                            setImageDrawable(getDrawableExt(R.drawable.ic_save, R.color.color_on_secondary))
                         }
                     }, 150)
                 }
@@ -234,7 +234,7 @@ class HomeActivity : AppCompatActivity() {
                     startActivityForResult(AuthUI.getInstance()
                             .createSignInIntentBuilder()
                             .setIsSmartLockEnabled(true)
-                            .setTheme(R.style.AppTheme)
+                        .setTheme(R.style.MyTheme_Main)
                             .setAvailableProviders(arrayListOf(AuthUI.IdpConfig.PhoneBuilder().build(),
                                     AuthUI.IdpConfig.GoogleBuilder().build()))
                             .build(), Constants.RC_SIGN_IN)

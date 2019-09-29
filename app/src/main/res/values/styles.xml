@@ -16,33 +16,8 @@
 
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/secondaryColor</item>
-        <item name="android:windowTranslucentStatus">@bool/translucent_status</item>
-        <item name="android:windowTranslucentNavigation">@bool/translucent_navigation</item>
-        <item name="drawerArrowStyle">@style/AppTheme.DrawerArrow</item>
-        <item name="chipStyle">@style/FilterChip</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.Launch">
-        <item name="android:windowBackground">@drawable/launch_screen</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" />
-
-    <style name="AppTheme.DrawerArrow" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/onPrimary</item>
+    <style name="MyTheme.DrawerArrow" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/color_on_primary</item>
         <item name="barLength">12dp</item>
     </style>
 
@@ -53,14 +28,6 @@
         <item name="chipBackgroundColor">@color/chip_background</item>
     </style>
 
-    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
-
-    <style name="BaseBottomSheetDialog" parent="@style/Theme.MaterialComponents.Light.BottomSheetDialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="bottomSheetStyle">@style/BottomSheet</item>
-    </style>
-
-    <style name="BottomSheet" parent="@style/Widget.MaterialComponents.BottomSheet.Modal">
-        <item name="android:background">@drawable/bs_background</item>
-    </style>
+    <!--Toolbar-->
+    <style name="Widget.MyTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary" />
 </resources>

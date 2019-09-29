@@ -38,7 +38,7 @@
         android:id="@+id/button_add_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/onSecondary"
+        android:background="@color/color_on_secondary"
         android:layout_marginEnd="8dp"
         android:padding="8dp"
         app:fabSize="mini"

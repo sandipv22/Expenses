@@ -91,7 +91,7 @@ android {
 
 configurations.all {
     resolutionStrategy {
-//        force 'com.squareup.okio:okio:1.15.0'
+        //add dependencies here if any resolution error occurs in build
     }
 }
 

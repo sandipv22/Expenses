@@ -214,7 +214,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                     title(R.string.paid_by)
                     listItems(items = names) { _, position, _ ->
                         paidByID = users[position].uid
-                        view!!.text_paid_by.text = users[position].name
+                        view.text_paid_by.text = users[position].name
                     }
                 }
             } else {
@@ -226,7 +226,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
                             title(R.string.paid_by)
                             listItems(items = names) { _, position, _ ->
                                 paidByID = users[position].uid
-                                view!!.text_paid_by.text = users[position].name
+                                view.text_paid_by.text = users[position].name
                             }
                         }
                     }
@@ -244,7 +244,7 @@ class AddExpenseFragment : Fragment(), DatePickerDialog.OnDateSetListener, TimeP
 
         activity!!.fab.apply {
             if (item != null) {
-                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save, R.color.onSecondary))
+                setImageDrawable(activity!!.getDrawableExt(R.drawable.ic_save, R.color.color_on_secondary))
             }
             setOnClickListener {
                 if (verifyData()) {
