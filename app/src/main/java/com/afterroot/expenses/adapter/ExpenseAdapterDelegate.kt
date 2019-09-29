@@ -32,6 +32,7 @@ class ExpenseAdapterDelegate(callbacks: ItemSelectedCallback) : RecyclerView.Ada
             put(Expense.TYPE_GROUP, GroupDelegateAdapter(callbacks))
             put(Expense.TYPE_EXPENSE, ExpenseListDelegateAdapter(callbacks))
             put(Expense.TYPE_GROUP_ALT, GroupAltDelegateAdapter(callbacks))
+            put(Expense.TYPE_EXPENSE_SUMMARY, ExpenseSummaryDelegateAdapter(callbacks))
         }
     }
 

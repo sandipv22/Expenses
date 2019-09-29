@@ -16,14 +16,6 @@
 
 package com.afterroot.expenses.model
 
-interface Expense {
-
-    fun getType(): Int
-
-    companion object {
-        const val TYPE_GROUP = 1
-        const val TYPE_EXPENSE = 2
-        const val TYPE_GROUP_ALT = 3
-        const val TYPE_EXPENSE_SUMMARY = 4
-    }
+data class ExpensesSummary(val name: String, val payable: Long = 0, val receivable: Long = 0) : Expense {
+    override fun getType() = Expense.TYPE_EXPENSE_SUMMARY
 }
