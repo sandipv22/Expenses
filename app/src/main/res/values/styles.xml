@@ -30,4 +30,6 @@
 
     <!--Toolbar-->
     <style name="Widget.MyTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary" />
+
+    <style name="MyTheme.TextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox" />
 </resources>
