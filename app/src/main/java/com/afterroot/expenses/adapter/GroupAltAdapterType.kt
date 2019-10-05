@@ -25,7 +25,7 @@ import com.afterroot.expenses.inflate
 import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.Group
 
-class GroupAltDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
+class GroupAltAdapterType(val callbacks: ItemSelectedCallback) : AdapterType {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = GroupAltVH(parent)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: Expense) {

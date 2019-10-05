@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
-import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
+import com.afterroot.expenses.adapter.DelegateAdapter
 import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
@@ -56,7 +56,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     private val _tag = "ExpenseListFragment"
     private val args: ExpenseListFragmentArgs by navArgs()
     private val expensesViewModel: ExpensesViewModel by viewModels()
-    private var expenseAdapter: ExpenseAdapterDelegate? = null
+    private var adapter: DelegateAdapter? = null
     private var mSnapshot: QuerySnapshot? = null
 
     override fun onCreateView(
@@ -111,13 +111,13 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
     }
 
     private fun initFirebaseDb() {
-        expenseAdapter = ExpenseAdapterDelegate(this)
+        adapter = DelegateAdapter(this)
 
         list.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm
             addItemDecoration(DividerItemDecoration(this.context, lm.orientation))
-            this.adapter = expenseAdapter
+            adapter = this@ExpenseListFragment.adapter
         }
 
         expensesViewModel.getSnapshot(groupDocID).observe(this, Observer<ViewModelState> { state ->
@@ -128,7 +128,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
 
                 is ViewModelState.Loaded<*> -> {
                     mSnapshot = state.data as QuerySnapshot
-                    expenseAdapter!!.add(mSnapshot!!.toObjects(ExpenseItem::class.java) as List<ExpenseItem>)
+                    adapter!!.add(mSnapshot!!.toObjects(ExpenseItem::class.java) as List<ExpenseItem>)
                     activity?.apply {
                         progress?.visible(false)
                         text_no_expenses.visible(mSnapshot!!.documents.size == 0)
@@ -187,7 +187,7 @@ class ExpenseListFragment : Fragment(), ItemSelectedCallback {
                             .collection(DBConstants.EXPENSES)
                         Database.delete(reference.document(docId), object : DeleteListener {
                             override fun onDeleteSuccess() {
-                                expenseAdapter!!.notifyItemRemoved(position)
+                                adapter!!.notifyItemRemoved(position)
                             }
                         })
                     }.setNegativeButton(getString(R.string.text_cancel)) { _, _ ->

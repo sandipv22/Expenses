@@ -33,7 +33,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
-import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
+import com.afterroot.expenses.adapter.DelegateAdapter
 import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
@@ -55,7 +55,7 @@ import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 
 class GroupsFragment : Fragment(), ItemSelectedCallback {
-    private var groupsAdapter: ExpenseAdapterDelegate? = null
+    private var groupsAdapter: DelegateAdapter? = null
     lateinit var db: FirebaseFirestore
     private val _tag = "GroupsFragment"
     private lateinit var _context: Context
@@ -91,7 +91,7 @@ class GroupsFragment : Fragment(), ItemSelectedCallback {
     private var mSnapshot: QuerySnapshot? = null
     private fun initFirebaseDb() {
         activity!!.progress.visibility = View.VISIBLE
-        groupsAdapter = ExpenseAdapterDelegate(this)
+        groupsAdapter = DelegateAdapter(this)
         list?.apply {
             val lm = LinearLayoutManager(this.context)
             layoutManager = lm

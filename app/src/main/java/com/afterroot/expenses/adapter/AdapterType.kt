@@ -20,7 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.expenses.model.Expense
 
-interface TypeDelegateAdapter {
+interface AdapterType {
     fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder
     fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: Expense)
 }

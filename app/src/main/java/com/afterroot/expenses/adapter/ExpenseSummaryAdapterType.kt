@@ -26,7 +26,7 @@ import com.afterroot.expenses.model.Expense
 import com.afterroot.expenses.model.ExpensesSummary
 import kotlinx.android.synthetic.main.list_item_expense_summary.view.*
 
-class ExpenseSummaryDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
+class ExpenseSummaryAdapterType(val callbacks: ItemSelectedCallback) : AdapterType {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = ViewHolder(parent)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: Expense) {

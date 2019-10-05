@@ -33,7 +33,7 @@ import kotlinx.android.synthetic.main.list_item_expense.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ExpenseListDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
+class ExpenseListAdapterType(val callbacks: ItemSelectedCallback) : AdapterType {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = ExpenseVH(parent)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: Expense) {

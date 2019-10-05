@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.AutoTransition
 import com.afterroot.expenses.Constants
 import com.afterroot.expenses.R
-import com.afterroot.expenses.adapter.ExpenseAdapterDelegate
+import com.afterroot.expenses.adapter.DelegateAdapter
 import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.database.DBConstants
 import com.afterroot.expenses.database.Database
@@ -55,7 +55,7 @@ class ExpenseSummaryDialogFragment : BottomSheetDialogFragment(), ItemSelectedCa
     private val names = ArrayList<String>()
     private val uidMap = SparseArray<User>()
     private var rawUserMap = HashMap<String, User>()
-    private var myAdapter: ExpenseAdapterDelegate? = null
+    private var myAdapter: DelegateAdapter? = null
     private var mGroupId: String? = null
     private var mSnapshot: QuerySnapshot? = null
     private var mList = ArrayList<Expense>()
@@ -175,7 +175,7 @@ class ExpenseSummaryDialogFragment : BottomSheetDialogFragment(), ItemSelectedCa
     }
 
     private fun loadToAdapter(list: ArrayList<ExpensesSummary>) {
-        myAdapter = ExpenseAdapterDelegate(this)
+        myAdapter = DelegateAdapter(this)
 
         expense_summary_members_list.apply {
             val lm = LinearLayoutManager(context)

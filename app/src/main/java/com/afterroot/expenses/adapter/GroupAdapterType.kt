@@ -28,7 +28,7 @@ import com.afterroot.expenses.utils.Utils
 import kotlinx.android.synthetic.main.list_item_group.view.*
 import java.util.*
 
-class GroupDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAdapter {
+class GroupAdapterType(val callbacks: ItemSelectedCallback) : AdapterType {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder = GroupVH(parent)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, item: Expense) {
