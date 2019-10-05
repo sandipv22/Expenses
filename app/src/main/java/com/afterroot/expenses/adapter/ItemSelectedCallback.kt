@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.afterroot.expenses.adapter.callback
+package com.afterroot.expenses.adapter
 
 import android.view.View
 

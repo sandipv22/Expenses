@@ -21,7 +21,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.afterroot.expenses.R
-import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.firebase.QueryCallback
 import com.afterroot.expenses.inflate

@@ -19,7 +19,6 @@ package com.afterroot.expenses.adapter
 import android.view.ViewGroup
 import androidx.collection.SparseArrayCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.afterroot.expenses.adapter.callback.ItemSelectedCallback
 import com.afterroot.expenses.model.Expense
 import java.util.*
 
