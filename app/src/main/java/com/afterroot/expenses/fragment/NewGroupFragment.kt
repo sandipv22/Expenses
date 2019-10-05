@@ -16,34 +16,25 @@
 
 package com.afterroot.expenses.fragment
 
-import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CursorAdapter
 import android.widget.MultiAutoCompleteTextView
-import androidx.core.os.bundleOf
-import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
-import androidx.loader.app.LoaderManager
-import androidx.loader.content.CursorLoader
-import androidx.loader.content.Loader
 import androidx.navigation.fragment.findNavController
 import com.afterroot.expenses.R
 import com.afterroot.expenses.database.DBConstants
+import com.afterroot.expenses.database.Database
 import com.afterroot.expenses.firebase.FirebaseUtils
 import com.afterroot.expenses.getDrawableExt
 import com.afterroot.expenses.model.Group
 import com.afterroot.expenses.utils.Utils
 import com.afterroot.expenses.visible
 import com.android.ex.chips.BaseRecipientAdapter
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.fragment_new_group.*
@@ -51,90 +42,9 @@ import kotlinx.android.synthetic.main.fragment_new_group.view.*
 import org.jetbrains.anko.design.snackbar
 import java.util.*
 
-private val FROM_COLUMNS: Array<String> = arrayOf(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
-private val TO_IDS: IntArray = intArrayOf(android.R.id.text1)
-private val PROJECTION: Array<out String> = arrayOf(
-    ContactsContract.Contacts._ID,
-    ContactsContract.Contacts.LOOKUP_KEY,
-    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
-)
-private const val CONTACT_ID_INDEX: Int = 0
-private const val CONTACT_KEY_INDEX: Int = 1
-private const val SELECTION: String = "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} LIKE ?"
+class NewGroupFragment : Fragment() {
 
-class NewGroupFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
-
-    private var contactId: Long = 0
-    private var contactKey: String? = null
-    private var contactUri: Uri? = null
-    private var cursorAdapter: SimpleCursorAdapter? = null
-    private val searchString: String = ""
-    private val selectionArgs = arrayOf(searchString)
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        val loaderManager = LoaderManager.getInstance(this)
-        loaderManager.initLoader(id, null, this)
-        activity?.also {
-            cursorAdapter = SimpleCursorAdapter(
-                it,
-                android.R.layout.simple_list_item_1,
-                null,
-                FROM_COLUMNS, TO_IDS,
-                0
-            )
-        }
-        activity!!.autoCompleteTextView.apply {
-            setAdapter(cursorAdapter)
-            setOnItemClickListener { parent, view, position, id ->
-                val cursor = (parent.adapter as CursorAdapter).cursor.apply {
-                    moveToPosition(position)
-                    contactId = getLong(CONTACT_ID_INDEX)
-                    contactKey = getString(CONTACT_KEY_INDEX)
-                    contactUri = ContactsContract.Contacts.getLookupUri(contactId, contactKey)
-                }
-            }
-            addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                }
-
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                }
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    bundleOf("FILTER" to s.toString()).apply {
-                        loaderManager.restartLoader(id, this, this@NewGroupFragment)
-                    }
-                }
-
-            })
-        }
-    }
-
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-        selectionArgs[0] = "%${args?.getString("FILTER")}%"
-        return activity?.let {
-            return CursorLoader(
-                it,
-                ContactsContract.Contacts.CONTENT_URI,
-                PROJECTION,
-                SELECTION,
-                selectionArgs,
-                null
-            )
-        } ?: throw IllegalStateException()
-    }
-
-    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-        cursorAdapter?.swapCursor(data)
-    }
-
-    override fun onLoaderReset(loader: Loader<Cursor>) {
-        cursorAdapter?.swapCursor(null)
-    }
-
-    private val db = FirebaseFirestore.getInstance()
+    private val db by lazy { Database.getInstance() }
     private val _tag = "NewGroupFragment"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -146,8 +56,7 @@ class NewGroupFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         edit_text_group_members.apply {
             setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
         }
-        val recAdapter = BaseRecipientAdapter(BaseRecipientAdapter.QUERY_TYPE_PHONE, activity!!)
-        recAdapter.isShowMobileOnly = false
+        val recAdapter = BaseRecipientAdapter(BaseRecipientAdapter.QUERY_TYPE_EMAIL, activity!!)
         edit_text_group_members.setAdapter(recAdapter)
 
         activity!!.fab.apply {
@@ -156,7 +65,7 @@ class NewGroupFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             setOnClickListener {
                 if (verifyData()) {
                     val selected = view.edit_text_group_members.sortedRecipients
-                    val userMAp = HashMap<String?, Int>()
+                    val members = HashMap<String?, Int>()
                     activity!!.progress.visibility = View.VISIBLE
                     Log.d(_tag, "onActivityResult: Adding contacts to Map")
                     var size = selected.size
@@ -165,45 +74,46 @@ class NewGroupFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
                         val value = Utils.formatPhone(activity!!, item.entry.destination)
 
                         db.collection(DBConstants.USERS)
-                                .whereEqualTo(DBConstants.FIELD_PHONE, value)
-                                .get()
-                                .addOnSuccessListener { querySnapshot ->
-                                    if (querySnapshot.documents.isNotEmpty()) {
-                                        val id = querySnapshot.documents[0].id
-                                        Log.d(_tag, "getUID: Query Successful for $value, with id $id")
-                                        userMAp[id] = DBConstants.TYPE_MEMBER
-                                        size--
-                                        if (size == 0) {
-                                            userMAp[FirebaseUtils.firebaseUser!!.uid] = DBConstants.TYPE_ADMIN
-                                            activity!!.progress.visibility = View.VISIBLE
-                                            Log.d(_tag, "onCreateOptionsMenu: Creating Group")
-                                            val group = Group(
-                                                    view.edit_text_group_name.text.toString(),
-                                                    Date(),
-                                                    userMAp,
-                                                    null,
-                                                    null)
-                                            db.collection(DBConstants.GROUPS).add(group).addOnSuccessListener {
-                                                activity!!.apply {
-                                                    root_layout.snackbar("Group Created")
-                                                    progress.visible(false)
-                                                    host_nav_fragment.findNavController().navigateUp()
-                                                }
-                                            }.addOnFailureListener {
-                                                activity!!.apply {
-                                                    root_layout.snackbar("Group not created.")
-                                                    progress.visible(false)
-                                                }
+                            .whereEqualTo(DBConstants.FIELD_EMAIL, value)
+                            .get()
+                            .addOnSuccessListener { querySnapshot ->
+                                if (querySnapshot.documents.isNotEmpty()) {
+                                    val id = querySnapshot.documents[0].id
+                                    Log.d(_tag, "getUID: Query Successful for $value, with id $id")
+                                    members[id] = DBConstants.TYPE_MEMBER
+                                    size--
+                                    if (size == 0) {
+                                        members[FirebaseUtils.firebaseUser!!.uid] = DBConstants.TYPE_ADMIN
+                                        activity!!.progress.visibility = View.VISIBLE
+                                        Log.d(_tag, "onCreateOptionsMenu: Creating Group")
+                                        val group = Group(
+                                            view.edit_text_group_name.text.toString(),
+                                            Date(),
+                                            members,
+                                            null,
+                                            null
+                                        )
+                                        db.collection(DBConstants.GROUPS).add(group).addOnSuccessListener {
+                                            activity!!.apply {
+                                                root_layout.snackbar("Group Created")
+                                                progress.visible(false)
+                                                host_nav_fragment.findNavController().navigateUp()
+                                            }
+                                        }.addOnFailureListener {
+                                            activity!!.apply {
+                                                root_layout.snackbar("Group not created.")
+                                                progress.visible(false)
                                             }
                                         }
-                                    } else {
-                                        Log.d(_tag, "getUID: User Not Available")
-                                        activity!!.apply {
-                                            root_layout.snackbar("${item.entry.destination} is not available")
-                                            progress.visible(false)
-                                        }
                                     }
-                                }.addOnFailureListener { Log.d(_tag, "getUID: Query Failed") }
+                                } else {
+                                    Log.d(_tag, "getUID: User Not Available")
+                                    activity!!.apply {
+                                        root_layout.snackbar("${item.entry.destination} is not available")
+                                        progress.visible(false)
+                                    }
+                                }
+                            }.addOnFailureListener { Log.d(_tag, "getUID: Query Failed") }
                     }
                 }
             }
@@ -241,7 +151,7 @@ class NewGroupFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
                     }
 
                 })
-                ti_layout_group_members.error = "Group memebers can not be empty"
+                ti_layout_group_members.error = "Group members can not be empty"
                 false
             }
             else -> true

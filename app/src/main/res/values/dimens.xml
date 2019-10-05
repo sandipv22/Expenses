@@ -24,6 +24,7 @@
     <dimen name="list_item_height_two_line">64dp</dimen>
     <dimen name="list_item_height_single_line">56dp</dimen>
     <dimen name="card_corner_radius">16dp</dimen>
-    <dimen name="text_drawable_padding">8dp</dimen>
-    <dimen name="text_item_padding">16dp</dimen>
+    <dimen name="text_input_drawable_padding">8dp</dimen>
+    <dimen name="text_input_padding">16dp</dimen>
+    <dimen name="text_input_padding_half">8dp</dimen>
 </resources>
