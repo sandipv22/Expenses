@@ -38,7 +38,7 @@ class GroupDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAd
 
     inner class GroupVH(parent: ViewGroup) : RecyclerView.ViewHolder(parent.inflate(R.layout.list_item_group)) {
         private val itemName: AppCompatTextView = itemView.item_name
-        private val itemEmail: AppCompatTextView = itemView.item_email
+        private val itemSecondaryText: AppCompatTextView = itemView.item_secondary_text
         private val itemDate: AppCompatTextView = itemView.item_time
 
         fun bind(item: Group) {
@@ -46,7 +46,7 @@ class GroupDelegateAdapter(val callbacks: ItemSelectedCallback) : TypeDelegateAd
             if (item.lastEntry != null) {
                 itemDate.text = Utils.getDateDiff(item.lastEntry!!, Calendar.getInstance().time)
             }
-            itemEmail.text = item.lastEntryText
+            itemSecondaryText.text = item.lastEntryText
 
             with(super.itemView) {
                 tag = item

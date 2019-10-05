@@ -95,7 +95,7 @@ class ExpenseAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerVie
 
     inner class GroupViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val itemName: AppCompatTextView = view.item_name
-        private val itemEmail: AppCompatTextView = view.item_email
+        private val itemSecondaryText: AppCompatTextView = view.item_secondary_text
         private val itemDate: AppCompatTextView = view.item_time
 
         fun bindView(position: Int) {
@@ -123,8 +123,10 @@ class ExpenseAdapter(callbacks: ListClickCallbacks<QuerySnapshot>) : RecyclerVie
 
         fun bindView(position: Int) {
             val expenseItem = mList[position] as ExpenseItem
-            amountText.text = String.format("%s%d",
-                    amountText.context.resources.getString(R.string.rs_symbol), expenseItem.amount)
+            amountText.text = String.format(
+                "%s%d",
+                amountText.context.resources.getString(R.string.rs_symbol), expenseItem.amount
+            )
             noteText.text = String.format("%s, with %s", expenseItem.note, Utils.formatNames(expenseItem.with!!))
             categoryText.text = expenseItem.category
 

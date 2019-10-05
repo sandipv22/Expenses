@@ -17,17 +17,16 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ti_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:hint="@string/text_name"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:hint="@string/text_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -36,8 +35,9 @@
             android:id="@+id/input_profile_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="5dp"
             android:drawableStart="@drawable/ic_person"
+            android:drawableLeft="@drawable/ic_person"
+            android:drawablePadding="5dp"
             android:inputType="text|textPersonName"
             android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -46,11 +46,8 @@
         android:id="@+id/ti_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:hint="@string/text_email"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:hint="@string/text_email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ti_name">
@@ -59,8 +56,9 @@
             android:id="@+id/input_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="5dp"
             android:drawableStart="@drawable/ic_email"
+            android:drawableLeft="@drawable/ic_email"
+            android:drawablePadding="5dp"
             android:inputType="text|textEmailAddress"
             android:selectAllOnFocus="true"
             android:singleLine="true" />
@@ -70,11 +68,8 @@
         android:id="@+id/ti_phone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:hint="@string/text_mobile_number"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:hint="@string/text_mobile_number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ti_email">
@@ -83,8 +78,9 @@
             android:id="@+id/input_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="5dp"
             android:drawableStart="@drawable/ic_phone"
+            android:drawableLeft="@drawable/ic_phone"
+            android:drawablePadding="5dp"
             android:inputType="none|phone" />
     </com.google.android.material.textfield.TextInputLayout>
 
