@@ -65,7 +65,6 @@ class HomeActivity : AppCompatActivity() {
     private var homeFragmentId = R.id.groupsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.MyTheme_Main)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
